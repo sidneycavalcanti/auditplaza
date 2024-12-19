@@ -1,9 +1,39 @@
 import React, { useState } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, TextInput, ScrollView } from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useEffect } from 'react';
+
+import { NavigationContainer } from '@react-navigation/native';
+import { createStackNavigator } from '@react-navigation/stack';
+
+const Stack = createStackNavigator();
 
 const AuditoriaScreen = () => {
   const [activeTab, setActiveTab] = useState('Vendas'); // Define a aba ativa
 
+  const checkAuth = async () => {
+    const token = await AsyncStorage.getItem('token');
+    if (!token) {
+      return false; // Usuário não autenticado
+    }
+    return true; // Usuário autenticado
+  };
+
+  const checkAuthentication = async () => {
+    const isAuthenticated = await checkAuth();
+    if (!isAuthenticated) {
+      Alert.alert('Sessão expirada', 'Por favor, faça login novamente.');
+      navigation.navigate('Login'); // Redirecionar para a tela de login
+    }
+  };
+  
+
+
+useEffect(() => {
+  checkAuthentication();
+}, []);
+
+  
   // Componentes das abas
   const VendasTab = () => (
     <View style={styles.contentContainer}>

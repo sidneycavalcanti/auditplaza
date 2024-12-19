@@ -1,30 +1,40 @@
 import React, { useState } from 'react';
-import { View,Image, Text, TextInput, TouchableOpacity, StyleSheet, Alert } from 'react-native';
+import { View, Image, Text, TextInput, TouchableOpacity, StyleSheet, Alert } from 'react-native';
+import useAuth from '../hooks/useAuth'; // Importa o hook personalizado
 
 const LoginScreen = ({ navigation }) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const { login, loading, error } = useAuth(); // Usa o hook personalizado
 
-  const handleLogin = () => {
+  const handleLogin = async () => {
     if (!email || !password) {
       Alert.alert('Erro', 'Por favor, preencha todos os campos!');
-      navigation.navigate('Home');
-      //return;
+      return;
     }
-    Alert.alert('Login realizado', `Bem-vindo, ${email}`);
-    // Aqui você pode navegar para a próxima tela
-    // navigation.navigate('Home');
+
+    const response = await login(email, password); // Usa a função de login do hook
+
+    if (response.success) {
+      Alert.alert('Sucesso', `Bem-vindo, ${response.data.user.name}`);
+      navigation.navigate('Home'); // Navega para a tela Home
+    } else {
+    //  Alert.alert('Erro', response.error || 'Falha no login');
+    Alert.alert('Usuário o senha incorreto, favor tentar novamente.');
+    }
   };
 
   return (
     <View style={styles.container}>
-       <Image
+      {/* Logo */}
+      <Image
         style={styles.logo}
         source={require('../assets/logo.png')} // Substitua pelo caminho da sua imagem
       />
+
       {/* Título */}
       <Text style={styles.title}>Auditoria Plaza</Text>
-      
+
       {/* Campo de E-mail */}
       <View style={styles.inputContainer}>
         <TextInput
@@ -50,8 +60,8 @@ const LoginScreen = ({ navigation }) => {
       </View>
 
       {/* Botão de Login */}
-      <TouchableOpacity style={styles.button} onPress={handleLogin}>
-        <Text style={styles.buttonText}>Entrar</Text>
+      <TouchableOpacity style={styles.button} onPress={handleLogin} disabled={loading}>
+        <Text style={styles.buttonText}>{loading ? 'Entrando...' : 'Entrar'}</Text>
       </TouchableOpacity>
 
       {/* Links Adicionais */}
@@ -76,11 +86,11 @@ const styles = StyleSheet.create({
     padding: 20,
   },
   logo: {
-    width: 150, // Tamanho da imagem
+    width: 150,
     height: 150,
-    borderRadius: 100, // Torna a imagem redonda
-    resizeMode: 'cover', // Ajusta a imagem dentro do círculo
-    elevation: 10, 
+    borderRadius: 100,
+    resizeMode: 'cover',
+    elevation: 10,
     marginBottom: 20,
   },
   title: {
@@ -104,7 +114,7 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
     shadowRadius: 5,
-    elevation: 100, // Sombras para Android
+    elevation: 3,
     borderColor: '#ccc',
     borderWidth: 1,
   },
@@ -120,7 +130,7 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.2,
     shadowRadius: 5,
-    elevation: 3, // Sombras para Android
+    elevation: 3,
   },
   buttonText: {
     color: '#fff',
