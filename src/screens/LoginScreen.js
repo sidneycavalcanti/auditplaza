@@ -13,14 +13,18 @@ const LoginScreen = ({ navigation }) => {
       return;
     }
 
-    const response = await login(email, password); // Usa a função de login do hook
+    try {
+      const response = await login(email, password); // Usa a função de login do hook
 
-    if (response.success) {
-      Alert.alert('Sucesso', `Bem-vindo, ${response.data.user.name}`);
-      navigation.navigate('Home'); // Navega para a tela Home
-    } else {
-    //  Alert.alert('Erro', response.error || 'Falha no login');
-    Alert.alert('Usuário o senha incorreto, favor tentar novamente.');
+      if (response.success) {
+        Alert.alert('Sucesso', `Bem-vindo, ${response.data.user.name}`);
+        navigation.navigate('Home'); // Navega para a tela Home
+      } else {
+        Alert.alert('Erro', response.error || 'Usuário ou senha incorretos. Tente novamente.');
+      }
+    } catch (error) {
+      console.error('Erro inesperado no login:', error);
+      Alert.alert('Erro', 'Ocorreu um erro inesperado. Tente novamente mais tarde.');
     }
   };
 
@@ -39,7 +43,7 @@ const LoginScreen = ({ navigation }) => {
       <View style={styles.inputContainer}>
         <TextInput
           style={styles.input}
-          placeholder="E-mail"
+          placeholder="Digite seu usuário"
           placeholderTextColor="#888"
           keyboardType="email-address"
           value={email}
@@ -51,7 +55,7 @@ const LoginScreen = ({ navigation }) => {
       <View style={styles.inputContainer}>
         <TextInput
           style={styles.input}
-          placeholder="Senha"
+          placeholder="Digite sua senha"
           placeholderTextColor="#888"
           secureTextEntry
           value={password}

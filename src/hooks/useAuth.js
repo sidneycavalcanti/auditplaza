@@ -1,7 +1,6 @@
-// src/hooks/useAuth.js
 import { useState } from 'react';
 import axios from 'axios';
-import AsyncStorage from '@react-native-async-storage/async-storage'; // Instale se ainda não estiver instalado: npm install @react-native-async-storage/async-storage
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const useAuth = () => {
   const [loading, setLoading] = useState(false);
@@ -12,26 +11,28 @@ const useAuth = () => {
     setError(null);
 
     try {
-      // Enviar requisição para o endpoint de login
       const response = await axios.post('http://192.168.10.103:3000/auth/signin', {
         username,
         password,
       });
 
       if (response.status === 200 && response.data.token) {
-        // Armazenar o token JWT no AsyncStorage
+        console.log('Token recebido no login:', response.data.token);
+
         await AsyncStorage.setItem('token', response.data.token);
 
-        // Retornar sucesso com os dados do usuário
+        const storedToken = await AsyncStorage.getItem('token');
+        console.log('Token armazenado no AsyncStorage:', storedToken);
+
         return { success: true, data: response.data };
       } else {
-        setError('Login failed. Please check your credentials.');
-        return { success: false, error: 'Login failed' };
+        setError('Login falhou. Verifique suas credenciais.');
+        return { success: false, error: 'Login falhou' };
       }
     } catch (err) {
-      console.error(err);
-      setError('An error occurred during login. Please try again.');
-      return { success: false, error: 'An error occurred' };
+      console.error('Erro ao fazer login:', err);
+      setError('Ocorreu um erro ao tentar fazer login. Tente novamente.');
+      return { success: false, error: 'Erro ao fazer login' };
     } finally {
       setLoading(false);
     }
@@ -39,22 +40,39 @@ const useAuth = () => {
 
   const logout = async () => {
     try {
-      // Remover o token JWT do AsyncStorage
+      console.log('Removendo token do AsyncStorage...');
       await AsyncStorage.removeItem('token');
+      console.log('Token removido com sucesso.');
       return { success: true };
     } catch (err) {
-      console.error('Logout error:', err);
-      return { success: false, error: 'Logout failed' };
+      console.error('Erro ao fazer logout:', err);
+      return { success: false, error: 'Falha ao fazer logout' };
     }
   };
 
   const getToken = async () => {
     try {
       const token = await AsyncStorage.getItem('token');
+      console.log('Token recuperado:', token);
       return token;
     } catch (err) {
-      console.error('Error retrieving token:', err);
+      console.error('Erro ao recuperar o token:', err);
       return null;
+    }
+  };
+
+  const validateToken = async () => {
+    try {
+      const token = await AsyncStorage.getItem('token');
+      if (!token) {
+        console.log('Token não encontrado no AsyncStorage.');
+        return false;
+      }
+      console.log('Token válido encontrado:', token);
+      return true;
+    } catch (err) {
+      console.error('Erro ao validar o token:', err);
+      return false;
     }
   };
 
@@ -62,6 +80,7 @@ const useAuth = () => {
     login,
     logout,
     getToken,
+    validateToken,
     loading,
     error,
   };
