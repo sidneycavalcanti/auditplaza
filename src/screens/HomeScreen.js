@@ -9,28 +9,38 @@ import {
   Image,
   ActivityIndicator,
 } from 'react-native';
-import { format } from 'date-fns';
+import { format, isToday, parseISO } from 'date-fns'; // Importação de parseISO para converter a string ISO para Date
 import useAuditorias from '../hooks/useAuditorias';
 
 const HomeScreen = ({ navigation }) => {
   const [searchQuery, setSearchQuery] = useState('');
-  const { auditorias, loading, error } = useAuditorias(); // Usa o hook personalizado
+  const { auditorias, loading, error, fetchAuditorias } = useAuditorias();
 
   const handleAuditoria = (lojaId) => {
     navigation.navigate('Auditoria', { lojaId });
+    
   };
 
   const handleSearch = (text) => {
     setSearchQuery(text);
   };
 
+  // Ordenar auditorias pela data mais recente
+  const sortedAuditorias = auditorias
+    ?.map((item) => ({
+      ...item,
+      data: parseISO(item.data), // Converte string ISO para objeto Date
+    }))
+    .sort((a, b) => b.data - a.data);
+
   // Filtrar auditorias com base na busca
-  const filteredAuditorias = auditorias?.filter((item) =>
+  const filteredAuditorias = sortedAuditorias?.filter((item) =>
     item.loja?.name?.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
   const renderAuditoria = ({ item }) => {
-    const isDisponivel = item.status === 'Disponível';
+    // Verifica se a auditoria está disponível e se a data é hoje
+    const isDisponivel = isToday(item.data);
 
     return (
       <View style={styles.auditoriaItem}>
@@ -38,10 +48,10 @@ const HomeScreen = ({ navigation }) => {
           <Text style={styles.label}>Loja:</Text> {item.loja?.name || 'N/A'}
         </Text>
         <Text style={styles.auditoriaText}>
-          <Text style={styles.label}>Data:</Text> {format(new Date(item.data), 'dd/MM/yyyy')}
+          <Text style={styles.label}>Data:</Text> {format(item.data, 'dd/MM/yyyy')}
         </Text>
         <Text style={styles.auditoriaText}>
-          <Text style={styles.label}>Status:</Text> {item.status || 'Indisponível'}
+          <Text style={styles.label}>Status:</Text> {isDisponivel ? 'Disponível' : 'Indisponível'}
         </Text>
         <TouchableOpacity
           style={[styles.button, isDisponivel ? styles.buttonAtivo : styles.buttonInativo]}
@@ -68,12 +78,17 @@ const HomeScreen = ({ navigation }) => {
       <View style={styles.inputContainer}>
         <TextInput
           style={styles.input}
-          placeholder="Pesquisar auditorias..."
+          placeholder="Pesquisar auditorias por loja..."
           placeholderTextColor="#888"
           value={searchQuery}
           onChangeText={handleSearch}
         />
       </View>
+
+       {/* Botão de Refresh */}
+       <TouchableOpacity style={styles.refreshButton} onPress={fetchAuditorias}>
+        <Text style={styles.refreshButtonText}>Atualizar</Text>
+      </TouchableOpacity>
 
       {/* Feedback ao Usuário */}
       {loading && <ActivityIndicator size="large" color="#20B2AA" />}
@@ -186,6 +201,19 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: '#999',
     marginTop: 20,
+  },
+
+  refreshButton: {
+    backgroundColor: '#20B2AA',
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    borderRadius: 25,
+    marginBottom: 20,
+  },
+  refreshButtonText: {
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: 'bold',
   },
 });
 

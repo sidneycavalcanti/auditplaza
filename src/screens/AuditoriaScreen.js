@@ -104,7 +104,96 @@ const AuditoriaScreen = () => {
 };
 
 const styles = StyleSheet.create({
-  // ... estilos do seu código original
+  container: {
+    flex: 1,
+    backgroundColor: '#f5f5f5',
+  },
+  tabsContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+    backgroundColor: '#ddd',
+    paddingVertical: 10,
+    borderBottomWidth: 1,
+    borderBottomColor: '#ccc',
+  },
+  tabButton: {
+    paddingVertical: 10,
+    paddingHorizontal: 15,
+    borderRadius: 5,
+  },
+  activeTab: {
+    borderBottomWidth: 3,
+    borderBottomColor: '#20B2AA',
+  },
+  tabText: {
+    fontSize: 14,
+    fontWeight: 'bold',
+    color: '#333',
+  },
+  contentContainer: {
+    padding: 20,
+  },
+  sectionTitle: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    marginBottom: 10,
+    color: '#333',
+  },
+  input: {
+    backgroundColor: '#fff',
+    borderRadius: 10,
+    padding: 10,
+    marginBottom: 15,
+    borderColor: '#ccc',
+    borderWidth: 1,
+    fontSize: 16,
+  },
+  textArea: {
+    backgroundColor: '#fff',
+    borderRadius: 10,
+    padding: 10,
+    borderColor: '#ccc',
+    borderWidth: 1,
+    fontSize: 16,
+    minHeight: 100,
+    textAlignVertical: 'top',
+    marginBottom: 15,
+  },
+  checkboxContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginBottom: 20,
+  },
+  checkbox: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#fff',
+    padding: 10,
+    borderRadius: 10,
+    elevation: 2,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 5,
+  },
+  checkboxText: {
+    fontSize: 16,
+    marginLeft: 5,
+    color: '#333',
+  },
+  button: {
+    backgroundColor: '#20B2AA',
+    paddingVertical: 15,
+    borderRadius: 10,
+    marginBottom: 15,
+    alignItems: 'center',
+  },
+  buttonText: {
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: 'bold',
+  },
 });
+
 
 export default AuditoriaScreen;
