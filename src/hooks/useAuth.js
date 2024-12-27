@@ -11,11 +11,13 @@ const useAuth = () => {
     setError(null);
 
     try {
-      const response = await axios.post('http://192.168.10.103:3000/auth/signin', {
+      const response = await axios.post('https://back-auditoria.onrender.com/auth/signin', {
         username,
         password,
       });
 
+      return { success: true, data: response.data };
+    {/* 
       if (response.status === 200 && response.data.token) {
         console.log('Token recebido no login:', response.data.token);
 
@@ -24,15 +26,16 @@ const useAuth = () => {
         const storedToken = await AsyncStorage.getItem('token');
         console.log('Token armazenado no AsyncStorage:', storedToken);
 
-        return { success: true, data: response.data };
+        
       } else {
         setError('Login falhou. Verifique suas credenciais.');
         return { success: false, error: 'Login falhou' };
       }
+        */}
     } catch (err) {
       console.error('Erro ao fazer login:', err);
       setError('Ocorreu um erro ao tentar fazer login. Tente novamente.');
-      return { success: false, error: 'Erro ao fazer login' };
+      return { success: false, error: 'Usuário ou senha incorreto' };
     } finally {
       setLoading(false);
     }

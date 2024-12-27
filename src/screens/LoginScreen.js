@@ -17,10 +17,10 @@ const LoginScreen = ({ navigation }) => {
       const response = await login(email, password); // Usa a função de login do hook
 
       if (response.success) {
-        Alert.alert('Sucesso', `Bem-vindo, ${response.data.user.name}`);
+        Alert.alert(`Bem-vindo, ${response.data.user.username}`);
         navigation.navigate('Home'); // Navega para a tela Home
       } else {
-        Alert.alert('Erro', response.error || 'Usuário ou senha incorretos. Tente novamente.');
+        Alert.alert( response.error || 'Usuário ou senha incorretos. Tente novamente.');
       }
     } catch (error) {
       console.error('Erro inesperado no login:', error);

@@ -17,7 +17,7 @@ const useAuditorias = () => {
         throw new Error('Token JWT não encontrado. Por favor, faça login novamente.');
       }
 
-      const response = await axios.get('http://192.168.10.103:3000/auditoria/minha', {
+      const response = await axios.get('https://back-auditoria.onrender.com/auditoria/minha', {
         headers: {
           Authorization: `Bearer ${token}`,
         },
