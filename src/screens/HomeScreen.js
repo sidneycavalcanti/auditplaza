@@ -8,8 +8,9 @@ import {
   StyleSheet,
   Image,
   ActivityIndicator,
+  SafeAreaView,
 } from 'react-native';
-import { format, isToday, parseISO } from 'date-fns'; // Importação de parseISO para converter a string ISO para Date
+import { format, isToday, parseISO } from 'date-fns';
 import useAuditorias from '../hooks/useAuditorias';
 
 const HomeScreen = ({ navigation }) => {
@@ -18,28 +19,26 @@ const HomeScreen = ({ navigation }) => {
 
   const handleAuditoria = (lojaId) => {
     navigation.navigate('Auditoria', { lojaId });
-    
   };
 
   const handleSearch = (text) => {
     setSearchQuery(text);
   };
 
-  // Ordenar auditorias pela data mais recente
+  // Ordenar auditorias e converter datas
   const sortedAuditorias = auditorias
     ?.map((item) => ({
       ...item,
-      data: parseISO(item.data), // Converte string ISO para objeto Date
+      data: parseISO(item.data),
     }))
     .sort((a, b) => b.data - a.data);
 
-  // Filtrar auditorias com base na busca
+  // Filtrar auditorias pelo texto de busca
   const filteredAuditorias = sortedAuditorias?.filter((item) =>
     item.loja?.name?.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
   const renderAuditoria = ({ item }) => {
-    // Verifica se a auditoria está disponível e se a data é hoje
     const isDisponivel = isToday(item.data);
 
     return (
@@ -67,55 +66,68 @@ const HomeScreen = ({ navigation }) => {
   };
 
   return (
-    <View style={styles.container}>
-      {/* Logo */}
-      <Image style={styles.logo} source={require('../assets/logo.png')} />
+    <SafeAreaView style={styles.safeContainer}>
+      <View style={styles.container}>
+        {/* Logo e título */}
+        <Image style={styles.logo} source={require('../assets/logo.png')} />
+        <Text style={styles.title}>Minhas Auditorias</Text>
 
-      {/* Título */}
-      <Text style={styles.title}>Minhas Auditorias</Text>
+        {/* Campo de busca */}
+        <View style={styles.inputContainer}>
+          <TextInput
+            style={styles.input}
+            placeholder="Pesquisar auditorias por loja..."
+            placeholderTextColor="#888"
+            value={searchQuery}
+            onChangeText={handleSearch}
+          />
+        </View>
 
-      {/* Campo de Pesquisa */}
-      <View style={styles.inputContainer}>
-        <TextInput
-          style={styles.input}
-          placeholder="Pesquisar auditorias por loja..."
-          placeholderTextColor="#888"
-          value={searchQuery}
-          onChangeText={handleSearch}
-        />
-      </View>
+        {/* Botão de atualizar */}
+        <TouchableOpacity
+          style={styles.refreshButton}
+          onPress={fetchAuditorias}
+          disabled={loading}
+        >
+          <Text style={styles.refreshButtonText}>
+            {loading ? 'Atualizando...' : 'Atualizar'}
+          </Text>
+        </TouchableOpacity>
 
-       {/* Botão de Refresh */}
-       <TouchableOpacity style={styles.refreshButton} onPress={fetchAuditorias}>
-        <Text style={styles.refreshButtonText}>Atualizar</Text>
-      </TouchableOpacity>
+        {/* Indicador de carregamento */}
+        {loading && <ActivityIndicator size="large" color="#20B2AA" />}
 
-      {/* Feedback ao Usuário */}
-      {loading && <ActivityIndicator size="large" color="#20B2AA" />}
-      {error && <Text style={styles.errorText}>Erro ao buscar auditorias: {error}</Text>}
+        {/* Mensagem de erro */}
+        {error && <Text style={styles.errorText}>Erro ao buscar auditorias: {error}</Text>}
 
-      {/* Lista de Auditorias */}
-      {!loading && !error && filteredAuditorias?.length > 0 ? (
-        <FlatList
+        {/* Lista de auditorias */}
+        {!loading && !error && filteredAuditorias?.length > 0 ? (
+          <FlatList
           data={filteredAuditorias}
           keyExtractor={(item) => item.id?.toString()}
           renderItem={renderAuditoria}
           contentContainerStyle={styles.listContainer}
+          style={{ width: '100%' }} // Preenche toda a largura
+          showsVerticalScrollIndicator={false}
         />
-      ) : (
-        !loading &&
-        !error && <Text style={styles.noResultsText}>Nenhuma auditoria encontrada.</Text>
-      )}
-    </View>
+        ) : (
+          !loading && !error && (
+            <Text style={styles.noResultsText}>Nenhuma auditoria encontrada.</Text>
+          )
+        )}
+      </View>
+    </SafeAreaView>
   );
 };
 
 const styles = StyleSheet.create({
+  safeContainer: {
+    flex: 1,
+    backgroundColor: '#f5f5f5',
+  },
   container: {
     flex: 1,
-    justifyContent: 'flex-start',
     alignItems: 'center',
-    backgroundColor: '#f5f5f5',
     padding: 20,
   },
   logo: {
@@ -151,7 +163,8 @@ const styles = StyleSheet.create({
     borderWidth: 1,
   },
   listContainer: {
-    width: '100%',
+    flexGrow: 1,
+    paddingBottom: 20,
   },
   auditoriaItem: {
     backgroundColor: '#ffffff',
@@ -163,6 +176,7 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.1,
     shadowRadius: 3,
     elevation: 2,
+    width: '100%',
   },
   auditoriaText: {
     fontSize: 16,
@@ -196,13 +210,14 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: 'red',
     marginTop: 10,
+    textAlign: 'center',
   },
   noResultsText: {
     fontSize: 16,
     color: '#999',
     marginTop: 20,
+    textAlign: 'center',
   },
-
   refreshButton: {
     backgroundColor: '#20B2AA',
     paddingVertical: 10,

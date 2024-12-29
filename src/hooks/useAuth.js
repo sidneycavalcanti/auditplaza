@@ -16,22 +16,24 @@ const useAuth = () => {
         password,
       });
 
-      return { success: true, data: response.data };
-    {/* 
+      
+    
       if (response.status === 200 && response.data.token) {
-        console.log('Token recebido no login:', response.data.token);
+        //console.log('Token recebido no login:', response.data.token);
 
         await AsyncStorage.setItem('token', response.data.token);
 
         const storedToken = await AsyncStorage.getItem('token');
-        console.log('Token armazenado no AsyncStorage:', storedToken);
+       // console.log('Token armazenado no AsyncStorage:', storedToken);
 
         
       } else {
         setError('Login falhou. Verifique suas credenciais.');
         return { success: false, error: 'Login falhou' };
       }
-        */}
+
+      return { success: true, data: response.data };
+
     } catch (err) {
       console.error('Erro ao fazer login:', err);
       setError('Ocorreu um erro ao tentar fazer login. Tente novamente.');

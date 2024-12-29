@@ -1,11 +1,22 @@
 import React, { useState } from 'react';
-import { View, Image, Text, TextInput, TouchableOpacity, StyleSheet, Alert } from 'react-native';
-import useAuth from '../hooks/useAuth'; // Importa o hook personalizado
+import {
+  KeyboardAvoidingView,
+  View,
+  Image,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  StyleSheet,
+  Alert,
+  Platform,
+  ScrollView,
+} from 'react-native';
+import useAuth from '../hooks/useAuth';
 
 const LoginScreen = ({ navigation }) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const { login, loading, error } = useAuth(); // Usa o hook personalizado
+  const { login, loading, error } = useAuth();
 
   const handleLogin = async () => {
     if (!email || !password) {
@@ -14,13 +25,13 @@ const LoginScreen = ({ navigation }) => {
     }
 
     try {
-      const response = await login(email, password); // Usa a função de login do hook
+      const response = await login(email, password);
 
       if (response.success) {
         Alert.alert(`Bem-vindo, ${response.data.user.username}`);
-        navigation.navigate('Home'); // Navega para a tela Home
+        navigation.navigate('Home');
       } else {
-        Alert.alert( response.error || 'Usuário ou senha incorretos. Tente novamente.');
+        Alert.alert(response.error || 'Usuário ou senha incorretos. Tente novamente.');
       }
     } catch (error) {
       console.error('Erro inesperado no login:', error);
@@ -29,61 +40,63 @@ const LoginScreen = ({ navigation }) => {
   };
 
   return (
-    <View style={styles.container}>
-      {/* Logo */}
-      <Image
-        style={styles.logo}
-        source={require('../assets/logo.png')} // Substitua pelo caminho da sua imagem
-      />
+    <KeyboardAvoidingView
+      style={{ flex: 1 }}
+      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+    >
+      <ScrollView
+        contentContainerStyle={styles.container}
+        keyboardShouldPersistTaps="handled"
+      >
+        {/* Logo */}
+        <Image style={styles.logo} source={require('../assets/logo.png')} />
 
-      {/* Título */}
-      <Text style={styles.title}>Auditoria Plaza</Text>
+        {/* Título */}
+        <Text style={styles.title}>Auditoria Plaza</Text>
 
-      {/* Campo de E-mail */}
-      <View style={styles.inputContainer}>
-        <TextInput
-          style={styles.input}
-          placeholder="Digite seu usuário"
-          placeholderTextColor="#888"
-          keyboardType="email-address"
-          value={email}
-          onChangeText={setEmail}
-        />
-      </View>
+        {/* Mensagem de erro (se existir) */}
+        {error && <Text style={styles.errorText}>{error}</Text>}
 
-      {/* Campo de Senha */}
-      <View style={styles.inputContainer}>
-        <TextInput
-          style={styles.input}
-          placeholder="Digite sua senha"
-          placeholderTextColor="#888"
-          secureTextEntry
-          value={password}
-          onChangeText={setPassword}
-        />
-      </View>
+        {/* Campo de E-mail */}
+        <View style={styles.inputContainer}>
+          <TextInput
+            style={styles.input}
+            placeholder="Digite seu usuário"
+            placeholderTextColor="#888"
+            keyboardType="email-address"
+            value={email}
+            onChangeText={setEmail}
+          />
+        </View>
 
-      {/* Botão de Login */}
-      <TouchableOpacity style={styles.button} onPress={handleLogin} disabled={loading}>
-        <Text style={styles.buttonText}>{loading ? 'Entrando...' : 'Entrar'}</Text>
-      </TouchableOpacity>
+        {/* Campo de Senha */}
+        <View style={styles.inputContainer}>
+          <TextInput
+            style={styles.input}
+            placeholder="Digite sua senha"
+            placeholderTextColor="#888"
+            secureTextEntry
+            value={password}
+            onChangeText={setPassword}
+          />
+        </View>
 
-      {/* Links Adicionais */}
-      <View style={styles.linksContainer}>
-        <TouchableOpacity onPress={() => Alert.alert('Recuperação de senha')}>
-          <Text style={styles.linkText}>Esqueceu sua senha?</Text>
+        {/* Botão de Login */}
+        <TouchableOpacity
+          style={[styles.button, loading && styles.buttonDisabled]}
+          onPress={handleLogin}
+          disabled={loading}
+        >
+          <Text style={styles.buttonText}>{loading ? 'Entrando...' : 'Entrar'}</Text>
         </TouchableOpacity>
-        <TouchableOpacity onPress={() => Alert.alert('Criar conta')}>
-          <Text style={styles.linkText}>Criar uma conta</Text>
-        </TouchableOpacity>
-      </View>
-    </View>
+      </ScrollView>
+    </KeyboardAvoidingView>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
+    flexGrow: 1,
     justifyContent: 'center',
     alignItems: 'center',
     backgroundColor: '#f5f5f5',
@@ -94,8 +107,9 @@ const styles = StyleSheet.create({
     height: 150,
     borderRadius: 100,
     resizeMode: 'cover',
-    elevation: 10,
+    elevation: 20,
     marginBottom: 20,
+    marginTop: -50,
   },
   title: {
     fontSize: 32,
@@ -136,19 +150,18 @@ const styles = StyleSheet.create({
     shadowRadius: 5,
     elevation: 3,
   },
+  buttonDisabled: {
+    backgroundColor: '#b2d8d8',
+  },
   buttonText: {
     color: '#fff',
     fontSize: 18,
     fontWeight: 'bold',
   },
-  linksContainer: {
-    marginTop: 20,
-    alignItems: 'center',
-  },
-  linkText: {
-    color: '#20B2AA',
-    fontSize: 16,
-    marginTop: 10,
+  errorText: {
+    color: 'red',
+    fontSize: 14,
+    marginBottom: 10,
   },
 });
 
