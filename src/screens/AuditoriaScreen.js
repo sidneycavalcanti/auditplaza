@@ -7,13 +7,16 @@ import {
   TextInput,
   ScrollView,
   Alert,
+  FlatList,
 } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { Picker } from '@react-native-picker/picker';
 import { useNavigation } from '@react-navigation/native';
 
-const AuditoriaScreen = () => {
+const AuditoriaScreen = ({ route }) => {
   const [activeTab, setActiveTab] = useState('Vendas'); // Aba ativa
   const navigation = useNavigation(); // Navegação para outras telas
+  const { lojaName } = route.params || { lojaName: 'Nome da Loja' }; // Nome da loja vindo da rota ou padrão
 
   // Verificar a autenticação do usuário
   const checkAuthentication = async () => {
@@ -27,6 +30,32 @@ const AuditoriaScreen = () => {
   useEffect(() => {
     checkAuthentication();
   }, []);
+
+  const [selectedReason, setSelectedReason] = useState('');
+  const [observation, setObservation] = useState('');
+  const [losses, setLosses] = useState([]);
+  const [annotations, setAnnotations] = useState([]);
+  const [annotation, setAnnotation] = useState('');
+
+  const addLoss = () => {
+    if (!selectedReason || !observation) {
+      Alert.alert('Erro', 'Preencha todos os campos.');
+      return;
+    }
+    setLosses([...losses, { reason: selectedReason, observation }]);
+    setSelectedReason('');
+    setObservation('');
+  };
+
+  const addAnnotation = () => {
+    if (!annotation) {
+      Alert.alert('Erro', 'Preencha o campo de anotações.');
+      return;
+    }
+    setAnnotations([...annotations, annotation]);
+    setAnnotation('');
+  };
+  
 
   // Componentes para as abas
   const VendasTab = () => (
@@ -52,16 +81,6 @@ const AuditoriaScreen = () => {
         numberOfLines={4}
       />
 
-      {/* Checkboxes */}
-      <View style={styles.checkboxContainer}>
-        <TouchableOpacity style={styles.checkbox}>
-          <Text style={styles.checkboxText}>Troca</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.checkbox}>
-          <Text style={styles.checkboxText}>Virada</Text>
-        </TouchableOpacity>
-      </View>
-
       <TouchableOpacity style={styles.button}>
         <Text style={styles.buttonText}>Adicionar</Text>
       </TouchableOpacity>
@@ -77,7 +96,7 @@ const AuditoriaScreen = () => {
       masculino: { especulador: 0, acompanhante: 0, outros: 0 },
       feminino: { especulador: 0, acompanhante: 0, outros: 0 },
     });
-
+  
     const handleIncrement = (gender, type) => {
       setFluxo((prevState) => ({
         ...prevState,
@@ -87,7 +106,7 @@ const AuditoriaScreen = () => {
         },
       }));
     };
-
+  
     const handleDecrement = (gender, type) => {
       setFluxo((prevState) => ({
         ...prevState,
@@ -97,17 +116,17 @@ const AuditoriaScreen = () => {
         },
       }));
     };
-
+  
     return (
       <View style={styles.contentContainer}>
         <Text style={styles.sectionTitle}>Fluxo de Pessoas</Text>
-
+  
         {/* Cabeçalhos */}
         <View style={styles.headerRow}>
           <Text style={styles.headerText}>Masculino</Text>
           <Text style={styles.headerText}>Feminino</Text>
         </View>
-
+  
         {/* Categorias */}
         {['especulador', 'acompanhante', 'outros'].map((category) => (
           <View key={category} style={styles.row}>
@@ -130,7 +149,7 @@ const AuditoriaScreen = () => {
                 </TouchableOpacity>
               </View>
             </View>
-
+  
             {/* Feminino */}
             <View style={styles.counterGroup}>
               <Text style={styles.label}>{capitalizeFirstLetter(category)}</Text>
@@ -152,16 +171,98 @@ const AuditoriaScreen = () => {
             </View>
           </View>
         ))}
-
+  
         <TouchableOpacity style={styles.button}>
           <Text style={styles.buttonText}>Salvar Fluxo</Text>
         </TouchableOpacity>
       </View>
     );
   };
+  
+  const PerdasTab = () => (
+    <View style={styles.contentContainer}>
+      <Text style={styles.sectionTitle}>Motivo da Perda</Text>
+      <Picker
+        selectedValue={selectedReason}
+        onValueChange={(itemValue) => setSelectedReason(itemValue)}
+        style={styles.picker}
+      >
+        <Picker.Item label="Selecione um motivo" value="" />
+        <Picker.Item label="Quebra" value="Quebra" />
+        <Picker.Item label="Desperdício" value="Desperdício" />
+        <Picker.Item label="Outro" value="Outro" />
+      </Picker>
 
-  const capitalizeFirstLetter = (string) =>
-    string.charAt(0).toUpperCase() + string.slice(1);
+      <Text style={styles.sectionTitle}>Observação</Text>
+      <TextInput
+        style={styles.textArea}
+        placeholder="Digite suas observações"
+        placeholderTextColor="#888"
+        multiline
+        numberOfLines={4}
+        value={observation}
+        onChangeText={setObservation}
+      />
+
+      <TouchableOpacity style={styles.button} onPress={addLoss}>
+        <Text style={styles.buttonText}>Gravar</Text>
+      </TouchableOpacity>
+
+      <FlatList
+        data={losses}
+        keyExtractor={(_, index) => index.toString()}
+        renderItem={({ item }) => (
+          <View style={styles.listItem}>
+            <Text style={styles.listText}>Motivo: {item.reason}</Text>
+            <Text style={styles.listText}>Observação: {item.observation}</Text>
+          </View>
+        )}
+      />
+    </View>
+  );
+
+  const AnotacoesTab = () => (
+    <View style={styles.contentContainer}>
+      <Text style={styles.sectionTitle}>Anotações</Text>
+      <TextInput
+        style={styles.textArea}
+        placeholder="Digite suas anotações"
+        placeholderTextColor="#888"
+        multiline
+        numberOfLines={4}
+        value={annotation}
+        onChangeText={setAnnotation}
+      />
+
+      <TouchableOpacity style={styles.button} onPress={addAnnotation}>
+        <Text style={styles.buttonText}>Gravar</Text>
+      </TouchableOpacity>
+
+      <FlatList
+        data={annotations}
+        keyExtractor={(_, index) => index.toString()}
+        renderItem={({ item }) => (
+          <View style={styles.listItem}>
+            <Text style={styles.listText}>{item}</Text>
+          </View>
+        )}
+      />
+    </View>
+  );
+
+  const OutrosTab = () => (
+    <View style={styles.contentContainer}>
+      <TouchableOpacity style={styles.button}>
+        <Text style={styles.buttonText}>Pausa</Text>
+      </TouchableOpacity>
+      <TouchableOpacity style={styles.button}>
+        <Text style={styles.buttonText}>Operacional</Text>
+      </TouchableOpacity>
+      <TouchableOpacity style={styles.button}>
+        <Text style={styles.buttonText}>Calculadora</Text>
+      </TouchableOpacity>
+    </View>
+  );
 
   const renderContent = () => {
     switch (activeTab) {
@@ -169,6 +270,12 @@ const AuditoriaScreen = () => {
         return <VendasTab />;
       case 'Fluxo':
         return <FluxoTab />;
+      case 'Perdas':
+        return <PerdasTab />;
+      case 'Anotações':
+        return <AnotacoesTab />;
+      case 'Outros':
+        return <OutrosTab />;
       default:
         return <VendasTab />;
     }
@@ -176,8 +283,14 @@ const AuditoriaScreen = () => {
 
   return (
     <View style={styles.container}>
+      {/* Barra com o nome da loja */}
+      <View style={styles.header}>
+        <Text style={styles.headerText}>{lojaName}</Text>
+      </View>
+
+      {/* Tabs */}
       <View style={styles.tabsContainer}>
-        {['Vendas', 'Fluxo', 'Perdas', 'Anotações', 'Outros'].map((tab) => (
+        {['Vendas', 'Perdas', 'Fluxo', 'Anotações', 'Outros'].map((tab) => (
           <TouchableOpacity
             key={tab}
             style={[styles.tabButton, activeTab === tab && styles.activeTab]}
@@ -187,16 +300,28 @@ const AuditoriaScreen = () => {
           </TouchableOpacity>
         ))}
       </View>
+
+      {/* Conteúdo da aba */}
       <ScrollView style={styles.scrollContainer}>{renderContent()}</ScrollView>
     </View>
   );
 };
 
 const styles = StyleSheet.create({
-  // Todos os estilos usados anteriormente...
   container: {
     flex: 1,
     backgroundColor: '#f5f5f5',
+  },
+  header: {
+    backgroundColor: '#20B2AA',
+    padding: 15,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  headerText: {
+    color: '#fff',
+    fontSize: 18,
+    fontWeight: 'bold',
   },
   tabsContainer: {
     flexDirection: 'row',
@@ -219,6 +344,9 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontWeight: 'bold',
     color: '#333',
+  },
+  activeTabText: {
+    color: '#20B2AA',
   },
   contentContainer: {
     padding: 20,
@@ -249,28 +377,6 @@ const styles = StyleSheet.create({
     textAlignVertical: 'top',
     marginBottom: 15,
   },
-  checkboxContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    marginBottom: 20,
-  },
-  checkbox: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: '#fff',
-    padding: 10,
-    borderRadius: 10,
-    elevation: 2,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 5,
-  },
-  checkboxText: {
-    fontSize: 16,
-    marginLeft: 5,
-    color: '#333',
-  },
   button: {
     backgroundColor: '#20B2AA',
     paddingVertical: 15,
@@ -283,79 +389,24 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: 'bold',
   },
-   headerRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
+  picker: {
+    backgroundColor: '#fff',
+    borderRadius: 10,
+    borderWidth: 1,
+    borderColor: '#ccc',
     marginBottom: 15,
   },
-  headerText: {
-    fontSize: 16,
-    fontWeight: 'bold',
-    textAlign: 'center',
-    flex: 1,
-    color: '#333',
-  },
-  row: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: 20,
-  },
-  counterGroup: {
-    flex: 1,
-    alignItems: 'center',
-  },
-  headerRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    marginBottom: 10,
-  },
-  headerText: {
-    fontSize: 16,
-    fontWeight: 'bold',
-    textAlign: 'center',
-    flex: 1,
-    color: '#333',
-  },
-  counterGroup: {
-    flex: 1,
-    alignItems: 'center',
-  },
-  counterContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginTop: 5,
-  },
-  counterButton: {
-    backgroundColor: '#20B2AA',
-    borderRadius: 8,
+  listItem: {
     padding: 10,
-    marginHorizontal: 5,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  counterButtonText: {
-    color: '#fff',
-    fontSize: 18,
-    fontWeight: 'bold',
-  },
-  counterValue: {
-    fontSize: 16,
-    fontWeight: 'bold',
-    marginHorizontal: 10,
-  },
- 
-  label: {
-    fontSize: 14,
-    fontWeight: 'bold',
-    textAlign: 'center',
+    backgroundColor: '#fff',
+    borderRadius: 5,
     marginBottom: 10,
-    flex: 1,
+    borderColor: '#ccc',
+    borderWidth: 1,
   },
-  headerRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    marginBottom: 15,
+  listText: {
+    fontSize: 14,
+    color: '#333',
   },
 });
 

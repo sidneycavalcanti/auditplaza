@@ -17,9 +17,10 @@ const HomeScreen = ({ navigation }) => {
   const [searchQuery, setSearchQuery] = useState('');
   const { auditorias, loading, error, fetchAuditorias } = useAuditorias();
 
-  const handleAuditoria = (lojaId) => {
-    navigation.navigate('Auditoria', { lojaId });
+  const handleAuditoria = (lojaId, lojaName) => {
+    navigation.navigate('Auditoria', { lojaId, lojaName });
   };
+  
 
   const handleSearch = (text) => {
     setSearchQuery(text);
@@ -42,28 +43,28 @@ const HomeScreen = ({ navigation }) => {
     const isDisponivel = isToday(item.data);
 
     return (
-      <View style={styles.auditoriaItem}>
-        <Text style={styles.auditoriaText}>
-          <Text style={styles.label}>Loja:</Text> {item.loja?.name || 'N/A'}
+    <View style={styles.auditoriaItem}>
+      <Text style={styles.auditoriaText}>
+        <Text style={styles.label}>Loja:</Text> {item.loja?.name || 'N/A'}
+      </Text>
+      <Text style={styles.auditoriaText}>
+        <Text style={styles.label}>Data:</Text> {format(item.data, 'dd/MM/yyyy')}
+      </Text>
+      <Text style={styles.auditoriaText}>
+        <Text style={styles.label}>Status:</Text> {isDisponivel ? 'Disponível' : 'Indisponível'}
+      </Text>
+      <TouchableOpacity
+        style={[styles.button, isDisponivel ? styles.buttonAtivo : styles.buttonInativo]}
+        disabled={!isDisponivel}
+        onPress={() => handleAuditoria(item.id, item.loja?.name)}
+      >
+        <Text style={styles.buttonText}>
+          {isDisponivel ? 'Iniciar Auditoria' : 'Indisponível'}
         </Text>
-        <Text style={styles.auditoriaText}>
-          <Text style={styles.label}>Data:</Text> {format(item.data, 'dd/MM/yyyy')}
-        </Text>
-        <Text style={styles.auditoriaText}>
-          <Text style={styles.label}>Status:</Text> {isDisponivel ? 'Disponível' : 'Indisponível'}
-        </Text>
-        <TouchableOpacity
-          style={[styles.button, isDisponivel ? styles.buttonAtivo : styles.buttonInativo]}
-          disabled={!isDisponivel}
-          onPress={() => handleAuditoria(item.id)}
-        >
-          <Text style={styles.buttonText}>
-            {isDisponivel ? 'Iniciar Auditoria' : 'Indisponível'}
-          </Text>
-        </TouchableOpacity>
-      </View>
-    );
-  };
+      </TouchableOpacity>
+    </View>
+  );
+};
 
   return (
     <SafeAreaView style={styles.safeContainer}>
