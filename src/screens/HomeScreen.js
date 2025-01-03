@@ -17,10 +17,16 @@ const HomeScreen = ({ navigation }) => {
   const [searchQuery, setSearchQuery] = useState('');
   const { auditorias, loading, error, fetchAuditorias } = useAuditorias();
 
-  const handleAuditoria = (lojaId, lojaName) => {
-    navigation.navigate('Auditoria', { lojaId, lojaName });
+  const handleAuditoria = (lojaId, lojaName, data, userName) => {
+    navigation.navigate('Auditoria', {
+      lojaId,
+      lojaName,
+      data: format(data, 'dd/MM/yyyy HH:mm:ss'), // Data e hora formatadas
+      userName, // Passar o nome do usuário
+    });
   };
-  
+
+
 
   const handleSearch = (text) => {
     setSearchQuery(text);
@@ -43,28 +49,29 @@ const HomeScreen = ({ navigation }) => {
     const isDisponivel = isToday(item.data);
 
     return (
-    <View style={styles.auditoriaItem}>
-      <Text style={styles.auditoriaText}>
-        <Text style={styles.label}>Loja:</Text> {item.loja?.name || 'N/A'}
-      </Text>
-      <Text style={styles.auditoriaText}>
-        <Text style={styles.label}>Data:</Text> {format(item.data, 'dd/MM/yyyy')}
-      </Text>
-      <Text style={styles.auditoriaText}>
-        <Text style={styles.label}>Status:</Text> {isDisponivel ? 'Disponível' : 'Indisponível'}
-      </Text>
-      <TouchableOpacity
-        style={[styles.button, isDisponivel ? styles.buttonAtivo : styles.buttonInativo]}
-        disabled={!isDisponivel}
-        onPress={() => handleAuditoria(item.id, item.loja?.name)}
-      >
-        <Text style={styles.buttonText}>
-          {isDisponivel ? 'Iniciar Auditoria' : 'Indisponível'}
+      <View style={styles.auditoriaItem}>
+        <Text style={styles.auditoriaText}>
+          <Text style={styles.label}>Loja:</Text> {item.loja?.name || 'N/A'}
         </Text>
-      </TouchableOpacity>
-    </View>
-  );
-};
+        <Text style={styles.auditoriaText}>
+          <Text style={styles.label}>Data:</Text> {format(item.data, 'dd/MM/yyyy')}
+        </Text>
+        <Text style={styles.auditoriaText}>
+          <Text style={styles.label}>Status:</Text> {isDisponivel ? 'Disponível' : 'Indisponível'}
+        </Text>
+        <TouchableOpacity
+          style={[styles.button, isDisponivel ? styles.buttonAtivo : styles.buttonInativo]}
+          disabled={!isDisponivel}
+          onPress={() => handleAuditoria(item.id, item.loja?.name, item.data, item.usuario?.name)} // Substitua por `user.name` ou valor real
+        >
+          <Text style={styles.buttonText}>
+            {isDisponivel ? 'Iniciar Auditoria' : 'Indisponível'}
+          </Text>
+        </TouchableOpacity>
+
+      </View>
+    );
+  };
 
   return (
     <SafeAreaView style={styles.safeContainer}>
@@ -104,13 +111,13 @@ const HomeScreen = ({ navigation }) => {
         {/* Lista de auditorias */}
         {!loading && !error && filteredAuditorias?.length > 0 ? (
           <FlatList
-          data={filteredAuditorias}
-          keyExtractor={(item) => item.id?.toString()}
-          renderItem={renderAuditoria}
-          contentContainerStyle={styles.listContainer}
-          style={{ width: '100%' }} // Preenche toda a largura
-          showsVerticalScrollIndicator={false}
-        />
+            data={filteredAuditorias}
+            keyExtractor={(item) => item.id?.toString()}
+            renderItem={renderAuditoria}
+            contentContainerStyle={styles.listContainer}
+            style={{ width: '100%' }} // Preenche toda a largura
+            showsVerticalScrollIndicator={false}
+          />
         ) : (
           !loading && !error && (
             <Text style={styles.noResultsText}>Nenhuma auditoria encontrada.</Text>

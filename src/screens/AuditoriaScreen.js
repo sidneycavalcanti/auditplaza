@@ -12,11 +12,20 @@ import {
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Picker } from '@react-native-picker/picker';
 import { useNavigation } from '@react-navigation/native';
+import useAuditoriaDetails from '../hooks/useAuditoriaDetails';
+
+
 
 const AuditoriaScreen = ({ route }) => {
-  const [activeTab, setActiveTab] = useState('Vendas'); // Aba ativa
-  const navigation = useNavigation(); // Navegação para outras telas
-  const { lojaName } = route.params || { lojaName: 'Nome da Loja' }; // Nome da loja vindo da rota ou padrão
+  const [activeTab, setActiveTab] = useState('Vendas');
+  const navigation = useNavigation();
+  const { lojaName, userName, data, auditoriaId } = route.params || {
+    lojaName: 'Loja Desconhecida',
+    data: 'Data Indisponível',
+    userName: 'Auditor Desconhecido',
+    auditoriaId: null,
+  };
+  const { auditoriadetails } = useAuditoriaDetails();
 
   // Verificar a autenticação do usuário
   const checkAuthentication = async () => {
@@ -26,6 +35,12 @@ const AuditoriaScreen = ({ route }) => {
       navigation.navigate('Login');
     }
   };
+
+  const capitalizeFirstLetter = (string) => {
+    if (!string) return ''; // Verifica se a string é válida
+    return string.charAt(0).toUpperCase() + string.slice(1);
+  };
+  
 
   useEffect(() => {
     checkAuthentication();
@@ -283,10 +298,12 @@ const AuditoriaScreen = ({ route }) => {
 
   return (
     <View style={styles.container}>
-      {/* Barra com o nome da loja */}
-      <View style={styles.header}>
-        <Text style={styles.headerText}>{lojaName}</Text>
-      </View>
+      {/* Barra com o nome da loja, data/hora e nome do usuário */}
+    <View style={styles.header}>
+      <Text style={styles.headerText}>Loja: {lojaName}</Text>
+      <Text style={styles.headerText}>Data: {data}</Text>
+      <Text style={styles.headerText}>Auditor: {userName}</Text> {/* Exibe o nome do usuário */}
+    </View>
 
       {/* Tabs */}
       <View style={styles.tabsContainer}>
@@ -317,11 +334,19 @@ const styles = StyleSheet.create({
     padding: 15,
     alignItems: 'center',
     justifyContent: 'center',
+    borderBottomWidth: 1,
+    borderBottomColor: '#ccc',
+    elevation: 4, // Adiciona uma sombra para destaque
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 4,
   },
   headerText: {
-    color: '#fff',
+    color: '#333',
     fontSize: 18,
     fontWeight: 'bold',
+    textAlign: 'center',
   },
   tabsContainer: {
     flexDirection: 'row',
@@ -406,6 +431,51 @@ const styles = StyleSheet.create({
   },
   listText: {
     fontSize: 14,
+    color: '#333',
+  },
+  headerRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginBottom: 15,
+  },
+  row: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 20,
+  },
+  counterGroup: {
+    flex: 1,
+    alignItems: 'center',
+  },
+  counterContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginTop: 5,
+  },
+  counterButton: {
+    backgroundColor: '#20B2AA',
+    borderRadius: 8,
+    padding: 10,
+    marginHorizontal: 5,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  counterButtonText: {
+    color: '#fff',
+    fontSize: 18,
+    fontWeight: 'bold',
+  },
+  counterValue: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    marginHorizontal: 10,
+  },
+  label: {
+    fontSize: 14,
+    fontWeight: 'bold',
+    textAlign: 'center',
+    marginBottom: 10,
     color: '#333',
   },
 });
