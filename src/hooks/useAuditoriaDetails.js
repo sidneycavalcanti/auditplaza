@@ -15,35 +15,57 @@ const useAuditoriaDetails = () => {
   const [error, setError] = useState(null);
 
   // Função genérica para chamadas à API
-  const handleApiRequest = async (url, method = 'GET', data = null) => {
+  const handleApiRequest = async (url, method = 'GET', data = null, additionalHeaders = {}) => {
     setLoading(true);
     setError(null);
+  
     try {
+      // Recuperar o token de autenticação
       const token = await AsyncStorage.getItem('token');
       if (!token) throw new Error('Token não encontrado');
-
+  
+      // Configuração da requisição
       const config = {
         method,
-        url: `https://back-auditoria.onrender.com${url}`, // Base URL configurada
-        headers: { Authorization: `Bearer ${token}` },
-        ...(data && { data }),
+        url: `https://back-auditoria.onrender.com${url}`, // Base URL
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json', // Definir JSON como padrão
+          ...additionalHeaders, // Headers adicionais, se necessários
+        },
+        ...(data && { data }), // Adiciona o corpo da requisição apenas se existir
       };
-
+  
+      console.log(`Chamando API: ${config.method} ${config.url}`, config); // Log útil para debug
+  
+      // Realizar a requisição
       const response = await axios(config);
+  
+      console.log('Resposta da API:', response.data); // Log de debug
       return response.data;
     } catch (err) {
-      setError(err.response?.data?.message || 'Erro na requisição');
-      throw err;
+      // Capturar e tratar o erro
+      const errorMessage = err.response?.data?.message || 'Erro na requisição';
+      console.error('Erro na API:', errorMessage, err); // Log detalhado do erro
+      setError(errorMessage);
+      throw new Error(errorMessage); // Repassar o erro para o chamador
     } finally {
-      setLoading(false);
+      setLoading(false); // Sempre desabilitar o estado de carregamento
     }
   };
+  
 
   // Funções de Vendas
   const cadastrarVenda = async (venda) => {
-    const novaVenda = await handleApiRequest('/vendas', 'POST', venda);
-    setVendas((prev) => [...prev, novaVenda]);
+    try {
+      const novaVenda = await handleApiRequest('/vendas', 'POST', venda); // Envia a venda
+      setVendas((prev) => [...prev, novaVenda]); // Atualiza o estado local
+    } catch (err) {
+      console.error('Erro ao cadastrar venda:', err); // Log de erro
+      throw err;
+    }
   };
+  
 
   const fetchUltimasVendas = async () => {
     const ultimasVendas = await handleApiRequest('/vendas');
@@ -107,15 +129,35 @@ const useAuditoriaDetails = () => {
 
   // Buscar Formas de Pagamento
   const fetchFormasPagamento = async () => {
-    const formasData = await handleApiRequest('/formadepagamento');
-    setFormasPagamento(formasData);
+    try {
+      const response = await handleApiRequest('/formadepagamento'); // Chama a API
+      if (response.formadepagamento && Array.isArray(response.formadepagamento)) {
+        setFormasPagamento(response.formadepagamento); // Atualiza o estado com os dados da API
+      } else {
+        setFormasPagamento([]); // Caso o retorno não seja o esperado
+      }
+    } catch (err) {
+      console.error(err);
+      setError(err.message || 'Erro ao buscar formas de pagamento');
+    }
   };
+  
 
   // Buscar Opções de Sexo
   const fetchSexos = async () => {
-    const sexosData = await handleApiRequest('/cadsexo');
-    setSexos(sexosData);
+    try {
+      const response = await handleApiRequest('/cadsexo'); // Chama a API
+      if (response.cadsexo && Array.isArray(response.cadsexo)) {
+        setSexos(response.cadsexo); // Atualiza o estado com os dados da API
+      } else {
+        setSexos([]); // Caso o retorno não seja o esperado
+      }
+    } catch (err) {
+      console.error(err);
+      setError(err.message || 'Erro ao buscar sexos');
+    }
   };
+  
 
   return {
     vendas,

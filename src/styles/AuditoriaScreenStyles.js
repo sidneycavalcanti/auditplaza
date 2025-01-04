@@ -1,93 +1,6 @@
-import React, { useState, useEffect } from 'react';
-import {
-  View,
-  Text,
-  TouchableOpacity,
-  StyleSheet,
-  ScrollView,
-  Alert,
-} from 'react-native';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import { useNavigation } from '@react-navigation/native';
-import useAuditoriaDetails from '../hooks/useAuditoriaDetails';
+import { StyleSheet } from 'react-native';
 
-import PerdasTab from '../components/Tabs/PerdasTab';
-import VendasTab from '../components/Tabs/VendasTab';
-import FluxoTab from '../components/Tabs/FluxoTab';
-import AnotacoesTab from '../components/Tabs/AnotacoesTab';
-import OutrosTab from '../components/Tabs/OutrosTab';
-
-const AuditoriaScreen = ({ route }) => {
-  const [activeTab, setActiveTab] = useState('Vendas');
-  const navigation = useNavigation();
-  const { lojaName, userName, data, auditoriaId } = route.params || {
-    lojaName: 'Loja Desconhecida',
-    data: 'Data Indisponível',
-    userName: 'Auditor Desconhecido',
-    auditoriaId: null,
-  };
-  const { auditoriadetails } = useAuditoriaDetails();
-
-  // Verificar a autenticação do usuário
-  const checkAuthentication = async () => {
-    const token = await AsyncStorage.getItem('token');
-    if (!token) {
-      Alert.alert('Sessão expirada', 'Por favor, faça login novamente.');
-      navigation.navigate('Login');
-    }
-  };
-
-  useEffect(() => {
-    checkAuthentication();
-  }, []);
-
-  const renderContent = () => {
-    switch (activeTab) {
-      case 'Vendas':
-        return <VendasTab />;
-      case 'Fluxo':
-        return <FluxoTab />;
-      case 'Perdas':
-        return <PerdasTab />;
-      case 'Anotações':
-        return <AnotacoesTab />;
-      case 'Outros':
-        return <OutrosTab />;
-      default:
-        return <VendasTab />;
-    }
-  };
-
-  return (
-    <View style={styles.container}>
-      {/* Barra com o nome da loja, data/hora e nome do usuário */}
-      <View style={styles.header}>
-        <Text style={styles.headerText}>Loja: {lojaName}</Text>
-        <Text style={styles.headerText}>Data: {data}</Text>
-        <Text style={styles.headerText}>Auditor: {userName}</Text>
-      </View>
-
-      {/* Tabs */}
-      <View style={styles.tabsContainer}>
-        {['Vendas', 'Perdas', 'Fluxo', 'Anotações', 'Outros'].map((tab) => (
-          <TouchableOpacity
-            key={tab}
-            style={[styles.tabButton, activeTab === tab && styles.activeTab]}
-            onPress={() => setActiveTab(tab)}
-          >
-            <Text style={[styles.tabText, activeTab === tab && styles.activeTabText]}>{tab}</Text>
-          </TouchableOpacity>
-        ))}
-      </View>
-
-      {/* Conteúdo da aba */}
-      <ScrollView style={styles.scrollContainer}>{renderContent()}</ScrollView>
-    </View>
-
-  );
-};
-
-const styles = StyleSheet.create({
+export default StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#f5f5f5',
@@ -241,6 +154,28 @@ const styles = StyleSheet.create({
     marginBottom: 10,
     color: '#333',
   },
+  checkboxContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 15,
+  },
+  checkboxLabel: {
+    marginLeft: 8,
+    fontSize: 16,
+    color: '#333',
+  },
+  picker: {
+    height: 50,
+    width: '100%',
+    borderWidth: 1,
+    borderColor: '#ccc',
+    borderRadius: 5,
+    marginBottom: 15,
+    backgroundColor: '#f9f9f9',
+  },
+  
+  errorText: {
+    color: 'red',
+    marginTop: 10,
+  },
 });
-
-export default AuditoriaScreen;
