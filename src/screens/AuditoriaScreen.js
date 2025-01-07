@@ -11,6 +11,8 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useNavigation } from '@react-navigation/native';
 import useAuditoriaDetails from '../hooks/useAuditoriaDetails';
 
+import styles from '../styles/AuditoriaScreenStyles'
+
 import PerdasTab from '../components/Tabs/PerdasTab';
 import VendasTab from '../components/Tabs/VendasTab';
 import FluxoTab from '../components/Tabs/FluxoTab';
@@ -20,12 +22,22 @@ import OutrosTab from '../components/Tabs/OutrosTab';
 const AuditoriaScreen = ({ route }) => {
   const [activeTab, setActiveTab] = useState('Vendas');
   const navigation = useNavigation();
-  const { lojaName, userName, data, auditoriaId } = route.params || {
+  const { lojaName, data, userName, auditoriaId } = route.params || {
     lojaName: 'Loja Desconhecida',
     data: 'Data Indisponível',
     userName: 'Auditor Desconhecido',
     auditoriaId: null,
   };
+{/*
+  useEffect(() => {
+    console.log('auditoria id', auditoriaId)
+    console.log('usuario id', userId)
+    console.log('loja id', lojaId)
+  }, []);
+
+  */}
+ 
+
   const { auditoriadetails } = useAuditoriaDetails();
 
   // Verificar a autenticação do usuário
@@ -44,17 +56,59 @@ const AuditoriaScreen = ({ route }) => {
   const renderContent = () => {
     switch (activeTab) {
       case 'Vendas':
-        return <VendasTab />;
+        return (
+          <VendasTab
+            auditoriaId={auditoriaId}
+            userName={userName}
+            lojaName={lojaName}
+            data={data}
+          />
+        );
       case 'Fluxo':
-        return <FluxoTab />;
+        return (
+          <FluxoTab
+            auditoriaId={auditoriaId}
+            userName={userName}
+            lojaName={lojaName}
+            data={data}
+          />
+        );
       case 'Perdas':
-        return <PerdasTab />;
+        return (
+          <PerdasTab
+            auditoriaId={auditoriaId}
+            userName={userName}
+            lojaName={lojaName}
+            data={data}
+          />
+        );
       case 'Anotações':
-        return <AnotacoesTab />;
+        return (
+          <AnotacoesTab
+            auditoriaId={auditoriaId}
+            userName={userName}
+            lojaName={lojaName}
+            data={data}
+          />
+        );
       case 'Outros':
-        return <OutrosTab />;
+        return (
+          <OutrosTab
+            auditoriaId={auditoriaId}
+            userName={userName}
+            lojaName={lojaName}
+            data={data}
+          />
+        );
       default:
-        return <VendasTab />;
+        return (
+          <VendasTab
+            auditoriaId={auditoriaId}
+            userName={userName}
+            lojaName={lojaName}
+            data={data}
+          />
+        );
     }
   };
 
@@ -87,160 +141,6 @@ const AuditoriaScreen = ({ route }) => {
   );
 };
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#f5f5f5',
-  },
-  header: {
-    backgroundColor: '#20B2AA',
-    padding: 15,
-    alignItems: 'center',
-    justifyContent: 'center',
-    borderBottomWidth: 1,
-    borderBottomColor: '#ccc',
-    elevation: 4, // Adiciona uma sombra para destaque
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.2,
-    shadowRadius: 4,
-  },
-  headerText: {
-    color: '#333',
-    fontSize: 18,
-    fontWeight: 'bold',
-    textAlign: 'center',
-  },
-  tabsContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-around',
-    backgroundColor: '#ddd',
-    paddingVertical: 10,
-    borderBottomWidth: 1,
-    borderBottomColor: '#ccc',
-  },
-  tabButton: {
-    paddingVertical: 10,
-    paddingHorizontal: 15,
-    borderRadius: 5,
-  },
-  activeTab: {
-    borderBottomWidth: 3,
-    borderBottomColor: '#20B2AA',
-  },
-  tabText: {
-    fontSize: 14,
-    fontWeight: 'bold',
-    color: '#333',
-  },
-  activeTabText: {
-    color: '#20B2AA',
-  },
-  contentContainer: {
-    padding: 20,
-  },
-  sectionTitle: {
-    fontSize: 16,
-    fontWeight: 'bold',
-    marginBottom: 10,
-    color: '#333',
-  },
-  input: {
-    backgroundColor: '#fff',
-    borderRadius: 10,
-    padding: 10,
-    marginBottom: 15,
-    borderColor: '#ccc',
-    borderWidth: 1,
-    fontSize: 16,
-  },
-  textArea: {
-    backgroundColor: '#fff',
-    borderRadius: 10,
-    padding: 10,
-    borderColor: '#ccc',
-    borderWidth: 1,
-    fontSize: 16,
-    minHeight: 100,
-    textAlignVertical: 'top',
-    marginBottom: 15,
-  },
-  button: {
-    backgroundColor: '#20B2AA',
-    paddingVertical: 15,
-    borderRadius: 10,
-    marginBottom: 15,
-    alignItems: 'center',
-  },
-  buttonText: {
-    color: '#fff',
-    fontSize: 16,
-    fontWeight: 'bold',
-  },
-  picker: {
-    backgroundColor: '#fff',
-    borderRadius: 10,
-    borderWidth: 1,
-    borderColor: '#ccc',
-    marginBottom: 15,
-  },
-  listItem: {
-    padding: 10,
-    backgroundColor: '#fff',
-    borderRadius: 5,
-    marginBottom: 10,
-    borderColor: '#ccc',
-    borderWidth: 1,
-  },
-  listText: {
-    fontSize: 14,
-    color: '#333',
-  },
-  headerRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    marginBottom: 15,
-  },
-  row: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: 20,
-  },
-  counterGroup: {
-    flex: 1,
-    alignItems: 'center',
-  },
-  counterContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginTop: 5,
-  },
-  counterButton: {
-    backgroundColor: '#20B2AA',
-    borderRadius: 8,
-    padding: 10,
-    marginHorizontal: 5,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  counterButtonText: {
-    color: '#fff',
-    fontSize: 18,
-    fontWeight: 'bold',
-  },
-  counterValue: {
-    fontSize: 16,
-    fontWeight: 'bold',
-    marginHorizontal: 10,
-  },
-  label: {
-    fontSize: 14,
-    fontWeight: 'bold',
-    textAlign: 'center',
-    marginBottom: 10,
-    color: '#333',
-  },
-});
+
 
 export default AuditoriaScreen;

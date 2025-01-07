@@ -129,6 +129,7 @@ const useAuditoriaDetails = () => {
 
   // Buscar Formas de Pagamento
   const fetchFormasPagamento = async () => {
+    setLoading(true); // Ativa o estado de carregamento antes da chamada específica
     try {
       const response = await handleApiRequest('/formadepagamento'); // Chama a API
       if (response.formadepagamento && Array.isArray(response.formadepagamento)) {
@@ -139,12 +140,14 @@ const useAuditoriaDetails = () => {
     } catch (err) {
       console.error(err);
       setError(err.message || 'Erro ao buscar formas de pagamento');
+    } finally {
+      setLoading(false); // Desativa o estado de carregamento
     }
   };
-  
 
   // Buscar Opções de Sexo
   const fetchSexos = async () => {
+    setLoading(true); // Ativa o estado de carregamento antes da chamada específica
     try {
       const response = await handleApiRequest('/cadsexo'); // Chama a API
       if (response.cadsexo && Array.isArray(response.cadsexo)) {
@@ -155,6 +158,8 @@ const useAuditoriaDetails = () => {
     } catch (err) {
       console.error(err);
       setError(err.message || 'Erro ao buscar sexos');
+    } finally {
+      setLoading(false); // Desativa o estado de carregamento
     }
   };
   
