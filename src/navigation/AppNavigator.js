@@ -6,6 +6,8 @@ import LoginScreen from '../screens/LoginScreen';
 import HomeScreen from '../screens/HomeScreen';
 import ProfileScreen from '../screens/ProfileScreen';
 import AuditoriaScreen  from '../screens/AuditoriaScreen';
+import UltimasVendasScreen from '../screens/UltimaVendasScreen';
+import VendasEditTab from '../components/Tabs/VendasEditTab';
 
 const Stack = createStackNavigator();
 
@@ -16,7 +18,9 @@ const AppNavigator = () => {
         <Stack.Screen name="Login" component={LoginScreen} />
         <Stack.Screen name="Home" component={HomeScreen} />
         <Stack.Screen name="Profile" component={ProfileScreen} />
-        <Stack.Screen name="Auditoria" component={AuditoriaScreen} />     
+        <Stack.Screen name="Auditoria" component={AuditoriaScreen} />   
+        <Stack.Screen name="UltimasVendas" component={UltimasVendasScreen} /> 
+        <Stack.Screen name="VendasEditTab" component={VendasEditTab} options={{ title: 'Editar Venda' }} />
       </Stack.Navigator>
     </NavigationContainer>
   );

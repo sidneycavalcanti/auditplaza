@@ -1,4 +1,4 @@
-import { StyleSheet } from 'react-native';
+import { StyleSheet, Platform } from 'react-native';
 
 export default StyleSheet.create({
   container: {
@@ -90,13 +90,7 @@ export default StyleSheet.create({
     fontSize: 16,
     fontWeight: 'bold',
   },
-  picker: {
-    backgroundColor: '#fff',
-    borderRadius: 10,
-    borderWidth: 1,
-    borderColor: '#ccc',
-    marginBottom: 15,
-  },
+  
   listItem: {
     padding: 10,
     backgroundColor: '#fff',
@@ -173,9 +167,69 @@ export default StyleSheet.create({
     marginBottom: 15,
     backgroundColor: '#f9f9f9',
   },
-  
+
   errorText: {
     color: 'red',
     marginTop: 10,
   },
+  contentContainer: {
+    flex: 1,
+    padding: 20,
+    backgroundColor: '#f5f5f5',
+  },
+  sectionTitle: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    marginBottom: 10,
+  },
+  input: {
+    height: 40,
+    borderColor: '#ccc',
+    borderWidth: 1,
+    borderRadius: 5,
+    paddingHorizontal: 10,
+    marginBottom: 15,
+    backgroundColor: '#fff',
+  },
+  picker: {
+    height: Platform.OS === 'ios' ? 200 : 50,
+    backgroundColor: Platform.OS === 'ios' ? '#f9f9f9' : '#fff',
+    borderRadius: Platform.OS === 'ios' ? 10 : 0,
+    borderWidth: Platform.OS === 'ios' ? 1 : 0,
+    borderColor: '#ccc',
+    marginBottom: 15,
+  },
+  checkboxContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginBottom: 15,
+  },
+  switchWrapper: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  button: {
+    backgroundColor: '#20B2AA',
+    padding: 15,
+    borderRadius: 5,
+    alignItems: 'center',
+    marginTop: 10,
+  },
+  buttonText: {
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: 'bold',
+  },
+  errorText: {
+    color: 'red',
+    marginTop: 10,
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginTop: 50,
+  },
+
+
 });

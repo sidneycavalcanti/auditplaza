@@ -5,15 +5,21 @@ import {
   TextInput,
   TouchableOpacity,
   Alert,
-  Platform,
-  StyleSheet,
   Switch,
   ActivityIndicator
 } from 'react-native';
 import { Picker } from '@react-native-picker/picker';
+
 import useAuditoriaDetails from '../../hooks/useAuditoriaDetails';
 
+import { useNavigation } from '@react-navigation/native';
+
+import styles from '../../styles/AuditoriaScreenStyles';
+
 const VendasTab = ({ auditoriaId, userId, lojaId }) => {
+
+  const navigation = useNavigation();
+  
   const {
     fetchSexos,
     fetchFormasPagamento,
@@ -121,19 +127,50 @@ const VendasTab = ({ auditoriaId, userId, lojaId }) => {
   };
   
 
-  // Função para buscar e listar as últimas vendas
+  // Função para buscar e listar as últimas vendas de uma auditoria específica
+  {/* const handleUltimasVendas = async () => {
+    try {
+      const vendas = await fetchUltimasVendas(auditoriaId); // Passe o auditoriaId como parâmetro
+  
+      // Verifique se as vendas foram retornadas
+      if (!vendas || vendas.length === 0) {
+        Alert.alert('Sem Vendas', 'Não há vendas cadastradas para esta auditoria.');
+        return;
+      }
+  
+      // Mostre as vendas no Alert
+      Alert.alert(
+        'Últimas Vendas',
+        vendas
+          .map((v) => `Valor: ${v.valor}, Data: ${new Date(v.createdAt).toLocaleString()}`)
+          .join('\n')
+      );
+    } catch (error) {
+      console.error('Erro ao listar vendas:', error.message);
+      Alert.alert('Erro', 'Não foi possível listar as últimas vendas.');
+    }
+  };*/}
+
   const handleUltimasVendas = async () => {
     try {
-      const vendas = await fetchUltimasVendas(); // Chama o hook para buscar as vendas
-      console.log('Últimas vendas:', vendas); // Log das vendas (para debug)
-
-      // Opcional: Exibir as vendas em um alert ou console
-      Alert.alert('Últimas vendas', vendas.map(v => `Valor: ${v.valor}, Data: ${v.createdAt}`).join('\n'));
+      const vendas = await fetchUltimasVendas(auditoriaId); // Passe o auditoriaId como parâmetro
+  
+      // Verifique se as vendas foram retornadas
+      if (!vendas || vendas.length === 0) {
+        Alert.alert('Sem Vendas', 'Não há vendas cadastradas para esta auditoria.');
+        return;
+      }
+  
+      // Renderiza uma nova tela ou modal com as vendas
+      navigation.navigate('UltimasVendas', { vendas });
     } catch (error) {
-      console.error('Erro ao listar vendas:', error);
+      console.error('Erro ao listar vendas:', error.message);
       Alert.alert('Erro', 'Não foi possível listar as últimas vendas.');
     }
   };
+  
+  
+
 
   return (
     <View style={styles.contentContainer}>
@@ -219,67 +256,5 @@ const VendasTab = ({ auditoriaId, userId, lojaId }) => {
     </View>
   );
 };
-
-
-const styles = StyleSheet.create({
-  contentContainer: {
-    flex: 1,
-    padding: 20,
-    backgroundColor: '#f5f5f5',
-  },
-  sectionTitle: {
-    fontSize: 16,
-    fontWeight: 'bold',
-    marginBottom: 10,
-  },
-  input: {
-    height: 40,
-    borderColor: '#ccc',
-    borderWidth: 1,
-    borderRadius: 5,
-    paddingHorizontal: 10,
-    marginBottom: 15,
-    backgroundColor: '#fff',
-  },
-  picker: {
-    height: Platform.OS === 'ios' ? 200 : 50,
-    backgroundColor: Platform.OS === 'ios' ? '#f9f9f9' : '#fff',
-    borderRadius: Platform.OS === 'ios' ? 10 : 0,
-    borderWidth: Platform.OS === 'ios' ? 1 : 0,
-    borderColor: '#ccc',
-    marginBottom: 15,
-  },
-  checkboxContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    marginBottom: 15,
-  },
-  switchWrapper: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  button: {
-    backgroundColor: '#20B2AA',
-    padding: 15,
-    borderRadius: 5,
-    alignItems: 'center',
-    marginTop: 10,
-  },
-  buttonText: {
-    color: '#fff',
-    fontSize: 16,
-    fontWeight: 'bold',
-  },
-  errorText: {
-    color: 'red',
-    marginTop: 10,
-  },
-  loadingContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginTop: 50,
-  },
-});
 
 export default VendasTab;

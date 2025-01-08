@@ -66,11 +66,24 @@ const useAuditoriaDetails = () => {
     }
   };
   
-
-  const fetchUltimasVendas = async () => {
-    const ultimasVendas = await handleApiRequest('/vendas');
-    setVendas(ultimasVendas);
+  const fetchUltimasVendas = async (auditoriaId) => {
+    try {
+      const response = await handleApiRequest(`/vendas?auditoriaId=${auditoriaId}`);
+      
+      // Verifique se 'vendas' existe na resposta
+      if (response && response.vendas) {
+        setVendas(response.vendas); // Atualiza o estado
+        return response.vendas; // Retorna a lista de vendas
+      } else {
+        throw new Error('Dados de vendas não encontrados.');
+      }
+    } catch (error) {
+      console.error('Erro ao buscar vendas:', error.message);
+      throw error;
+    }
   };
+  
+  
 
   // Funções de Fluxo
   const cadastrarFluxo = async (fluxoItem) => {
