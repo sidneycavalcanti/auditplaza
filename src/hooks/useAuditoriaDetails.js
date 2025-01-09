@@ -6,6 +6,7 @@ const useAuditoriaDetails = () => {
   const [vendas, setVendas] = useState([]);
   const [fluxo, setFluxo] = useState([]);
   const [perdas, setPerdas] = useState([]);
+  const [motivoperdas, setMotivoperdas] = useState([]);
   const [anotacoes, setAnotacoes] = useState([]);
   const [operacoes, setOperacoes] = useState([]);
   const [pausas, setPausas] = useState([]);
@@ -13,6 +14,7 @@ const useAuditoriaDetails = () => {
   const [sexos, setSexos] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+
 
   // Função genérica para chamadas à API
   const handleApiRequest = async (url, method = 'GET', data = null, additionalHeaders = {}) => {
@@ -97,15 +99,61 @@ const useAuditoriaDetails = () => {
   };
 
   // Funções de Perdas
-  const cadastrarPerda = async (perda) => {
-    const novaPerda = await handleApiRequest('/perdas', 'POST', perda);
-    setPerdas((prev) => [...prev, novaPerda]);
+  const cadastrarPerda = async () => {
+    try {
+      if (!perda || !perda.motivo || !perda.descricao) {
+        throw new Error('Dados inválidos para cadastro da perda.');
+      }
+  
+      const novaPerda = await handleApiRequest('/perdas', 'POST', perda);
+      console.log('Nova perda cadastrada:', novaPerda);
+  
+      setPerdas((prev) => [...prev, novaPerda]); // Atualiza o estado com a nova perda
+    } catch (error) {
+      console.error('Erro ao cadastrar perda:', error.message);
+      throw new Error('Erro ao cadastrar a perda.');
+    }
   };
+  
 
   const fetchPerdas = async () => {
-    const perdasData = await handleApiRequest('/perdas');
-    setPerdas(perdasData);
+    setLoading(true); // Ativa o estado de carregamento antes da chamada específica
+    try {
+      const perdasData = await handleApiRequest('/perdas');
+      console.log('Dados de perdas:', perdasData); // Verificar estrutura
+  
+      if (perdasData.perdas && Array.isArray(perdasData.perdas)) {
+        setPerdas(perdasData.perdas); // Caso seja um array direto
+      } else {
+        setPerdas([]); // Caso a estrutura seja inesperada
+      }
+    } catch (error) {
+      console.error('Erro ao buscar perdas:', error);
+    } finally {
+      setLoading(false); // Desativa o estado de carregamento
+    }
   };
+
+  const fetchMotivoPerdas = async () => {
+    setLoading(true); // Ativa o estado de carregamento antes da chamada específica
+    try {
+      const motivoperdasData = await handleApiRequest('/motivoperdas');
+      console.log('Dados de perdas:', motivoperdasData); // Verificar estrutura
+  
+      if (motivoperdasData.motivoperdas && Array.isArray(motivoperdasData.motivoperdas)) {
+        setMotivoperdas(motivoperdasData.motivoperdas); // Caso seja um array direto
+      } else {
+        setMotivoperdas([]); // Caso a estrutura seja inesperada
+      }
+    } catch (error) {
+      console.error('Erro ao buscar perdas:', error);
+    } finally {
+      setLoading(false); // Desativa o estado de carregamento
+    }
+  };
+
+  
+  
 
   // Funções de Anotações
   const cadastrarAnotacao = async (anotacao) => {
@@ -186,6 +234,7 @@ const useAuditoriaDetails = () => {
     pausas,
     formasPagamento,
     sexos,
+    motivoperdas,
     cadastrarVenda,
     fetchUltimasVendas,
     cadastrarFluxo,
@@ -200,6 +249,7 @@ const useAuditoriaDetails = () => {
     fetchPausas,
     fetchFormasPagamento,
     fetchSexos,
+    fetchMotivoPerdas,
     loading,
     error,
   };
