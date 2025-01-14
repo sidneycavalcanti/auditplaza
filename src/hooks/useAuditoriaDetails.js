@@ -134,6 +134,23 @@ const useAuditoriaDetails = () => {
     }
   };
 
+  const fetchUltimasPerdas = async (auditoriaId) => {
+    try {
+      const response = await handleApiRequest(`/perdas?auditoriaId=${auditoriaId}`);
+      
+      // Verifique se 'vendas' existe na resposta
+      if (response && response.perdas) {
+        setPerdas(response.perdas); // Atualiza o estado
+        return response.perdas; // Retorna a lista de vendas
+      } else {
+        throw new Error('Dados de perdas não encontrados.');
+      }
+    } catch (error) {
+      console.error('Erro ao buscar perdas:', error.message);
+      throw error;
+    }
+  };
+
   const fetchMotivoPerdas = async () => {
     setLoading(true); // Ativa o estado de carregamento antes da chamada específica
     try {
@@ -237,6 +254,7 @@ const useAuditoriaDetails = () => {
     motivoperdas,
     cadastrarVenda,
     fetchUltimasVendas,
+    fetchUltimasPerdas,
     cadastrarFluxo,
     fetchFluxo,
     cadastrarPerda,

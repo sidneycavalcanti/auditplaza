@@ -5,7 +5,15 @@ import styles from '../../styles/AuditoriaScreenStyles';
 import useAuditoriaDetails from '../../hooks/useAuditoriaDetails';
 
 const PerdasTab = () => {
-  const { cadastrarPerda, fetchPerdas, fetchMotivoPerdas, motivoperdas, perdas, loading, error } = useAuditoriaDetails();
+  const { 
+    cadastrarPerda, 
+    fetchPerdas, 
+    fetchMotivoPerdas, 
+    fetchUltimasPerdas,
+    motivoperdas, 
+    perdas, 
+    loading, 
+    error } = useAuditoriaDetails();
 
   // Declaração de estados
   const [motivoPerdas, setMotivoperdas] = useState('');
@@ -45,6 +53,25 @@ const PerdasTab = () => {
     }
   };
 
+  // Função para cadastrar uma perda
+   const handleUltimasPerdas = async () => {
+      try {
+        const perdas = await fetchUltimasPerdas(auditoriaId); // Passe o auditoriaId como parâmetro
+    
+        // Verifique se as vendas foram retornadas
+        if (!perdas || perdas.length === 0) {
+          Alert.alert('Sem Perdas', 'Não há perdas cadastradas para esta auditoria.');
+          return;
+        }
+    
+        // Renderiza uma nova tela ou modal com as vendas
+        navigation.navigate('UltimasPerdas', { perdas });
+      } catch (error) {
+        console.error('Erro ao listar perdas:', error.message);
+        Alert.alert('Erro', 'Não foi possível listar as últimas perdas.');
+      }
+    };
+
   // Renderiza um indicador de carregamento enquanto os dados estão sendo buscados
   if (loading) {
     return (
@@ -81,8 +108,13 @@ const PerdasTab = () => {
       />
 
       <TouchableOpacity style={styles.button} onPress={handleCadPerdas}>
-        <Text style={styles.buttonText}>Gravar</Text>
+        <Text style={styles.buttonText}>Adicionar</Text>
       </TouchableOpacity>
+
+      <TouchableOpacity style={styles.button} onPress={handleUltimasPerdas}>
+        <Text style={styles.buttonText}>Ultimas perdas </Text>
+      </TouchableOpacity>
+
 
       {/* Renderiza uma mensagem de erro, se houver */}
       {error && <Text style={styles.errorText}>{error}</Text>}

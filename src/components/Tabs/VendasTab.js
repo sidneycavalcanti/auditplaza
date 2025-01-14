@@ -28,8 +28,7 @@ const VendasTab = ({ auditoriaId, userId, lojaId }) => {
     formasPagamento,
     sexos,
     loading,
-    error,
-  } = useAuditoriaDetails();
+    error } = useAuditoriaDetails();
 
   const [valor, setValor] = useState('');
   const [faixaEtaria, setFaixaEtaria] = useState('adulto'); // Default faixa etária
@@ -218,6 +217,17 @@ const VendasTab = ({ auditoriaId, userId, lojaId }) => {
         <Picker.Item label="Adulto" value="adulto" />
         <Picker.Item label="Idoso" value="idoso" />
       </Picker>
+
+        <Text style={styles.sectionTitle}>Descrição:</Text>
+            <TextInput
+              style={styles.textArea}
+              placeholder="Digite suas observações"
+              placeholderTextColor="#888"
+              multiline
+              numberOfLines={4}
+              //value={descricao}
+              //onChangeText={setDescricao}
+            />
 
       <View style={styles.checkboxContainer}>
         <View style={styles.switchWrapper}>
