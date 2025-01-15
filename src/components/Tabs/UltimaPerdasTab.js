@@ -9,7 +9,7 @@ import {
 
 } from 'react-native';
 
-const UltimasPerdasScreen = ({ route, navigation }) => {
+const UltimasPerdasTab = ({ route, navigation }) => {
   const { perdas } = route.params;
 
   const handleEdit = (perdas) => {
@@ -114,4 +114,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default UltimasPerdasScreen;
+export default UltimasPerdasTab;

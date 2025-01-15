@@ -9,18 +9,19 @@ import {
 
 } from 'react-native';
 
-const UltimasPerdasScreen = ({ route, navigation }) => {
-  const { perdas } = route.params;
 
-  const handleEdit = (perdas) => {
-    console.log('Venda enviada para edição:', perdas); // Verifique os dados no console
-    navigation.navigate('VendasEditTab', { perdas }); // Passa a venda inteira para edição
+const UltimasVendasTab = ({ route, navigation }) => {
+  const { vendas } = route.params;
+
+  const handleEdit = (venda) => {
+    console.log('Venda enviada para edição:', venda); // Verifique os dados no console
+    navigation.navigate('VendasEditTab', { venda }); // Passa a venda inteira para edição
   };
 
-  const handleExcluirPerdas = async (perdasId) => {
+  const handleExcluirVenda = async (vendaId) => {
     try {
       // Lógica para excluir a venda
-      await excluirVenda(perdasId); // Chame a função que faz a requisição para excluir
+      await excluirVenda(vendaId); // Chame a função que faz a requisição para excluir
       Alert.alert('Sucesso', 'Venda excluída com sucesso!');
       // Atualize a lista de vendas ou recarregue os dados
       navigation.goBack(); // Volte para a lista de auditorias
@@ -31,16 +32,16 @@ const UltimasPerdasScreen = ({ route, navigation }) => {
   };
   
 
-  const renderPerdas= ({ item }) => (
+  const renderVenda = ({ item }) => (
     <View style={styles.vendaItem}>
-      <Text style={styles.valorText}>Motivo: {item.valor}</Text>
+      <Text style={styles.valorText}>Valor: R$ {item.valor}</Text>
       <View style={styles.buttonsContainer}>
       <TouchableOpacity style={styles.editButton} onPress={() => handleEdit(item)}>
           <Text style={styles.buttonText}>Editar</Text>
         </TouchableOpacity>
         <TouchableOpacity
           style={styles.deleteButton}
-          onPress={() => handleExcluirPerdas(item.id)}
+          onPress={() => handleExcluirVenda(item.id)}
         >
           <Text style={styles.buttonText}>Excluir</Text>
         </TouchableOpacity>
@@ -52,11 +53,11 @@ const UltimasPerdasScreen = ({ route, navigation }) => {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Últimas Perdas</Text>
+      <Text style={styles.title}>Últimas Vendas</Text>
       <FlatList
-        data={perdas}
+        data={vendas}
         keyExtractor={(item) => item.id.toString()}
-        renderItem={renderPerdas}
+        renderItem={renderVenda}
         contentContainerStyle={styles.listContainer}
       />
     </View>
@@ -114,4 +115,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default UltimasPerdasScreen;
+export default UltimasVendasTab;

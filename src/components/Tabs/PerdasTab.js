@@ -4,7 +4,13 @@ import { Picker } from '@react-native-picker/picker';
 import styles from '../../styles/AuditoriaScreenStyles';
 import useAuditoriaDetails from '../../hooks/useAuditoriaDetails';
 
-const PerdasTab = () => {
+
+import { useNavigation } from '@react-navigation/native';
+
+const PerdasTab = ({auditoriaId}) => {
+
+    
+  const navigation = useNavigation();
   const { 
     cadastrarPerda, 
     fetchPerdas, 

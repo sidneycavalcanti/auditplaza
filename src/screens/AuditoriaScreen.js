@@ -19,6 +19,9 @@ import FluxoTab from '../components/Tabs/FluxoTab';
 import AnotacoesTab from '../components/Tabs/AnotacoesTab';
 import OutrosTab from '../components/Tabs/OutrosTab';
 
+
+import UltimasVendasTab from '../components/Tabs/UltimaVendasTab';
+
 const AuditoriaScreen = ({ route }) => {
   const [activeTab, setActiveTab] = useState('Vendas');
   const navigation = useNavigation();
@@ -55,6 +58,16 @@ const AuditoriaScreen = ({ route }) => {
 
   const renderContent = () => {
     switch (activeTab) {
+      case 'UltimasVendasTab':
+        return (
+          <UltimasVendasTab
+            auditoriaId={auditoriaId}
+            userName={userName}
+            lojaName={lojaName}
+            data={data}
+          />
+        );
+
       case 'Vendas':
         return (
           <VendasTab
