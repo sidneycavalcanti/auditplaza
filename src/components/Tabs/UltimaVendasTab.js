@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   View,
   Text,
@@ -6,37 +6,74 @@ import {
   Alert,
   StyleSheet,
   FlatList,
-
+  ActivityIndicator,
+  ScrollView
 } from 'react-native';
+import useAuditoriaDetails from '../../hooks/useAuditoriaDetails';
 
+const UltimasVendasTab = ({ auditoriaId, lojaName, data, userName, navigation }) => {
+  const [vendas, setVendas] = useState([]);
+  const [loading, setLoading] = useState(true);
 
-const UltimasVendasTab = ({ route, navigation }) => {
-  const { vendas } = route.params;
+  const { fetchUltimasVendas, excluirVenda } = useAuditoriaDetails();
 
-  const handleEdit = (venda) => {
-    console.log('Venda enviada para edição:', venda); // Verifique os dados no console
-    navigation.navigate('VendasEditTab', { venda }); // Passa a venda inteira para edição
-  };
+  // Carregar vendas ao abrir a aba
+  useEffect(() => {
+    carregarVendas();
+  }, []);
 
-  const handleExcluirVenda = async (vendaId) => {
+  const carregarVendas = async () => {
     try {
-      // Lógica para excluir a venda
-      await excluirVenda(vendaId); // Chame a função que faz a requisição para excluir
-      Alert.alert('Sucesso', 'Venda excluída com sucesso!');
-      // Atualize a lista de vendas ou recarregue os dados
-      navigation.goBack(); // Volte para a lista de auditorias
+      const response = await fetchUltimasVendas(auditoriaId);
+      setVendas(response);
     } catch (error) {
-      console.error('Erro ao excluir venda:', error);
-      Alert.alert('Erro', 'Não foi possível excluir a venda.');
+      console.error('Erro ao carregar vendas:', error);
+      Alert.alert('Erro', 'Não foi possível carregar as últimas vendas.');
+    } finally {
+      setLoading(false);
     }
   };
-  
+
+  const handleEdit = (venda) => {
+    console.log('Venda enviada para edição:', venda);
+    navigation.navigate('VendasEditTab', { venda });
+  };
+
+  const handleExcluirVenda = (vendaId) => {
+    Alert.alert(
+      'Confirmação',
+      'Deseja excluir esta venda?',
+      [
+        { text: 'Cancelar', style: 'cancel' },
+        {
+          text: 'Excluir',
+          onPress: async () => {
+            try {
+              await excluirVenda(vendaId);
+              setVendas(vendas.filter((venda) => venda.id !== vendaId));
+              Alert.alert('Sucesso', 'Venda excluída com sucesso!');
+            } catch (error) {
+              console.error('Erro ao excluir venda:', error);
+              Alert.alert('Erro', 'Erro ao excluir a venda.');
+            }
+          },
+        },
+      ],
+      { cancelable: true }
+    );
+  };
 
   const renderVenda = ({ item }) => (
     <View style={styles.vendaItem}>
-      <Text style={styles.valorText}>Valor: R$ {item.valor}</Text>
+      <View>
+        <Text style={styles.valorText}>
+          Valor: R$ {item.valor ? Number(item.valor).toFixed(2) : '0.00'}
+        </Text>
+
+        <Text style={styles.dataText}>Data: {new Date(item.createdAt).toLocaleString()}</Text>
+      </View>
       <View style={styles.buttonsContainer}>
-      <TouchableOpacity style={styles.editButton} onPress={() => handleEdit(item)}>
+        <TouchableOpacity style={styles.editButton} onPress={() => handleEdit(item)}>
           <Text style={styles.buttonText}>Editar</Text>
         </TouchableOpacity>
         <TouchableOpacity
@@ -49,17 +86,24 @@ const UltimasVendasTab = ({ route, navigation }) => {
     </View>
   );
 
-  
-
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Últimas Vendas</Text>
-      <FlatList
-        data={vendas}
-        keyExtractor={(item) => item.id.toString()}
-        renderItem={renderVenda}
-        contentContainerStyle={styles.listContainer}
-      />
+      <Text style={styles.title}>📋 Últimas Vendas</Text>
+
+      {loading ? (
+        <ActivityIndicator size="large" color="#20B2AA" />
+      ) : vendas.length === 0 ? (
+        <Text style={styles.emptyText}>Nenhuma venda cadastrada.</Text>
+      ) : (
+        <ScrollView nestedScrollEnabled={true}>
+          <FlatList
+            data={vendas}
+            keyExtractor={(item) => item.id.toString()}
+            renderItem={renderVenda}
+            scrollEnabled={false}  // 🔑 Evita conflito de rolagem
+          />
+        </ScrollView>
+      )}
     </View>
   );
 };
@@ -70,29 +114,40 @@ const styles = StyleSheet.create({
     padding: 20,
     backgroundColor: '#f5f5f5',
   },
+  header: {
+    backgroundColor: '#20B2AA',
+    padding: 15,
+    borderRadius: 5,
+    marginBottom: 15,
+  },
+  headerText: {
+    color: '#fff',
+    fontWeight: 'bold',
+  },
   title: {
     fontSize: 20,
     fontWeight: 'bold',
     marginBottom: 10,
     textAlign: 'center',
   },
-  listContainer: {
-    marginTop: 10,
-  },
   vendaItem: {
     backgroundColor: '#fff',
     padding: 10,
-    borderRadius: 2,
+    borderRadius: 5,
     marginBottom: 10,
+    borderColor: '#ccc',
+    borderWidth: 1,
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    borderColor: '#ccc',
-    borderWidth: 1,
   },
   valorText: {
     fontSize: 16,
     fontWeight: 'bold',
+  },
+  dataText: {
+    fontSize: 14,
+    color: '#555',
   },
   buttonsContainer: {
     flexDirection: 'row',
@@ -110,8 +165,12 @@ const styles = StyleSheet.create({
   },
   buttonText: {
     color: '#fff',
-    fontSize: 14,
     fontWeight: 'bold',
+  },
+  emptyText: {
+    textAlign: 'center',
+    color: '#777',
+    marginTop: 20,
   },
 });
 

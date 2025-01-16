@@ -31,7 +31,7 @@ const AuditoriaScreen = ({ route }) => {
     userName: 'Auditor Desconhecido',
     auditoriaId: null,
   };
-{/*
+  {/*
   useEffect(() => {
     console.log('auditoria id', auditoriaId)
     console.log('usuario id', userId)
@@ -39,7 +39,7 @@ const AuditoriaScreen = ({ route }) => {
   }, []);
 
   */}
- 
+
 
   const { auditoriadetails } = useAuditoriaDetails();
 
@@ -58,16 +58,17 @@ const AuditoriaScreen = ({ route }) => {
 
   const renderContent = () => {
     switch (activeTab) {
-      case 'UltimasVendasTab':
+      case 'UltimasVendas':
         return (
           <UltimasVendasTab
-            auditoriaId={auditoriaId}
-            userName={userName}
-            lojaName={lojaName}
-            data={data}
-          />
+          auditoriaId={auditoriaId}
+          lojaName={lojaName}
+          data={data}
+          userName={userName}
+          navigation={navigation}
+        />
+        
         );
-
       case 'Vendas':
         return (
           <VendasTab
@@ -75,6 +76,7 @@ const AuditoriaScreen = ({ route }) => {
             userName={userName}
             lojaName={lojaName}
             data={data}
+            setActiveTab={setActiveTab} // 🔥 Mantém a função passando
           />
         );
       case 'Fluxo':
@@ -120,6 +122,7 @@ const AuditoriaScreen = ({ route }) => {
             userName={userName}
             lojaName={lojaName}
             data={data}
+            setActiveTab={setActiveTab}
           />
         );
     }

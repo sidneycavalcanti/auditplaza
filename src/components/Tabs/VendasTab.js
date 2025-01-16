@@ -16,7 +16,7 @@ import { useNavigation } from '@react-navigation/native';
 
 import styles from '../../styles/AuditoriaScreenStyles';
 
-const VendasTab = ({ auditoriaId, userId, lojaId }) => {
+const VendasTab = ({ auditoriaId, userId, lojaId, setActiveTab }) => {
 
   const navigation = useNavigation();
   
@@ -256,11 +256,12 @@ const VendasTab = ({ auditoriaId, userId, lojaId }) => {
         </Text>
       </TouchableOpacity>
 
-      <TouchableOpacity style={styles.button} onPress={handleUltimasVendas}>
+      <TouchableOpacity style={styles.button} onPress={() => setActiveTab('UltimasVendas')}>
         <Text style={styles.buttonText}>
-          {loading ? 'Abrindo ultimas vendas...' : 'Ultimas vendas'}
+          {loading ? 'Abrindo últimas vendas...' : 'Últimas Vendas'}
         </Text>
       </TouchableOpacity>
+
 
       {error && <Text style={styles.errorText}>{error}</Text>}
     </View>
