@@ -11,7 +11,7 @@ import {
 } from 'react-native';
 import useAuditoriaDetails from '../../hooks/useAuditoriaDetails';
 
-const UltimasVendasTab = ({ auditoriaId, lojaName, data, userName, navigation }) => {
+const UltimasVendasTab = ({ auditoriaId, navigation }) => {
   const [vendas, setVendas] = useState([]);
   const [loading, setLoading] = useState(true);
 

@@ -1,46 +1,68 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   View,
   Text,
+  FlatList,
   TouchableOpacity,
   Alert,
+  ActivityIndicator,
   StyleSheet,
-  FlatList,
-
 } from 'react-native';
+import useAuditoriaDetails from '../../hooks/useAuditoriaDetails';
 
-const UltimasPerdasTab = ({ route, navigation }) => {
-  const { perdas } = route.params;
+const UltimasPerdasTab = ({ auditoriaId, lojaName, data, userName }) => {
+  const [perdas, setPerdas] = useState([]);
+  const [loading, setLoading] = useState(true);
 
-  const handleEdit = (perdas) => {
-    console.log('Venda enviada para edição:', perdas); // Verifique os dados no console
-    navigation.navigate('VendasEditTab', { perdas }); // Passa a venda inteira para edição
-  };
+  const { fetchUltimasPerdas, excluirPerda } = useAuditoriaDetails();
 
-  const handleExcluirPerdas = async (perdasId) => {
+  useEffect(() => {
+    carregarPerdas();
+  }, []);
+
+  const carregarPerdas = async () => {
     try {
-      // Lógica para excluir a venda
-      await excluirVenda(perdasId); // Chame a função que faz a requisição para excluir
-      Alert.alert('Sucesso', 'Venda excluída com sucesso!');
-      // Atualize a lista de vendas ou recarregue os dados
-      navigation.goBack(); // Volte para a lista de auditorias
+      const response = await fetchUltimasPerdas(auditoriaId);
+      setPerdas(response || []); // Garante que perdas não seja null
     } catch (error) {
-      console.error('Erro ao excluir venda:', error);
-      Alert.alert('Erro', 'Não foi possível excluir a venda.');
+      console.error('Erro ao carregar perdas:', error);
+      Alert.alert('Erro', 'Não foi possível carregar as últimas perdas.');
+    } finally {
+      setLoading(false);
     }
   };
-  
 
-  const renderPerdas= ({ item }) => (
-    <View style={styles.vendaItem}>
-      <Text style={styles.valorText}>Motivo: {item.valor}</Text>
+  const handleExcluirPerda = (perdaId) => {
+    Alert.alert(
+      'Confirmação',
+      'Deseja excluir esta perda?',
+      [
+        { text: 'Cancelar', style: 'cancel' },
+        {
+          text: 'Excluir',
+          onPress: async () => {
+            try {
+              await excluirPerda(perdaId);
+              setPerdas(perdas.filter((perda) => perda.id !== perdaId));
+              Alert.alert('Sucesso', 'Perda excluída com sucesso!');
+            } catch (error) {
+              Alert.alert('Erro', 'Erro ao excluir a perda.');
+            }
+          },
+        },
+      ],
+      { cancelable: true }
+    );
+  };
+
+  const renderPerda = ({ item }) => (
+    <View style={styles.perdaItem}>
+      <Text style={styles.valorText}>Motivo: {item.motivoperdasId.lojaName}</Text>
+      <Text style={styles.valorText}>Descrição: {item.descricao}</Text>
       <View style={styles.buttonsContainer}>
-      <TouchableOpacity style={styles.editButton} onPress={() => handleEdit(item)}>
-          <Text style={styles.buttonText}>Editar</Text>
-        </TouchableOpacity>
         <TouchableOpacity
           style={styles.deleteButton}
-          onPress={() => handleExcluirPerdas(item.id)}
+          onPress={() => handleExcluirPerda(item.id)}
         >
           <Text style={styles.buttonText}>Excluir</Text>
         </TouchableOpacity>
@@ -48,17 +70,22 @@ const UltimasPerdasTab = ({ route, navigation }) => {
     </View>
   );
 
-  
-
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Últimas Perdas</Text>
-      <FlatList
-        data={perdas}
-        keyExtractor={(item) => item.id.toString()}
-        renderItem={renderPerdas}
-        contentContainerStyle={styles.listContainer}
-      />
+      <Text style={styles.title}>📋 Últimas Perdas</Text>
+      {loading ? (
+        <ActivityIndicator size="large" color="#20B2AA" />
+      ) : perdas.length === 0 ? (
+        <Text style={styles.emptyText}>Nenhuma perda cadastrada.</Text>
+      ) : (
+        <FlatList
+          data={perdas}
+          keyExtractor={(item) => item.id.toString()}
+          renderItem={renderPerda}
+          nestedScrollEnabled={true} // Permite rolagem aninhada
+          contentContainerStyle={styles.listContainer}
+        />
+      )}
     </View>
   );
 };
@@ -75,17 +102,11 @@ const styles = StyleSheet.create({
     marginBottom: 10,
     textAlign: 'center',
   },
-  listContainer: {
-    marginTop: 10,
-  },
-  vendaItem: {
+  perdaItem: {
     backgroundColor: '#fff',
     padding: 10,
-    borderRadius: 2,
+    borderRadius: 5,
     marginBottom: 10,
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
     borderColor: '#ccc',
     borderWidth: 1,
   },
@@ -96,12 +117,6 @@ const styles = StyleSheet.create({
   buttonsContainer: {
     flexDirection: 'row',
   },
-  editButton: {
-    backgroundColor: '#4CAF50',
-    padding: 10,
-    borderRadius: 5,
-    marginRight: 5,
-  },
   deleteButton: {
     backgroundColor: '#F44336',
     padding: 10,
@@ -109,8 +124,12 @@ const styles = StyleSheet.create({
   },
   buttonText: {
     color: '#fff',
-    fontSize: 14,
     fontWeight: 'bold',
+  },
+  emptyText: {
+    textAlign: 'center',
+    color: '#777',
+    marginTop: 20,
   },
 });
 

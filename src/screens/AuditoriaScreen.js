@@ -21,8 +21,11 @@ import OutrosTab from '../components/Tabs/OutrosTab';
 
 
 import UltimasVendasTab from '../components/Tabs/UltimaVendasTab';
+import UltimasPerdasTab from '../components/Tabs/UltimaPerdasTab';
+import UltimasAnostacoesTab from '../components/Tabs/UltimasAnostacoesTab.js';
 
 const AuditoriaScreen = ({ route }) => {
+  const [perdasTab, setPerdasTab] = useState('perdas');
   const [activeTab, setActiveTab] = useState('Vendas');
   const navigation = useNavigation();
   const { lojaName, data, userName, auditoriaId } = route.params || {
@@ -58,6 +61,15 @@ const AuditoriaScreen = ({ route }) => {
 
   const renderContent = () => {
     switch (activeTab) {
+      case 'UltimasPerdas':
+        return (
+          <UltimasPerdasTab
+            auditoriaId={auditoriaId}
+            lojaName={lojaName}
+            data={data}
+            userName={userName}
+          />
+        );
       case 'UltimasVendas':
         return (
           <UltimasVendasTab
@@ -66,6 +78,7 @@ const AuditoriaScreen = ({ route }) => {
           data={data}
           userName={userName}
           navigation={navigation}
+
         />
         
         );
@@ -91,11 +104,12 @@ const AuditoriaScreen = ({ route }) => {
       case 'Perdas':
         return (
           <PerdasTab
-            auditoriaId={auditoriaId}
-            userName={userName}
-            lojaName={lojaName}
-            data={data}
-          />
+          auditoriaId={auditoriaId}
+          userName={userName}
+          lojaName={lojaName}
+          data={data}
+          setActiveTab={setActiveTab} // 🔥 Corrigido
+        />
         );
       case 'Anotações':
         return (

@@ -7,7 +7,7 @@ import useAuditoriaDetails from '../../hooks/useAuditoriaDetails';
 
 import { useNavigation } from '@react-navigation/native';
 
-const PerdasTab = ({auditoriaId}) => {
+const PerdasTab = ({auditoriaId, setActiveTab}) => {
 
     
   const navigation = useNavigation();
@@ -120,6 +120,12 @@ const PerdasTab = ({auditoriaId}) => {
       <TouchableOpacity style={styles.button} onPress={handleUltimasPerdas}>
         <Text style={styles.buttonText}>Ultimas perdas </Text>
       </TouchableOpacity>
+
+      <TouchableOpacity style={styles.button} onPress={() => setActiveTab('UltimasPerdas')}>
+              <Text style={styles.buttonText}>
+                {loading ? 'Abrindo últimas perdas...' : 'Últimas Perdas'}
+              </Text>
+            </TouchableOpacity>
 
 
       {/* Renderiza uma mensagem de erro, se houver */}
