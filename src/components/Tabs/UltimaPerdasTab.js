@@ -7,6 +7,7 @@ import {
   Alert,
   ActivityIndicator,
   StyleSheet,
+  ScrollView
 } from 'react-native';
 import useAuditoriaDetails from '../../hooks/useAuditoriaDetails';
 
@@ -54,12 +55,22 @@ const UltimasPerdasTab = ({ auditoriaId, lojaName, data, userName }) => {
       { cancelable: true }
     );
   };
-
   const renderPerda = ({ item }) => (
     <View style={styles.perdaItem}>
-      <Text style={styles.valorText}>Motivo: {item.motivoperdasId.lojaName}</Text>
-      <Text style={styles.valorText}>Descrição: {item.descricao}</Text>
+      {/* Motivo e Descrição */}
+      <View>
+        <Text style={styles.valorText}>Motivo: {item.motivoperdas?.name || 'Não informado'}</Text>
+        <Text style={styles.obstext}>Descrição: {item.observacao || 'Sem observação'}</Text>
+      </View>
+  
+      {/* Botões de Ações */}
       <View style={styles.buttonsContainer}>
+        <TouchableOpacity
+          style={styles.editButton}
+          onPress={() => handleEdit(item)}
+        >
+          <Text style={styles.buttonText}>Editar</Text>
+        </TouchableOpacity>
         <TouchableOpacity
           style={styles.deleteButton}
           onPress={() => handleExcluirPerda(item.id)}
@@ -78,13 +89,15 @@ const UltimasPerdasTab = ({ auditoriaId, lojaName, data, userName }) => {
       ) : perdas.length === 0 ? (
         <Text style={styles.emptyText}>Nenhuma perda cadastrada.</Text>
       ) : (
+        <ScrollView nestedScrollEnabled={true}>
         <FlatList
-          data={perdas}
+          data={perdas || []}
           keyExtractor={(item) => item.id.toString()}
           renderItem={renderPerda}
-          nestedScrollEnabled={true} // Permite rolagem aninhada
+          scrollEnabled={false} // Impede que a FlatList role
           contentContainerStyle={styles.listContainer}
         />
+      </ScrollView>
       )}
     </View>
   );
@@ -96,6 +109,8 @@ const styles = StyleSheet.create({
     padding: 20,
     backgroundColor: '#f5f5f5',
   },
+
+
   title: {
     fontSize: 20,
     fontWeight: 'bold',
@@ -109,13 +124,26 @@ const styles = StyleSheet.create({
     marginBottom: 10,
     borderColor: '#ccc',
     borderWidth: 1,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
   },
   valorText: {
     fontSize: 16,
     fontWeight: 'bold',
   },
+  obstext: {
+    fontSize: 14,
+    color: '#555',
+  },
   buttonsContainer: {
     flexDirection: 'row',
+  },
+  editButton: {
+    backgroundColor: '#4CAF50',
+    padding: 10,
+    borderRadius: 5,
+    marginRight: 5,
   },
   deleteButton: {
     backgroundColor: '#F44336',

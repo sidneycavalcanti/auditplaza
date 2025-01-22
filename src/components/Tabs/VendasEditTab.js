@@ -7,6 +7,7 @@ import {
   Alert,
   StyleSheet,
   ActivityIndicator,
+  ScrollView
 } from 'react-native';
 import { Picker } from '@react-native-picker/picker';
 
@@ -76,7 +77,7 @@ const VendasEditTab = ({ route, navigation }) => {
   }
 
   return (
-    <View style={styles.container}>
+    <ScrollView style={styles.container}>
       {/*<Text style={styles.title}>Editar Venda</Text>*/}
 
       <Text style={styles.label}>Valor:</Text>
@@ -125,7 +126,7 @@ const VendasEditTab = ({ route, navigation }) => {
       <TouchableOpacity style={styles.button} onPress={handleEditarVenda}>
         <Text style={styles.buttonText}>Salvar</Text>
       </TouchableOpacity>
-    </View>
+    </ScrollView>
   );
 };
 

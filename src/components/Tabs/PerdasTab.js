@@ -117,10 +117,6 @@ const PerdasTab = ({auditoriaId, setActiveTab}) => {
         <Text style={styles.buttonText}>Adicionar</Text>
       </TouchableOpacity>
 
-      <TouchableOpacity style={styles.button} onPress={handleUltimasPerdas}>
-        <Text style={styles.buttonText}>Ultimas perdas </Text>
-      </TouchableOpacity>
-
       <TouchableOpacity style={styles.button} onPress={() => setActiveTab('UltimasPerdas')}>
               <Text style={styles.buttonText}>
                 {loading ? 'Abrindo últimas perdas...' : 'Últimas Perdas'}
