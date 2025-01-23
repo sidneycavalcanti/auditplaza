@@ -25,7 +25,11 @@ const UltimasVendasTab = ({ auditoriaId, navigation }) => {
   const carregarVendas = async () => {
     try {
       const response = await fetchUltimasVendas(auditoriaId);
-      setVendas(response);
+  
+      // Ordena as vendas pela data de criação (createdAt) da mais recente para a mais antiga
+      const vendasOrdenadas = response.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+  
+      setVendas(vendasOrdenadas);
     } catch (error) {
       console.error('Erro ao carregar vendas:', error);
       Alert.alert('Erro', 'Não foi possível carregar as últimas vendas.');
@@ -33,6 +37,7 @@ const UltimasVendasTab = ({ auditoriaId, navigation }) => {
       setLoading(false);
     }
   };
+  
 
   const handleEdit = (venda) => {
     console.log('Venda enviada para edição:', venda);

@@ -8,41 +8,42 @@ import {
   Image,
   ActivityIndicator,
   SafeAreaView,
+  Alert,
 } from 'react-native';
 import { format, isToday, parseISO } from 'date-fns';
 
 import useAuditorias from '../hooks/useAuditorias';
-
-import styles from '../styles/HomeScreenStyles'
-
-
+import styles from '../styles/HomeScreenStyles';
 
 const HomeScreen = ({ navigation }) => {
   const [searchQuery, setSearchQuery] = useState('');
   const { auditorias, loading, error, fetchAuditorias } = useAuditorias();
 
   const handleAuditoria = (lojaId, lojaName, data, userName, userId, auditoriaId) => {
-    if (!auditoriaId) {
-      console.error('auditoriaId está indefinido antes da navegação');
-      return;
-    }
-    if (!lojaId) {
-      console.error('lojaId está indefinido antes da navegação');
-      return;
-    }
-    if (!userId) {
-      console.error('userId está indefinido antes da navegação');
-      return;
-    }
-    navigation.navigate('Auditoria', {
+    console.log('Iniciando auditoria com os parâmetros:', {
       lojaId,
       lojaName,
-      data: format(data, 'dd/MM/yyyy HH:mm:ss'), // Data e hora formatadas
-      userName, // Nome do usuário
+      data,
+      userName,
       userId,
-      auditoriaId, // Inclua o ID da auditoria
+      auditoriaId,
+    });
+  
+    if (!auditoriaId || !lojaId || !userId) {
+      console.error('Erro: Parâmetros faltando antes da navegação');
+      return Alert.alert('Erro', 'Dados incompletos para iniciar auditoria.');
+    }
+  
+    navigation.navigate('Auditoria', {
+      lojaId, // Incluindo o ID da loja na navegação
+      lojaName,
+      data: format(data, 'dd/MM/yyyy HH:mm:ss'),
+      userName,
+      userId,
+      auditoriaId,
     });
   };
+  
 
   const handleSearch = (text) => {
     setSearchQuery(text);
@@ -52,9 +53,9 @@ const HomeScreen = ({ navigation }) => {
   const sortedAuditorias = auditorias
     ?.map((item) => ({
       ...item,
-      data: parseISO(item.data),
+      data: parseISO(item.data), // Converte a data para um formato manipulável
     }))
-    .sort((a, b) => b.data - a.data);
+    .sort((a, b) => b.data - a.data); // Ordena da mais recente para a mais antiga
 
   // Filtrar auditorias pelo texto de busca
   const filteredAuditorias = sortedAuditorias?.filter((item) =>
@@ -63,7 +64,16 @@ const HomeScreen = ({ navigation }) => {
 
   const renderAuditoria = ({ item }) => {
     const isDisponivel = isToday(item.data);
-
+  
+    console.log('Renderizando auditoria:', {
+      lojaId: item.loja?.id,
+      lojaName: item.loja?.name,
+      data: item.data,
+      userName: item.usuario?.name,
+      userId: item.usuario?.id,
+      auditoriaId: item.id,
+    });
+  
     return (
       <View style={styles.auditoriaItem}>
         <Text style={styles.auditoriaText}>
@@ -80,12 +90,12 @@ const HomeScreen = ({ navigation }) => {
           disabled={!isDisponivel}
           onPress={() =>
             handleAuditoria(
-              item.loja?.id, // ID da loja
-              item.loja?.name, // Nome da loja
-              item.data, // Data da auditoria
-              item.usuario?.name, // Nome do usuário
-              item.usuario?.id, // ID da usuario
-              item.id // ID da auditoria
+              item.loja?.id || null,
+              item.loja?.name || 'N/A',
+              item.data || null,
+              item.usuario?.name || 'N/A',
+              item.usuario?.id || null,
+              item.id || null
             )
           }
         >
@@ -93,11 +103,10 @@ const HomeScreen = ({ navigation }) => {
             {isDisponivel ? 'Iniciar Auditoria' : 'Indisponível'}
           </Text>
         </TouchableOpacity>
-
       </View>
     );
   };
-
+  
   return (
     <SafeAreaView style={styles.safeContainer}>
       <View style={styles.container}>

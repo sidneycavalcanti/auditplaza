@@ -17,6 +17,7 @@ import VendasTab from '../components/Tabs/VendasTab';
 import FluxoTab from '../components/Tabs/FluxoTab';
 import AnotacoesTab from '../components/Tabs/AnotacoesTab';
 import OutrosTab from '../components/Tabs/OutrosTab';
+import VendasEditTab from '../components/Tabs/VendasEditTab';
 
 
 import UltimasVendasTab from '../components/Tabs/UltimaVendasTab';
@@ -27,7 +28,7 @@ const AuditoriaScreen = ({ route }) => {
   const [perdasTab, setPerdasTab] = useState('perdas');
   const [activeTab, setActiveTab] = useState('Vendas');
   const navigation = useNavigation();
-  const { lojaName, data, userName, auditoriaId } = route.params || {
+  const { lojaName, lojaId, data, userName, auditoriaId } = route.params || {
     lojaName: 'Loja Desconhecida',
     data: 'Data Indisponível',
     userName: 'Auditor Desconhecido',
@@ -58,8 +59,21 @@ const AuditoriaScreen = ({ route }) => {
     checkAuthentication();
   }, []);
 
+  useEffect(() => {
+    console.log('AuditoriaScreen -> route.params:', route.params); // Verifique os dados passados
+  }, [route.params]);
+
   const renderContent = () => {
     switch (activeTab) {
+      case 'VendasEditTab':
+        return (
+          <VendasEditTab
+            auditoriaId={auditoriaId}
+            lojaName={lojaName}
+            data={data}
+            userName={userName}
+          />
+        );
       case 'UltimasPerdas':
         return (
           <UltimasPerdasTab
@@ -86,6 +100,7 @@ const AuditoriaScreen = ({ route }) => {
           <VendasTab
             auditoriaId={auditoriaId}
             userName={userName}
+            lojaId={lojaId}
             lojaName={lojaName}
             data={data}
             setActiveTab={setActiveTab} // 🔥 Mantém a função passando
