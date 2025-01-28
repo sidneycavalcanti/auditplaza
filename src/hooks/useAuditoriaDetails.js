@@ -85,7 +85,21 @@ const useAuditoriaDetails = () => {
     }
   };
   
-  
+
+  const excluirVenda = async (idVenda) => {
+    try {
+      // Requisição para excluir a venda usando o método DELETE
+      await handleApiRequest(`/vendas/${idVenda}`, 'DELETE');
+      
+      // Atualiza o estado local, removendo a venda pelo ID
+      setVendas((prev) => prev.filter((venda) => venda.id !== idVenda));
+      
+      console.log('Venda excluída com sucesso!');
+    } catch (err) {
+      console.error('Erro ao excluir venda:', err); // Log de erro
+      throw err; // Opcional: Propagar o erro para tratamento adicional
+    }
+  };
 
   // Funções de Fluxo
   const cadastrarFluxo = async (fluxoItem) => {
@@ -251,7 +265,7 @@ const useAuditoriaDetails = () => {
     pausas,
     formasPagamento,
     sexos,
-    motivoperdas,
+    motivoperdas,excluirVenda,
     cadastrarVenda,
     fetchUltimasVendas,
     fetchUltimasPerdas,
