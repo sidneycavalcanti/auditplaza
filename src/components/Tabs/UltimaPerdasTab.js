@@ -11,7 +11,7 @@ import {
 } from 'react-native';
 import useAuditoriaDetails from '../../hooks/useAuditoriaDetails';
 
-const UltimasPerdasTab = ({ auditoriaId, lojaName, data, userName }) => {
+const UltimasPerdasTab = ({ auditoriaId, setActiveTab }) => {
   const [perdas, setPerdas] = useState([]);
   const [loading, setLoading] = useState(true);
 

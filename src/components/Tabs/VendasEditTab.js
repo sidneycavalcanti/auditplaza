@@ -13,12 +13,18 @@ import { Picker } from '@react-native-picker/picker';
 
 import useAuditoriaDetails from '../../hooks/useAuditoriaDetails';
 
+import styles from '../../styles/AuditoriaScreenStyles';
 
+const VendasEditTab = ({ venda, navigation, setActiveTab }) => {
+  if (!venda) {
+    return (
+      <View style={styles.container}>
+        <Text style={styles.errorText}>Erro: Nenhuma venda selecionada.</Text>
+      </View>
+    );
+  }
 
-const VendasEditTab = ({ route, navigation }) => {
   const { fetchSexos, fetchFormasPagamento, atualizarVenda, loading } = useAuditoriaDetails();
-
-  const { venda } = route.params || {};
 
   // Verificações de segurança para evitar valores indefinidos
   const [valor, setValor] = useState(venda?.valor?.toString() || '');
@@ -27,6 +33,9 @@ const VendasEditTab = ({ route, navigation }) => {
   const [selectedFormaPagamento, setSelectedFormaPagamento] = useState(venda?.formaPagamentoId?.toString() || '');
   const [sexos, setSexos] = useState([]);
   const [formasPagamento, setFormasPagamento] = useState([]);
+  const [observacao, setObservacao] = useState(venda?.observacao?.toString() || '');
+  const [isTrocaChecked, setIsTrocaChecked] = useState(venda?.troca); // Estado para "Troca"
+  
 
   useEffect(() => {
     console.log('Dados recebidos para edição:', venda);
@@ -67,20 +76,30 @@ const VendasEditTab = ({ route, navigation }) => {
     }
   };
 
-  if (loading) {
+  {/*if (loading) {
     return (
       <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
         <ActivityIndicator size="large" color="#20B2AA" />
         <Text>Carregando...</Text>
       </View>
     );
-  }
+  }*/}
 
   return (
-    <ScrollView style={styles.container}>
-      {/*<Text style={styles.title}>Editar Venda</Text>*/}
+    <ScrollView style={styles.contentContainer}>
+      <Text style={styles.title}>📋 Editar Venda</Text>
+      {/* 🔥 Loading agora aparece logo após o título */}
+    {loading && (
+      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', marginVertical: 10 }}>
+        <ActivityIndicator size="large" color="#20B2AA" />
+        <Text>Carregando...</Text>
+      </View>
+    )}
 
-      <Text style={styles.label}>Valor:</Text>
+    {/* 🔥 Campos de edição só aparecem quando o loading termina */}
+    {!loading && (
+      <>
+      <Text style={styles.sectionTitle}>Valor:</Text>
       <TextInput
         style={styles.input}
         placeholder="Digite o valor"
@@ -89,7 +108,7 @@ const VendasEditTab = ({ route, navigation }) => {
         onChangeText={setValor}
       />
 
-      <Text style={styles.label}>Sexo:</Text>
+      <Text style={styles.sectionTitle}>Sexo:</Text>
       <Picker
         selectedValue={selectedSexo}
         onValueChange={(itemValue) => setSelectedSexo(itemValue)}
@@ -100,7 +119,7 @@ const VendasEditTab = ({ route, navigation }) => {
         ))}
       </Picker>
 
-      <Text style={styles.label}>Forma de Pagamento:</Text>
+      <Text style={styles.sectionTitle}>Forma de Pagamento:</Text>
       <Picker
         selectedValue={selectedFormaPagamento}
         onValueChange={(itemValue) => setSelectedFormaPagamento(itemValue)}
@@ -111,7 +130,7 @@ const VendasEditTab = ({ route, navigation }) => {
         ))}
       </Picker>
 
-      <Text style={styles.label}>Faixa Etária:</Text>
+      <Text style={styles.sectionTitle}>Faixa Etária:</Text>
       <Picker
         selectedValue={faixaEtaria}
         onValueChange={(itemValue) => setFaixaEtaria(itemValue)}
@@ -123,60 +142,43 @@ const VendasEditTab = ({ route, navigation }) => {
         <Picker.Item label="Idoso" value="idoso" />
       </Picker>
 
+      <Text style={styles.sectionTitle}>Observação:</Text>
+            <TextInput
+              style={styles.textArea}
+              placeholder="Digite suas observações"
+              placeholderTextColor="#888"
+              multiline
+              numberOfLines={4}
+              value={observacao}
+              onChangeText={setObservacao}
+            />
+      
+            <View style={styles.checkboxContainer}>
+              <View style={styles.switchWrapper}>
+                <Text>Troca</Text>
+                <Switch
+                  value={isTrocaChecked}
+                  onValueChange={setIsTrocaChecked}
+                  trackColor={{ false: '#767577', true: '#20B2AA' }}
+                  thumbColor={isTrocaChecked ? '#20B2AA' : '#f4f3f4'}
+                />
+              </View>
+            </View>
+
       <TouchableOpacity style={styles.button} onPress={handleEditarVenda}>
         <Text style={styles.buttonText}>Salvar</Text>
       </TouchableOpacity>
+
+      <TouchableOpacity style={styles.button} onPress={()=> setActiveTab('UltimasVendas')}>
+        <Text style={styles.buttonText}>Voltar</Text>
+      </TouchableOpacity>
+      </>
+      )}
     </ScrollView>
+    
   );
 };
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    padding: 20,
-    backgroundColor: '#f5f5f5',
-  },
-  title: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    marginBottom: 20,
-  },
-  label: {
-    fontSize: 16,
-    marginBottom: 5,
-  },
-  input: {
-    height: 40,
-    borderColor: '#ccc',
-    borderWidth: 1,
-    borderRadius: 5,
-    paddingHorizontal: 10,
-    marginBottom: 15,
-    backgroundColor: '#fff',
-  },
-  picker: {
-    height: 150,
-    backgroundColor: '#fff',
-    marginBottom: 30,
-    justifyContent: 'center', 
-  },
-  button: {
-    backgroundColor: '#20B2AA',
-    paddingVertical: 15,
-    borderRadius: 10,
-    marginBottom: 15,
-    alignItems: 'center',
-  },
-  buttonText: {
-    color: '#fff',
-    fontSize: 16,
-    fontWeight: 'bold',
-  },
-  loadingContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-});
+
 
 export default VendasEditTab;

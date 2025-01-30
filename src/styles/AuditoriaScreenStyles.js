@@ -230,6 +230,12 @@ export default StyleSheet.create({
     alignItems: 'center',
     marginTop: 50,
   },
+  title: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    marginBottom: 10,
+    textAlign: 'center',
+  },
 
 
 });

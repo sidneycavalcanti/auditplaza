@@ -10,11 +10,10 @@ import {
 } from 'react-native';
 import { Picker } from '@react-native-picker/picker';
 import useAuditoriaDetails from '../../hooks/useAuditoriaDetails';
-import { useNavigation } from '@react-navigation/native';
+
 import styles from '../../styles/AuditoriaScreenStyles';
 
 const VendasTab = ({ auditoriaId, userId, lojaId, setActiveTab }) => {
-  const navigation = useNavigation();
   const {
     fetchSexos,
     fetchFormasPagamento,

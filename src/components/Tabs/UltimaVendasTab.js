@@ -11,10 +11,12 @@ import {
 } from 'react-native';
 import useAuditoriaDetails from '../../hooks/useAuditoriaDetails';
 
-const UltimasVendasTab = ({ auditoriaId, navigation }) => {
+
+const UltimasVendasTab = ({ auditoriaId ,setActiveTab }) => {
+
+
   const [vendas, setVendas] = useState([]);
   const [loading, setLoading] = useState(true);
-
   const { fetchUltimasVendas, excluirVenda } = useAuditoriaDetails();
 
   // Carregar vendas ao abrir a aba
@@ -39,10 +41,10 @@ const UltimasVendasTab = ({ auditoriaId, navigation }) => {
   };
   
 
-  const handleEdit = (venda) => {
-    console.log('Venda enviada para edição:', venda);
-    navigation.navigate('VendasEditTab', { venda });
-  };
+  //const handleEdit = (venda) => {
+ //   console.log('Venda enviada para edição:', venda);
+  //  navigation.navigate('VendasEditTab', { venda });
+ // };
 
   const handleExcluirVenda = (vendaId) => {
     Alert.alert(
@@ -78,7 +80,7 @@ const UltimasVendasTab = ({ auditoriaId, navigation }) => {
         <Text style={styles.dataText}>Data: {new Date(item.createdAt).toLocaleString()}</Text>
       </View>
       <View style={styles.buttonsContainer}>
-        <TouchableOpacity style={styles.editButton} onPress={() => handleEdit(item)}>
+        <TouchableOpacity style={styles.editButton} onPress={() => setActiveTab('VendasEditTab', item)}>
           <Text style={styles.buttonText}>Editar</Text>
         </TouchableOpacity>
         <TouchableOpacity

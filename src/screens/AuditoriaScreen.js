@@ -25,6 +25,8 @@ import UltimasPerdasTab from '../components/Tabs/UltimaPerdasTab';
 import UltimasAnostacoesTab from '../components/Tabs/UltimasAnostacoesTab.js';
 
 const AuditoriaScreen = ({ route }) => {
+  
+  const [selectedVenda, setSelectedVenda] = useState(null); // 🔥 Armazena a venda selecionada
   const [perdasTab, setPerdasTab] = useState('perdas');
   const [activeTab, setActiveTab] = useState('Vendas');
   const navigation = useNavigation();
@@ -72,6 +74,8 @@ const AuditoriaScreen = ({ route }) => {
             lojaName={lojaName}
             data={data}
             userName={userName}
+            setActiveTab={setActiveTab} // 🔥 Mantém a função passando
+            venda={selectedVenda} // 🔥 Passa a venda selecionada
           />
         );
       case 'UltimasPerdas':
@@ -83,18 +87,16 @@ const AuditoriaScreen = ({ route }) => {
             userName={userName}
           />
         );
-      case 'UltimasVendas':
-        return (
-          <UltimasVendasTab
-          auditoriaId={auditoriaId}
-          lojaName={lojaName}
-          data={data}
-          userName={userName}
-          navigation={navigation}
-
-        />
-        
-        );
+        case 'UltimasVendas':
+          return (
+            <UltimasVendasTab
+              auditoriaId={auditoriaId}
+              setActiveTab={(tab, venda = null) => {
+                setSelectedVenda(venda);
+                setActiveTab(tab);
+              }} // 🔥 Agora passa a venda corretamente
+            />
+          );
       case 'Vendas':
         return (
           <VendasTab
