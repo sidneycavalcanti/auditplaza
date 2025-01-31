@@ -71,19 +71,50 @@ const useAuditoriaDetails = () => {
   const fetchUltimasVendas = async (auditoriaId) => {
     try {
       const response = await handleApiRequest(`/vendas?auditoriaId=${auditoriaId}`);
-      
-      // Verifique se 'vendas' existe na resposta
+  
+      console.log("📡 Vendas recebidas:", response);
+  
       if (response && response.vendas) {
-        setVendas(response.vendas); // Atualiza o estado
-        return response.vendas; // Retorna a lista de vendas
+        setVendas(response.vendas.map(venda => ({
+          ...venda,
+          faixaEtaria: venda.faixaEtaria || 'adulto', // 🔥 Garante que sempre tenha um valor correto
+          sexo: venda.sexo || { id: '', name: 'Desconhecido' }, // 🔥 Evita undefined
+          formadepagamento: venda.formadepagamento || { id: '', name: 'Não informado' } // 🔥 Evita undefined
+        })));
+        return response.vendas;
       } else {
         throw new Error('Dados de vendas não encontrados.');
       }
     } catch (error) {
-      console.error('Erro ao buscar vendas:', error.message);
+      console.error("❌ Erro ao buscar vendas:", error);
       throw error;
     }
   };
+  
+
+const atualizarVenda = async (venda) => {
+  try {
+    if (!venda.id) {
+      throw new Error("ID da venda é obrigatório para atualizar.");
+    }
+
+    console.log(`📡 Enviando requisição PUT para /vendas/${venda.id}`, JSON.stringify(venda, null, 2));
+
+    const vendaAtualizada = await handleApiRequest(`/vendas/${venda.id}`, 'PUT', venda);
+
+    console.log('✅ Venda atualizada na API:', vendaAtualizada);
+
+    setVendas((prevVendas) =>
+      prevVendas.map((v) => (v.id === venda.id ? vendaAtualizada : v))
+    );
+
+    return vendaAtualizada;
+  } catch (err) {
+    console.error("❌ Erro ao atualizar venda:", err);
+    throw err;
+  }
+};
+
   
 
   const excluirVenda = async (idVenda) => {
@@ -265,7 +296,9 @@ const useAuditoriaDetails = () => {
     pausas,
     formasPagamento,
     sexos,
-    motivoperdas,excluirVenda,
+    motivoperdas,
+    atualizarVenda,
+    excluirVenda,
     cadastrarVenda,
     fetchUltimasVendas,
     fetchUltimasPerdas,
