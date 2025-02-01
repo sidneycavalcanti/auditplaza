@@ -24,7 +24,10 @@ const UltimasPerdasTab = ({ auditoriaId, setActiveTab }) => {
   const carregarPerdas = async () => {
     try {
       const response = await fetchUltimasPerdas(auditoriaId);
-      setPerdas(response || []); // Garante que perdas não seja null
+
+      const perdasOrdenadas = response.sort((a,b) => new Date (b.createdAt) - new Date(a.createdAt));
+
+      setPerdas(perdasOrdenadas || []); // Garante que perdas não seja null
     } catch (error) {
       console.error('Erro ao carregar perdas:', error);
       Alert.alert('Erro', 'Não foi possível carregar as últimas perdas.');
@@ -55,6 +58,7 @@ const UltimasPerdasTab = ({ auditoriaId, setActiveTab }) => {
       { cancelable: true }
     );
   };
+  
   const renderPerda = ({ item }) => (
     <View style={styles.perdaItem}>
       {/* Motivo e Descrição */}

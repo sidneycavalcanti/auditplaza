@@ -56,44 +56,43 @@ const VendasTab = ({ auditoriaId, userId, lojaId, setActiveTab }) => {
       Alert.alert('Erro', 'Por favor, insira um valor numérico válido no formato 10.20 ou 10,20.');
       return;
     }
-
+  
     if (!selectedSexo) {
       Alert.alert('Erro', 'Selecione um sexo.');
       return;
     }
-
+  
     if (!selectedFormaPagamento) {
       Alert.alert('Erro', 'Selecione uma forma de pagamento.');
       return;
     }
-
+  
     if (!faixaEtaria) {
       Alert.alert('Erro', 'Selecione uma faixa etária.');
       return;
     }
-
-    // Converte o valor para formato numérico adequado
-    const valorNumerico = parseFloat(valor.replace(',', '.')); // Substitui vírgula por ponto
-
+  
+    // Converte o valor para número
+    const valorNumerico = parseFloat(valor.replace(',', '.'));
+  
     // Objeto de venda
     const venda = {
       valor: valorNumerico,
-      faixaEtaria,
-      sexoId: parseInt(selectedSexo, 10), // Converte ID para número
-      formadepagamentoId: parseInt(selectedFormaPagamento, 10), // Converte ID para número
-      auditoriaId: parseInt(auditoriaId, 10), // Certifique-se de que auditoriaId é válido
-      usuarioId: parseInt(userId, 10), // Certifique-se de que userId é válido
-      lojaId: parseInt(lojaId, 10), // Certifique-se de que lojaId é válido
+      faixaetaria: faixaEtaria, // 🔥 Certifique-se de que está correto
+      sexoId: parseInt(selectedSexo, 10),
+      formadepagamentoId: parseInt(selectedFormaPagamento, 10),
+      auditoriaId: parseInt(auditoriaId, 10),
+      usuarioId: parseInt(userId, 10),
+      lojaId: parseInt(lojaId, 10),
       observacao,
       troca: isTrocaChecked,
     };
-
+  
+    console.log("📡 Enviando venda para API:", JSON.stringify(venda, null, 2));
+  
     try {
-      // Envia a venda para a API
       await cadastrarVenda(venda);
       Alert.alert('Sucesso', 'Venda cadastrada com sucesso!');
-
-      // Reseta os campos após sucesso
       setValor('');
       setSelectedSexo('');
       setSelectedFormaPagamento('');
@@ -101,10 +100,11 @@ const VendasTab = ({ auditoriaId, userId, lojaId, setActiveTab }) => {
       setObservacao('');
       setIsTrocaChecked(false);
     } catch (err) {
-      console.error('Erro ao salvar venda:', err);
+      console.error("❌ Erro ao salvar venda:", err);
       Alert.alert('Erro', 'Não foi possível salvar a venda.');
     }
   };
+  
 
   return (
     <View style={styles.contentContainer}>

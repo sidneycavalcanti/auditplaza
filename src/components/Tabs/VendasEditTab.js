@@ -31,9 +31,9 @@ const VendasEditTab = ({ venda, setActiveTab }) => {
     loading
   } = useAuditoriaDetails();
 
-  // Estados para edição
+  // 🚀 Inicializa os estados corretamente
   const [valor, setValor] = useState(venda?.valor?.toString() || '');
-  const [faixaEtaria, setFaixaEtaria] = useState(venda?.faixaetaria || '');
+  const [faixaEtaria, setFaixaEtaria] = useState(venda?.faixaetaria || 'adulto'); // 🔥 Garante que o valor padrão seja o correto
   const [selectedSexo, setSelectedSexo] = useState(venda?.sexo?.id?.toString() || '');
   const [selectedFormaPagamento, setSelectedFormaPagamento] = useState(venda?.formadepagamento?.id?.toString() || '');
   const [observacao, setObservacao] = useState(venda?.observacao || '');
@@ -50,9 +50,9 @@ const VendasEditTab = ({ venda, setActiveTab }) => {
 
   // 🔍 Log para depuração
   useEffect(() => {
-    console.log('Venda carregada para edição:', venda);
-    console.log('Sexos carregados:', sexos);
-    console.log('Formas de pagamento carregadas:', formasPagamento);
+    console.log("📥 Venda recebida para edição:", venda);
+    console.log("Sexos carregados:", sexos);
+    console.log("Formas de pagamento carregadas:", formasPagamento);
   }, [venda, sexos, formasPagamento]);
 
   const handleEditarVenda = async () => {
@@ -62,23 +62,24 @@ const VendasEditTab = ({ venda, setActiveTab }) => {
     }
 
     const vendaAtualizada = {
-      ...venda,
-      valor: parseFloat(valor.replace(',', '.')),
-      faixaEtaria,
-      sexoId: parseInt(selectedSexo, 10),
+      id: venda.id,
+      auditoriaId: venda.auditoriaId,
       formadepagamentoId: parseInt(selectedFormaPagamento, 10),
+      sexoId: parseInt(selectedSexo, 10),
+      valor: parseFloat(valor.replace(',', '.')),
+      faixaetaria: faixaEtaria, // 🔥 Aqui garantimos que o valor correto seja enviado!
       observacao,
       troca: isTrocaChecked
     };
 
-    console.log('📡 Enviando atualização da venda:', vendaAtualizada);
+    console.log("📡 Enviando atualização da venda:", JSON.stringify(vendaAtualizada, null, 2));
 
     try {
       await atualizarVenda(vendaAtualizada);
       Alert.alert('Sucesso', 'Venda atualizada com sucesso!');
       setActiveTab('UltimasVendas'); // Retorna à lista de vendas
     } catch (err) {
-      console.error('❌ Erro ao atualizar venda:', err);
+      console.error("❌ Erro ao atualizar venda:", err);
       Alert.alert('Erro', 'Não foi possível atualizar a venda.');
     }
   };
@@ -132,7 +133,10 @@ const VendasEditTab = ({ venda, setActiveTab }) => {
           <Text style={styles.sectionTitle}>Faixa Etária:</Text>
           <Picker
             selectedValue={faixaEtaria}
-            onValueChange={(itemValue) => setFaixaEtaria(itemValue)}
+            onValueChange={(itemValue) => {
+              console.log("📝 Alterando faixaEtaria para:", itemValue);
+              setFaixaEtaria(itemValue);
+            }}
             style={styles.picker}
           >
             <Picker.Item label="Infantil" value="infantil" />

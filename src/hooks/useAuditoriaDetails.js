@@ -144,21 +144,39 @@ const atualizarVenda = async (venda) => {
   };
 
   // Funções de Perdas
-  const cadastrarPerda = async () => {
+  const cadastrarPerda = async (perda) => {
     try {
-      if (!perda || !perda.motivo || !perda.descricao) {
+      if (!perda || !perda.motivoperdasId || !perda.descricao) {
         throw new Error('Dados inválidos para cadastro da perda.');
       }
   
+      console.log('📡 Enviando nova perda para API:', JSON.stringify(perda, null, 2));
+  
       const novaPerda = await handleApiRequest('/perdas', 'POST', perda);
-      console.log('Nova perda cadastrada:', novaPerda);
+      console.log('✅ Nova perda cadastrada:', novaPerda);
   
       setPerdas((prev) => [...prev, novaPerda]); // Atualiza o estado com a nova perda
     } catch (error) {
-      console.error('Erro ao cadastrar perda:', error.message);
+      console.error('❌ Erro ao cadastrar perda:', error.message);
       throw new Error('Erro ao cadastrar a perda.');
     }
   };
+
+  const excluirPerda = async (idPerda) => {
+    try {
+      // Requisição para excluir a venda usando o método DELETE
+      await handleApiRequest(`/perdas/${idPerda}`, 'DELETE');
+      
+      // Atualiza o estado local, removendo a venda pelo ID
+      setPerdas((prev) => prev.filter((perda) => perda.id !== idPerda));
+      
+      console.log('Perda excluída com sucesso!');
+    } catch (err) {
+      console.error('Erro ao excluir perda:', err); // Log de erro
+      throw err; // Opcional: Propagar o erro para tratamento adicional
+    }
+  };
+  
   
 
   const fetchPerdas = async () => {
@@ -299,6 +317,7 @@ const atualizarVenda = async (venda) => {
     motivoperdas,
     atualizarVenda,
     excluirVenda,
+    excluirPerda,
     cadastrarVenda,
     fetchUltimasVendas,
     fetchUltimasPerdas,

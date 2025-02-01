@@ -4,30 +4,27 @@ import { Picker } from '@react-native-picker/picker';
 import styles from '../../styles/AuditoriaScreenStyles';
 import useAuditoriaDetails from '../../hooks/useAuditoriaDetails';
 
-
-const PerdasTab = ({setActiveTab}) => {
-  const { 
-    cadastrarPerda, 
-    fetchPerdas, 
-    fetchMotivoPerdas, 
-    motivoperdas,  
-    loading, 
-    error } = useAuditoriaDetails();
+const PerdasTab = ({ auditoriaId, setActiveTab }) => {
+  const {
+    cadastrarPerda,
+    fetchMotivoPerdas,
+    motivoperdas,
+    loading,
+    error
+  } = useAuditoriaDetails();
 
   // Declaração de estados
-  const [motivoPerdas, setMotivoperdas] = useState('');
-  const [selectedPerda, setSelectedPerda] = useState('');
+  const [selectedMotivoPerda, setSelectedMotivoPerda] = useState('');
   const [descricao, setDescricao] = useState('');
 
-  // Busca inicial das perdas ao montar o componente
+  // Busca os motivos de perda ao montar o componente
   useEffect(() => {
     fetchMotivoPerdas();
-    fetchPerdas();
   }, []);
 
   // Função para cadastrar uma perda
   const handleCadPerdas = async () => {
-    if (!selectedPerda) {
+    if (!selectedMotivoPerda) {
       Alert.alert('Erro', 'Selecione um motivo para a perda.');
       return;
     }
@@ -38,21 +35,27 @@ const PerdasTab = ({setActiveTab}) => {
 
     try {
       const perda = {
-        motivoId: parseInt(selectedPerda), // ID do motivo da perda
+        motivoperdasId: parseInt(selectedMotivoPerda, 10), // ID do motivo da perda
         descricao, // Observação
+        auditoriaId: parseInt(auditoriaId, 10)
       };
 
-      await cadastrarPerda(perda); // Chama a função para cadastrar a perda
+      console.log("📡 Enviando nova perda para API:", JSON.stringify(perda, null, 2));
+
+      await cadastrarPerda(perda);
       Alert.alert('Sucesso', 'Perda cadastrada com sucesso!');
-      setSelectedPerda(''); // Limpa o campo motivo
-      setDescricao(''); // Limpa o campo descrição
+
+      // Limpa os campos após o cadastro
+      setSelectedMotivoPerda('');
+      setDescricao('');
+
+      // Redireciona para a lista de perdas
+      //setActiveTab('UltimasPerdas');
     } catch (err) {
-      console.error('Erro ao cadastrar perda:', err);
+      console.error('❌ Erro ao cadastrar perda:', err);
       Alert.alert('Erro', 'Não foi possível cadastrar a perda.');
     }
   };
-
-  // Função para cadastrar uma perda
 
   // Renderiza um indicador de carregamento enquanto os dados estão sendo buscados
   if (loading) {
@@ -63,13 +66,14 @@ const PerdasTab = ({setActiveTab}) => {
       </View>
     );
   }
+
   // Renderiza o conteúdo principal
   return (
     <View style={styles.contentContainer}>
       <Text style={styles.sectionTitle}>Motivo da Perda:</Text>
       <Picker
-        selectedValue={selectedPerda}
-        onValueChange={(itemValue) => setSelectedPerda(String(itemValue))}
+        selectedValue={selectedMotivoPerda}
+        onValueChange={(itemValue) => setSelectedMotivoPerda(String(itemValue))}
         style={styles.picker}
       >
         <Picker.Item label="Selecione um motivo" value="" />
@@ -94,16 +98,12 @@ const PerdasTab = ({setActiveTab}) => {
       </TouchableOpacity>
 
       <TouchableOpacity style={styles.button} onPress={() => setActiveTab('UltimasPerdas')}>
-              <Text style={styles.buttonText}>
-                {loading ? 'Abrindo últimas perdas...' : 'Últimas Perdas'}
-              </Text>
-            </TouchableOpacity>
-
+        <Text style={styles.buttonText}>Últimas Perdas</Text>
+      </TouchableOpacity>
 
       {/* Renderiza uma mensagem de erro, se houver */}
       {error && <Text style={styles.errorText}>{error}</Text>}
     </View>
-    
   );
 };
 
