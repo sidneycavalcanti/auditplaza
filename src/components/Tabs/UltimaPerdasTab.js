@@ -16,24 +16,23 @@ const UltimasPerdasTab = ({ auditoriaId, setActiveTab }) => {
 
   const [perdas, setPerdas] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [loadingMore, setLoadingMore] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
 
   const { fetchUltimasPerdas, excluirPerda } = useAuditoriaDetails();
 
   useEffect(() => {
-    carregarPerdas();
-  }, []);
+    carregarPerdas(currentPage);
+  }, [currentPage]);
 
-  const carregarPerdas = async () => {
-    
+  const carregarPerdas = async (page) => {
+
     try {
-      const response = await fetchUltimasPerdas(auditoriaId);
+      setLoading(true)
+      const response = await fetchUltimasPerdas(auditoriaId, page);
 
-      const perdasOrdenadas = response.sort((a,b) => new Date (b.createdAt) - new Date(a.createdAt));
-
-      setPerdas(perdasOrdenadas || []); // Garante que perdas não seja null
+      setPerdas(response.perdas); // Garante que perdas não seja null
+      setTotalPages(response.totalPages)
     } catch (error) {
       console.error('Erro ao carregar perdas:', error);
       Alert.alert('Erro', 'Não foi possível carregar as últimas perdas.');
@@ -64,7 +63,7 @@ const UltimasPerdasTab = ({ auditoriaId, setActiveTab }) => {
       { cancelable: true }
     );
   };
-  
+
   const renderPerda = ({ item }) => (
     <View style={styles.perdaItem}>
       {/* Motivo e Descrição */}
@@ -72,7 +71,7 @@ const UltimasPerdasTab = ({ auditoriaId, setActiveTab }) => {
         <Text style={styles.valorText}> {item.motivoperdas?.name || 'Não informado'}</Text>
         <Text style={styles.obstext}>Observacão: {item.obs || 'Sem observação'}</Text>
       </View>
-  
+
       {/* Botões de Ações */}
       <View style={styles.buttonsContainer}>
         <TouchableOpacity style={styles.editButton} onPress={() => setActiveTab('PerdasEditTab', item)}>
@@ -96,15 +95,38 @@ const UltimasPerdasTab = ({ auditoriaId, setActiveTab }) => {
       ) : perdas.length === 0 ? (
         <Text style={styles.emptyText}>Nenhuma perda cadastrada.</Text>
       ) : (
-        <ScrollView nestedScrollEnabled={true}>
-        <FlatList
-          data={perdas || []}
-          keyExtractor={(item) => item.id.toString()}
-          renderItem={renderPerda}
-          scrollEnabled={false} // Impede que a FlatList role
-          contentContainerStyle={styles.listContainer}
-        />
-      </ScrollView>
+
+        <>
+          <ScrollView nestedScrollEnabled={true}>
+            <FlatList
+              data={perdas || []}
+              keyExtractor={(item) => item.id.toString()}
+              renderItem={renderPerda}
+              scrollEnabled={false} // Impede que a FlatList role
+              contentContainerStyle={styles.listContainer}
+            />
+          </ScrollView>
+          {/* 🔥 Botões de Paginação */}
+          <View style={styles.paginationContainer}>
+            <TouchableOpacity
+              style={[styles.pageButton, currentPage === 1 && styles.disabledButton]}
+              onPress={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+              disabled={currentPage === 1}
+            >
+              <Text style={styles.buttonText}>Anterior</Text>
+            </TouchableOpacity>
+
+            <Text style={styles.pageInfo}>Página {currentPage} de {totalPages}</Text>
+
+            <TouchableOpacity
+              style={[styles.pageButton, currentPage === totalPages && styles.disabledButton]}
+              onPress={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
+              disabled={currentPage === totalPages}
+            >
+              <Text style={styles.buttonText}>Próxima</Text>
+            </TouchableOpacity>
+          </View>
+        </>
       )}
     </View>
   );
@@ -142,7 +164,12 @@ const styles = StyleSheet.create({
   obstext: {
     fontSize: 14,
     color: '#555',
+    flexShrink: 1, // 🔥 Permite que o texto quebre sem aumentar o tamanho do container
+    flexWrap: 'wrap', // 🔥 Quebra a linha corretamente
+    textAlign: 'left', // 🔥 Mantém um alinhamento legível
+    maxWidth: '60%', // 🔥 Garante que o texto ocupe no máximo 70% do espaço e não empurre os botões
   },
+  
   buttonsContainer: {
     flexDirection: 'row',
   },
@@ -165,6 +192,25 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     color: '#777',
     marginTop: 20,
+  },
+  paginationContainer: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginTop: 10,
+  },
+  pageButton: {
+    backgroundColor: '#20B2AA',
+    padding: 10,
+    borderRadius: 5,
+    marginHorizontal: 5,
+  },
+  disabledButton: {
+    backgroundColor: '#B0C4DE',
+  },
+  pageInfo: {
+    fontSize: 16,
+    fontWeight: 'bold',
   },
 });
 

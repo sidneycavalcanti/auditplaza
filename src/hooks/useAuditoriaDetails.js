@@ -68,20 +68,27 @@ const useAuditoriaDetails = () => {
     }
   };
   
-  const fetchUltimasVendas = async (auditoriaId) => {
+  const fetchUltimasVendas = async (auditoriaId, page = 1, limit = 10) => {
     try {
-      const response = await handleApiRequest(`/vendas?auditoriaId=${auditoriaId}`);
-  
+      const response = await handleApiRequest(`/vendas?auditoriaId=${auditoriaId}&page=${page}&limit=${limit}`);
+      
       console.log("📡 Vendas recebidas:", response);
   
       if (response && response.vendas) {
-        setVendas(response.vendas.map(venda => ({
-          ...venda,
-          faixaEtaria: venda.faixaEtaria || 'adulto', // 🔥 Garante que sempre tenha um valor correto
-          sexo: venda.sexo || { id: '', name: 'Desconhecido' }, // 🔥 Evita undefined
-          formadepagamento: venda.formadepagamento || { id: '', name: 'Não informado' } // 🔥 Evita undefined
-        })));
-        return response.vendas;
+        return {
+          vendas: response.vendas
+            .map(venda => ({
+              ...venda,
+              faixaEtaria: venda.faixaEtaria || 'adulto',
+              sexo: venda.sexo || { id: '', name: 'Desconhecido' },
+              formadepagamento: venda.formadepagamento || { id: '', name: 'Não informado' }
+            }))
+            .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)), // 🔥 Ordena do mais recente para o mais antigo
+  
+          totalPages: response.totalPages,
+          totalItems: response.totalItems,
+          currentPage: response.currentPage,
+        };
       } else {
         throw new Error('Dados de vendas não encontrados.');
       }
@@ -90,6 +97,9 @@ const useAuditoriaDetails = () => {
       throw error;
     }
   };
+  
+
+  
   
 
 const atualizarVenda = async (venda) => {
@@ -134,13 +144,36 @@ const atualizarVenda = async (venda) => {
 
   // Funções de Fluxo
   const cadastrarFluxo = async (fluxoItem) => {
-    const novoFluxo = await handleApiRequest('/avoperacional', 'POST', fluxoItem);
+    const novoFluxo = await handleApiRequest('/fluxo', 'POST', fluxoItem);
     setFluxo((prev) => [...prev, novoFluxo]);
   };
 
-  const fetchFluxo = async () => {
-    const fluxoData = await handleApiRequest('/avoperacional');
-    setFluxo(fluxoData);
+  const fetchFluxo = async (auditoriaId) => {
+    try {
+      console.log("📡 Chamando API: /fluxo?auditoriaId=", auditoriaId);
+  
+      const response = await handleApiRequest(`/fluxo?auditoriaId=${auditoriaId}`);
+  
+      if (response && response.fluxopessoa) {
+        console.log("✅ Fluxo recebido:", response.fluxopessoa);
+        return response.fluxopessoa; // Ajustado para pegar a chave correta
+      } else {
+        throw new Error('Nenhum dado de fluxo encontrado.');
+      }
+    } catch (error) {
+      console.error('❌ Erro ao buscar fluxo:', error.message);
+      throw error;
+    }
+  };
+  
+
+  const atualizarFluxo = async (auditoriaId, campo, novoValor) => {
+    try {
+      await handleApiRequest(`/fluxo/${auditoriaId}`, 'PATCH', { [campo]: novoValor });
+    } catch (error) {
+      console.error('Erro ao atualizar fluxo:', error);
+      throw error;
+    }
   };
 
   // Funções de Perdas
@@ -197,14 +230,28 @@ const atualizarVenda = async (venda) => {
     }
   };
 
-  const fetchUltimasPerdas = async (auditoriaId) => {
+  const fetchUltimasPerdas = async (auditoriaId, page = 1, limit = 10) => {
     try {
-      const response = await handleApiRequest(`/perdas?auditoriaId=${auditoriaId}`);
-      
-      // Verifique se 'vendas' existe na resposta
+      const response = await handleApiRequest(
+        `/perdas?auditoriaId=${auditoriaId}&page=${page}&limit=${limit}`
+      );
+  
+      console.log("📡 Perdas recebidas:", response);
+  
       if (response && response.perdas) {
-        setPerdas(response.perdas); // Atualiza o estado
-        return response.perdas; // Retorna a lista de vendas
+        return {
+          perdas: response.perdas
+            .map(perda => ({
+              ...perda,
+              motivoPerda: perda.motivoperdas || { id: '', name: 'Desconhecido' }, 
+              observacao: perda.obs || 'Sem observação',
+            }))
+            .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)), // 🔥 Ordenação do mais recente para o mais antigo
+  
+          totalPages: response.totalPages, 
+          totalItems: response.totalItems,
+          currentPage: response.currentPage,
+        };
       } else {
         throw new Error('Dados de perdas não encontrados.');
       }
@@ -213,7 +260,7 @@ const atualizarVenda = async (venda) => {
       throw error;
     }
   };
-
+  
   const fetchMotivoPerdas = async () => {
     setLoading(true); // Ativa o estado de carregamento antes da chamada específica
     try {
@@ -337,6 +384,7 @@ const atualizarVenda = async (venda) => {
     formasPagamento,
     sexos,
     motivoperdas,
+    atualizarFluxo,
     atualizarPerda,
     atualizarVenda,
     excluirVenda,

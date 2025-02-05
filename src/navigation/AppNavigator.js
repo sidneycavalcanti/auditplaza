@@ -6,9 +6,10 @@ import LoginScreen from '../screens/LoginScreen';
 import HomeScreen from '../screens/HomeScreen';
 import ProfileScreen from '../screens/ProfileScreen';
 import AuditoriaScreen  from '../screens/AuditoriaScreen';
-//import UltimasVendasScreen from '../screens/UltimaVendasScreen';
+
 import VendasEditTab from '../components/Tabs/VendasEditTab';
 import PerdasEditTab from '../components/Tabs/PerdasEditTab';
+
 import UltimasVendasTab from '../components/Tabs/UltimaVendasTab';
 import UltimasPerdasTab from '../components/Tabs/UltimaPerdasTab';
 //import UltimasPerdasScreen from '../screens/UltimaPerdasScreen';

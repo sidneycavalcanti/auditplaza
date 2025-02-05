@@ -52,8 +52,7 @@ const LoginScreen = ({ navigation }) => {
           contentContainerStyle={styles.container}
           keyboardShouldPersistTaps="handled"
           enableOnAndroid={true}
-          extraHeight={1} // 🔥 Ajusta a altura extra ao subir o teclado
-          extraScrollHeight={1} // 🔥 Define a distância extra ao rolar
+          
         >
           {/* Logo */}
           <Image style={styles.logo} source={require('../assets/logo.png')} />

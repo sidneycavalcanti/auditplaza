@@ -11,29 +11,27 @@ import {
 } from 'react-native';
 import useAuditoriaDetails from '../../hooks/useAuditoriaDetails';
 
-
-const UltimasVendasTab = ({ auditoriaId ,setActiveTab }) => {
+const UltimasVendasTab = ({ auditoriaId, setActiveTab }) => {
   console.log("🔍 setActiveTab recebido:", setActiveTab);
-
 
   const [vendas, setVendas] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
 
   const { fetchUltimasVendas, excluirVenda } = useAuditoriaDetails();
 
-  // Carregar vendas ao abrir a aba
   useEffect(() => {
-    carregarVendas();
-  }, []);
+    carregarVendas(currentPage);
+  }, [currentPage]);
 
-  const carregarVendas = async () => {
+  const carregarVendas = async (page) => {
     try {
-      const response = await fetchUltimasVendas(auditoriaId);
-  
-      // Ordena as vendas pela data de criação (createdAt) da mais recente para a mais antiga
-      const vendasOrdenadas = response.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
-  
-      setVendas(vendasOrdenadas);
+      setLoading(true);
+      const response = await fetchUltimasVendas(auditoriaId, page);
+      
+      setVendas(response.vendas);
+      setTotalPages(response.totalPages);
     } catch (error) {
       console.error('Erro ao carregar vendas:', error);
       Alert.alert('Erro', 'Não foi possível carregar as últimas vendas.');
@@ -41,12 +39,6 @@ const UltimasVendasTab = ({ auditoriaId ,setActiveTab }) => {
       setLoading(false);
     }
   };
-  
-
-  //const handleEdit = (venda) => {
- //   console.log('Venda enviada para edição:', venda);
-  //  navigation.navigate('VendasEditTab', { venda });
- // };
 
   const handleExcluirVenda = (vendaId) => {
     Alert.alert(
@@ -78,7 +70,6 @@ const UltimasVendasTab = ({ auditoriaId ,setActiveTab }) => {
         <Text style={styles.valorText}>
           Valor: R$ {item.valor ? Number(item.valor).toFixed(2) : '0.00'}
         </Text>
-
         <Text style={styles.dataText}>Data: {new Date(item.createdAt).toLocaleString()}</Text>
       </View>
       <View style={styles.buttonsContainer}>
@@ -104,14 +95,39 @@ const UltimasVendasTab = ({ auditoriaId ,setActiveTab }) => {
       ) : vendas.length === 0 ? (
         <Text style={styles.emptyText}>Nenhuma venda cadastrada.</Text>
       ) : (
-        <ScrollView nestedScrollEnabled={true}>
+        <>
+          {/* ✅ Remova o ScrollView, pois FlatList já lida com rolagem */}
+          <ScrollView nestedScrollEnabled={true}>
           <FlatList
             data={vendas}
             keyExtractor={(item) => item.id.toString()}
             renderItem={renderVenda}
-            scrollEnabled={false}  // 🔑 Evita conflito de rolagem
+            scrollEnabled={false} // Impede que a FlatList role
+            contentContainerStyle={styles.listContainer} // Mantém um espaçamento adequado
           />
-        </ScrollView>
+          </ScrollView>
+          
+          {/* 🔥 Botões de Paginação */}
+          <View style={styles.paginationContainer}>
+            <TouchableOpacity
+              style={[styles.pageButton, currentPage === 1 && styles.disabledButton]}
+              onPress={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+              disabled={currentPage === 1}
+            >
+              <Text style={styles.buttonText}>Anterior</Text>
+            </TouchableOpacity>
+
+            <Text style={styles.pageInfo}>Página {currentPage} de {totalPages}</Text>
+
+            <TouchableOpacity
+              style={[styles.pageButton, currentPage === totalPages && styles.disabledButton]}
+              onPress={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
+              disabled={currentPage === totalPages}
+            >
+              <Text style={styles.buttonText}>Próxima</Text>
+            </TouchableOpacity>
+          </View>
+        </>
       )}
     </View>
   );
@@ -122,16 +138,6 @@ const styles = StyleSheet.create({
     flex: 1,
     padding: 20,
     backgroundColor: '#f5f5f5',
-  },
-  header: {
-    backgroundColor: '#20B2AA',
-    padding: 15,
-    borderRadius: 5,
-    marginBottom: 15,
-  },
-  headerText: {
-    color: '#fff',
-    fontWeight: 'bold',
   },
   title: {
     fontSize: 20,
@@ -181,6 +187,28 @@ const styles = StyleSheet.create({
     color: '#777',
     marginTop: 20,
   },
+  paginationContainer: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginTop: 10,
+  },
+  pageButton: {
+    backgroundColor: '#20B2AA',
+    padding: 10,
+    borderRadius: 5,
+    marginHorizontal: 5,
+  },
+  disabledButton: {
+    backgroundColor: '#B0C4DE',
+  },
+  pageInfo: {
+    fontSize: 16,
+    fontWeight: 'bold',
+  },
+  listContainer: {
+    paddingBottom: 20, // Evita que o último item fique cortado
+  }
 });
 
 export default UltimasVendasTab;
