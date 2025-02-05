@@ -13,10 +13,12 @@ import useAuditoriaDetails from '../../hooks/useAuditoriaDetails';
 
 
 const UltimasVendasTab = ({ auditoriaId ,setActiveTab }) => {
+  console.log("🔍 setActiveTab recebido:", setActiveTab);
 
 
   const [vendas, setVendas] = useState([]);
   const [loading, setLoading] = useState(true);
+
   const { fetchUltimasVendas, excluirVenda } = useAuditoriaDetails();
 
   // Carregar vendas ao abrir a aba

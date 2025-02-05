@@ -15,7 +15,7 @@ const PerdasTab = ({ auditoriaId, setActiveTab }) => {
 
   // Declaração de estados
   const [selectedMotivoPerda, setSelectedMotivoPerda] = useState('');
-  const [descricao, setDescricao] = useState('');
+  const [selectedObs, setSelectedObs] = useState('');
 
   // Busca os motivos de perda ao montar o componente
   useEffect(() => {
@@ -28,7 +28,7 @@ const PerdasTab = ({ auditoriaId, setActiveTab }) => {
       Alert.alert('Erro', 'Selecione um motivo para a perda.');
       return;
     }
-    if (!descricao) {
+    if (!selectedObs) {
       Alert.alert('Erro', 'Digite uma descrição para a perda.');
       return;
     }
@@ -36,7 +36,7 @@ const PerdasTab = ({ auditoriaId, setActiveTab }) => {
     try {
       const perda = {
         motivoperdasId: parseInt(selectedMotivoPerda, 10), // ID do motivo da perda
-        descricao, // Observação
+        obs: selectedObs,
         auditoriaId: parseInt(auditoriaId, 10)
       };
 
@@ -47,7 +47,7 @@ const PerdasTab = ({ auditoriaId, setActiveTab }) => {
 
       // Limpa os campos após o cadastro
       setSelectedMotivoPerda('');
-      setDescricao('');
+      setSelectedObs('');
 
       // Redireciona para a lista de perdas
       //setActiveTab('UltimasPerdas');
@@ -89,8 +89,8 @@ const PerdasTab = ({ auditoriaId, setActiveTab }) => {
         placeholderTextColor="#888"
         multiline
         numberOfLines={4}
-        value={descricao}
-        onChangeText={setDescricao}
+        value={selectedObs}
+        onChangeText={setSelectedObs}
       />
 
       <TouchableOpacity style={styles.button} onPress={handleCadPerdas}>

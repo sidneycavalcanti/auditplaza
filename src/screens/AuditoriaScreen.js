@@ -17,7 +17,9 @@ import VendasTab from '../components/Tabs/VendasTab';
 import FluxoTab from '../components/Tabs/FluxoTab';
 import AnotacoesTab from '../components/Tabs/AnotacoesTab';
 import OutrosTab from '../components/Tabs/OutrosTab';
+
 import VendasEditTab from '../components/Tabs/VendasEditTab';
+import PerdasEditTab from '../components/Tabs/PerdasEditTab';
 
 
 import UltimasVendasTab from '../components/Tabs/UltimaVendasTab';
@@ -27,7 +29,7 @@ import UltimasAnostacoesTab from '../components/Tabs/UltimasAnostacoesTab.js';
 const AuditoriaScreen = ({ route }) => {
   
   const [selectedVenda, setSelectedVenda] = useState(null); // 🔥 Armazena a venda selecionada
-  const [perdasTab, setPerdasTab] = useState('perdas');
+  const [selectedPerda, setSelectedPerda] = useState(null);
   const [activeTab, setActiveTab] = useState('Vendas');
   const navigation = useNavigation();
   const { lojaName, lojaId, data, userName, auditoriaId } = route.params || {
@@ -78,6 +80,17 @@ const AuditoriaScreen = ({ route }) => {
             venda={selectedVenda} // 🔥 Passa a venda selecionada
           />
         );
+      case 'PerdasEditTab':
+        return (
+          <PerdasEditTab
+            auditoriaId={auditoriaId}
+            lojaName={lojaName}
+            data={data}
+            userName={userName}
+            setActiveTab={setActiveTab} // 🔥 Mantém a função passando
+            perda={selectedPerda} // 🔥 Passa a venda selecionada
+          />
+        );
       case 'UltimasPerdas':
         return (
           <UltimasPerdasTab
@@ -85,6 +98,10 @@ const AuditoriaScreen = ({ route }) => {
             lojaName={lojaName}
             data={data}
             userName={userName}
+            setActiveTab={(tab, perda = null) => {
+              setSelectedPerda(perda); // 🔥 Guarda a perda para edição
+              setActiveTab(tab);
+            }}
           />
         );
         case 'UltimasVendas':
@@ -122,9 +139,10 @@ const AuditoriaScreen = ({ route }) => {
           <PerdasTab
           auditoriaId={auditoriaId}
           userName={userName}
+          lojaId={lojaId}
           lojaName={lojaName}
           data={data}
-          setActiveTab={setActiveTab} // 🔥 Corrigido
+          setActiveTab={setActiveTab} 
         />
         );
       case 'Anotações':

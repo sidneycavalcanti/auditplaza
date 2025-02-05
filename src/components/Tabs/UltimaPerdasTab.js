@@ -12,8 +12,13 @@ import {
 import useAuditoriaDetails from '../../hooks/useAuditoriaDetails';
 
 const UltimasPerdasTab = ({ auditoriaId, setActiveTab }) => {
+  console.log("🔍 setActiveTab recebido:", setActiveTab);
+
   const [perdas, setPerdas] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [loadingMore, setLoadingMore] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
 
   const { fetchUltimasPerdas, excluirPerda } = useAuditoriaDetails();
 
@@ -22,6 +27,7 @@ const UltimasPerdasTab = ({ auditoriaId, setActiveTab }) => {
   }, []);
 
   const carregarPerdas = async () => {
+    
     try {
       const response = await fetchUltimasPerdas(auditoriaId);
 
@@ -63,16 +69,13 @@ const UltimasPerdasTab = ({ auditoriaId, setActiveTab }) => {
     <View style={styles.perdaItem}>
       {/* Motivo e Descrição */}
       <View>
-        <Text style={styles.valorText}>Motivo: {item.motivoperdas?.name || 'Não informado'}</Text>
-        <Text style={styles.obstext}>Descrição: {item.observacao || 'Sem observação'}</Text>
+        <Text style={styles.valorText}> {item.motivoperdas?.name || 'Não informado'}</Text>
+        <Text style={styles.obstext}>Observacão: {item.obs || 'Sem observação'}</Text>
       </View>
   
       {/* Botões de Ações */}
       <View style={styles.buttonsContainer}>
-        <TouchableOpacity
-          style={styles.editButton}
-          onPress={() => handleEdit(item)}
-        >
+        <TouchableOpacity style={styles.editButton} onPress={() => setActiveTab('PerdasEditTab', item)}>
           <Text style={styles.buttonText}>Editar</Text>
         </TouchableOpacity>
         <TouchableOpacity

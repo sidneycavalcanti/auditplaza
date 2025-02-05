@@ -146,7 +146,7 @@ const atualizarVenda = async (venda) => {
   // Funções de Perdas
   const cadastrarPerda = async (perda) => {
     try {
-      if (!perda || !perda.motivoperdasId || !perda.descricao) {
+      if (!perda || !perda.motivoperdasId || !perda.obs) {
         throw new Error('Dados inválidos para cadastro da perda.');
       }
   
@@ -232,6 +232,28 @@ const atualizarVenda = async (venda) => {
     }
   };
 
+  const atualizarPerda = async (perda) => {
+    try {
+      if (!perda.id) {
+        throw new Error("ID da perda é obrigatório para atualizar.");
+      }
+  
+      console.log(`📡 Enviando requisição PUT para /perdas/${perda.id}`, JSON.stringify(perda, null, 2));
+  
+      const perdaAtualizada = await handleApiRequest(`/perdas/${perda.id}`, 'PUT', perda);
+  
+      console.log('✅ Perda atualizada na API:', perdaAtualizada);
+  
+      setPerdas((prevPerdas) =>
+        prevPerdas.map((v) => (v.id === perda.id ? perdaAtualizada : v))
+      );
+  
+      return perdaAtualizada;
+    } catch (err) {
+      console.error("❌ Erro ao atualizar perda:", err);
+      throw err;
+    }
+  };
   
   
 
@@ -315,6 +337,7 @@ const atualizarVenda = async (venda) => {
     formasPagamento,
     sexos,
     motivoperdas,
+    atualizarPerda,
     atualizarVenda,
     excluirVenda,
     excluirPerda,

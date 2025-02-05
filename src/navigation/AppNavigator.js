@@ -8,6 +8,7 @@ import ProfileScreen from '../screens/ProfileScreen';
 import AuditoriaScreen  from '../screens/AuditoriaScreen';
 //import UltimasVendasScreen from '../screens/UltimaVendasScreen';
 import VendasEditTab from '../components/Tabs/VendasEditTab';
+import PerdasEditTab from '../components/Tabs/PerdasEditTab';
 import UltimasVendasTab from '../components/Tabs/UltimaVendasTab';
 import UltimasPerdasTab from '../components/Tabs/UltimaPerdasTab';
 //import UltimasPerdasScreen from '../screens/UltimaPerdasScreen';
@@ -25,7 +26,7 @@ const AppNavigator = () => {
         <Stack.Screen name="UltimasVendas" component={UltimasVendasTab} /> 
         <Stack.Screen name="UltimasPerdas" component={UltimasPerdasTab} /> 
         <Stack.Screen name="VendasEditTab" component={VendasEditTab} options={{ title: 'Editar Venda' }} />
-        
+        <Stack.Screen name="PerdasEditTab" component={PerdasEditTab} options={{ title: 'Editar Perda' }} />
 
       </Stack.Navigator>
     </NavigationContainer>

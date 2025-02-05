@@ -24,7 +24,7 @@ const PerdasEditTab = ({ perda, setActiveTab }) => {
   const {
     fetchPerdas,
     fetchMotivoPerdas,
-    atualizarVenda,
+    atualizarPerda,
     perdas,
     motivoperdas,
     loading
@@ -32,7 +32,7 @@ const PerdasEditTab = ({ perda, setActiveTab }) => {
 
   // 🚀 Inicializa os estados corretamente
   const [selectedMotivoPerda, setSelectedMotivoPerda] = useState(perda?.motivoperdas?.id?.toString() || '');
-  const [observacao, setObservacao] = useState(perda?.observacao || '');
+  const [observacao, setObservacao] = useState(perda?.obs || '');
 
   // 🚀 Carregar listas de perdas e motivos de perda
   useEffect(() => {
@@ -66,9 +66,9 @@ const PerdasEditTab = ({ perda, setActiveTab }) => {
     console.log("📡 Enviando atualização da perda:", JSON.stringify(perdaAtualizada, null, 2));
 
     try {
-      await atualizarVenda(perdaAtualizada);
+      await atualizarPerda(perdaAtualizada);
       Alert.alert('Sucesso', 'Perda atualizada com sucesso!');
-      setActiveTab('UltimasVendas'); // Retorna à lista de perdas
+      setActiveTab('UltimasPerdas'); // Retorna à lista de perdas
     } catch (err) {
       console.error("❌ Erro ao atualizar perda:", err);
       Alert.alert('Erro', 'Não foi possível atualizar a perda.');
@@ -115,7 +115,7 @@ const PerdasEditTab = ({ perda, setActiveTab }) => {
             <Text style={styles.buttonText}>Salvar</Text>
           </TouchableOpacity>
 
-          <TouchableOpacity style={styles.button} onPress={() => setActiveTab('UltimasVendas')}>
+          <TouchableOpacity style={styles.button} onPress={() => setActiveTab('UltimasPerdas')}>
             <Text style={styles.buttonText}>Voltar</Text>
           </TouchableOpacity>
         </>
