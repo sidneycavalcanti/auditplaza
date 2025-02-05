@@ -10,7 +10,10 @@ import {
   Alert,
   Platform,
   ScrollView,
+  Keyboard,
+  TouchableWithoutFeedback,
 } from 'react-native';
+import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import useAuth from '../hooks/useAuth';
 
 const LoginScreen = ({ navigation }) => {
@@ -44,52 +47,57 @@ const LoginScreen = ({ navigation }) => {
       style={{ flex: 1 }}
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
     >
-      <ScrollView
-        contentContainerStyle={styles.container}
-        keyboardShouldPersistTaps="handled"
-      >
-        {/* Logo */}
-        <Image style={styles.logo} source={require('../assets/logo.png')} />
-
-        {/* Título */}
-        <Text style={styles.title}>Auditoria Plaza</Text>
-
-        {/* Mensagem de erro (se existir) */}
-        {error && <Text style={styles.errorText}>{error}</Text>}
-
-        {/* Campo de E-mail */}
-        <View style={styles.inputContainer}>
-          <TextInput
-            style={styles.input}
-            placeholder="Digite seu usuário"
-            placeholderTextColor="#888"
-            keyboardType="email-address"
-            value={email}
-            onChangeText={setEmail}
-          />
-        </View>
-
-        {/* Campo de Senha */}
-        <View style={styles.inputContainer}>
-          <TextInput
-            style={styles.input}
-            placeholder="Digite sua senha"
-            placeholderTextColor="#888"
-            secureTextEntry
-            value={password}
-            onChangeText={setPassword}
-          />
-        </View>
-
-        {/* Botão de Login */}
-        <TouchableOpacity
-          style={[styles.button, loading && styles.buttonDisabled]}
-          onPress={handleLogin}
-          disabled={loading}
+      <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+        <KeyboardAwareScrollView
+          contentContainerStyle={styles.container}
+          keyboardShouldPersistTaps="handled"
+          enableOnAndroid={true}
+          extraHeight={1} // 🔥 Ajusta a altura extra ao subir o teclado
+          extraScrollHeight={1} // 🔥 Define a distância extra ao rolar
         >
-          <Text style={styles.buttonText}>{loading ? 'Entrando...' : 'Entrar'}</Text>
-        </TouchableOpacity>
-      </ScrollView>
+          {/* Logo */}
+          <Image style={styles.logo} source={require('../assets/logo.png')} />
+
+          {/* Título */}
+          <Text style={styles.title}>Auditoria Plaza</Text>
+
+          {/* Mensagem de erro (se existir) */}
+          {error && <Text style={styles.errorText}>{error}</Text>}
+
+          {/* Campo de E-mail */}
+          <View style={styles.inputContainer}>
+            <TextInput
+              style={styles.input}
+              placeholder="Digite seu usuário"
+              placeholderTextColor="#888"
+              keyboardType="email-address"
+              value={email}
+              onChangeText={setEmail}
+            />
+          </View>
+
+          {/* Campo de Senha */}
+          <View style={styles.inputContainer}>
+            <TextInput
+              style={styles.input}
+              placeholder="Digite sua senha"
+              placeholderTextColor="#888"
+              secureTextEntry
+              value={password}
+              onChangeText={setPassword}
+            />
+          </View>
+
+          {/* Botão de Login */}
+          <TouchableOpacity
+            style={[styles.button, loading && styles.buttonDisabled]}
+            onPress={handleLogin}
+            disabled={loading}
+          >
+            <Text style={styles.buttonText}>{loading ? 'Entrando...' : 'Entrar'}</Text>
+          </TouchableOpacity>
+        </KeyboardAwareScrollView>
+      </TouchableWithoutFeedback>
     </KeyboardAvoidingView>
   );
 };
