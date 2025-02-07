@@ -55,24 +55,31 @@ const PerdasEditTab = ({ perda, setActiveTab }) => {
       Alert.alert('Erro', 'Por favor, selecione um motivo da perda.');
       return;
     }
-
+  
     const perdaAtualizada = {
       id: perda.id,
       auditoriaId: perda.auditoriaId,
       motivoperdasId: parseInt(selectedMotivoPerda, 10),
-      observacao,
+      obs: observacao, // 🔥 Verifique se a API espera "obs" e não "observacao"
     };
-
+  
     console.log("📡 Enviando atualização da perda:", JSON.stringify(perdaAtualizada, null, 2));
-
+  
     try {
-      await atualizarPerda(perdaAtualizada);
-      Alert.alert('Sucesso', 'Perda atualizada com sucesso!');
-      setActiveTab('UltimasPerdas'); // Retorna à lista de perdas
-    } catch (err) {
+      const response = await atualizarPerda(perdaAtualizada);
+      console.log("🔍 Resposta da API ao atualizar perda:", response);
+  
+      // Verifica se a resposta contém um ID, confirmando que foi atualizada
+      if (response && response.id) {  
+        Alert.alert('Sucesso', 'Perda atualizada com sucesso!');
+        setActiveTab('UltimasPerdas'); // Retorna à lista de perdas
+      } else {
+        throw new Error('A resposta da API não confirmou a atualização.');
+      }
+  } catch (err) {
       console.error("❌ Erro ao atualizar perda:", err);
       Alert.alert('Erro', 'Não foi possível atualizar a perda.');
-    }
+  }
   };
 
   return (

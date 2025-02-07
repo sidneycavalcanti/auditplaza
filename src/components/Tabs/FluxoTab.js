@@ -1,35 +1,21 @@
 import React, { useState, useEffect } from 'react';
-import {
-  View,
-  Text,
-  TouchableOpacity,
-  ActivityIndicator,
-} from 'react-native';
+import { View, Text, TouchableOpacity, ActivityIndicator } from 'react-native';
 import useAuditoriaDetails from '../../hooks/useAuditoriaDetails';
 import styles from '../../styles/AuditoriaScreenStyles';
 
 const FluxoTab = ({ auditoriaId }) => {
   const { fetchFluxo, atualizarFluxo } = useAuditoriaDetails();
-  const [fluxo, setFluxo] = useState({});
+  const [fluxo, setFluxo] = useState(null);
   const [loading, setLoading] = useState(true);
 
+  // 🔄 Buscar os dados do fluxo ao entrar na tela
   useEffect(() => {
     const carregarFluxo = async () => {
       try {
-        console.log("🔄 Buscando fluxo para auditoria:", auditoriaId);
+        console.log(`🔄 Buscando fluxo para auditoria ID: ${auditoriaId}`);
         const fluxoData = await fetchFluxo(auditoriaId);
-
-        console.log("✅ Dados recebidos do fluxo:", fluxoData);
-
-        if (fluxoData && fluxoData.fluxopessoa) {
-          // 🔥 Transformar array em objeto baseado na categoria e sexo
-          const fluxoFormatado = fluxoData.fluxopessoa.reduce((acc, item) => {
-            const key = `${item.categoria}_${item.sexo}`; // Ex: "outros_masculino"
-            acc[key] = item.quantidade || 0; // Pega corretamente a quantidade
-            return acc;
-          }, {});
-
-          setFluxo(fluxoFormatado);
+        if (fluxoData) {
+          setFluxo(fluxoData);
         } else {
           console.warn("⚠️ Nenhum fluxo encontrado.");
         }
@@ -45,22 +31,41 @@ const FluxoTab = ({ auditoriaId }) => {
     }
   }, [auditoriaId]);
 
-  const handleUpdateFluxo = async (categoria, sexo, valor) => {
-    const key = `${categoria}_${sexo}`;
-    const novoValor = Math.max((fluxo[key] || 0) + valor, 0);
+  // ➕➖ Atualiza os valores no banco em tempo real
+  const handleUpdateFluxo = async (fluxoId, valorAtual, incremento) => {
+    if (!fluxo || fluxo.length === 0) return;
 
-    setFluxo((prev) => ({
-      ...prev,
-      [key]: novoValor,
-    }));
+    const novoValor = Math.max(valorAtual + incremento, 0); // 🔥 Evita valores negativos
+
+    // Atualiza o estado local primeiro para experiência do usuário
+    setFluxo((prev) =>
+        prev.map((item) =>
+            item.id === fluxoId ? { ...item, quantidade: novoValor } : item
+        )
+    );
 
     try {
-      await atualizarFluxo(auditoriaId, categoria, sexo, novoValor);
-    } catch (error) {
-      console.error('Erro ao atualizar fluxo:', error);
-    }
-  };
+        const requestBody = { quantidade: novoValor }; // Pode precisar de ajustes
+        console.log(`📡 Enviando atualização para fluxo ID: ${fluxoId}, Novo Valor: ${novoValor}`);
+        console.log('🛠 Corpo da requisição:', JSON.stringify(requestBody, null, 2));
 
+        const response = await atualizarFluxo(fluxoId, requestBody);
+        console.log('✅ Resposta do backend:', response);
+    } catch (error) {
+        console.error('❌ Erro ao atualizar fluxo:', error.response?.data || error.message);
+
+        // Se falhar, reverte a mudança no estado local
+        setFluxo((prev) =>
+            prev.map((item) =>
+                item.id === fluxoId ? { ...item, quantidade: valorAtual } : item
+            )
+        );
+    }
+};
+
+
+
+  
   if (loading) {
     return (
       <View style={styles.loadingContainer}>
@@ -74,57 +79,76 @@ const FluxoTab = ({ auditoriaId }) => {
     <View style={styles.contentContainer}>
       {fluxo ? (
         <>
-          {/* 🔥 Masculino */}
-          <Text style={styles.sectionTitle}>🧑 Masculino</Text>
-          {['especulador', 'acompanhante', 'outros'].map((categoria) => (
-            <View key={`${categoria}_masculino`} style={styles.fluxoItem}>
-              <Text style={styles.label}>{categoria.charAt(0).toUpperCase() + categoria.slice(1)}:</Text>
-              
-              <View style={styles.buttonContainer}>
-                <TouchableOpacity
-                  style={styles.buttonMinus}
-                  onPress={() => handleUpdateFluxo(categoria, 'masculino', -1)}
-                >
-                  <Text style={styles.buttonText}>-</Text>
-                </TouchableOpacity>
-                
-                <Text style={styles.valorText}>{fluxo[`${categoria}_masculino`] || 0}</Text>
-                
-                <TouchableOpacity
-                  style={styles.buttonPlus}
-                  onPress={() => handleUpdateFluxo(categoria, 'masculino', 1)}
-                >
-                  <Text style={styles.buttonText}>+</Text>
-                </TouchableOpacity>
-              </View>
+          {/* 🔥 Layout dividido em colunas */}
+          <View style={styles.row}>
+            {/* Masculino - Coluna esquerda */}
+            <View style={styles.column}>
+              <Text style={styles.headerText}>🧑 Masculino</Text>
+              {Object.values(fluxo)
+                .filter((item) => item.sexo === "masculino")
+                .map((item) => (
+                  <View key={item.id} style={styles.counterGroup}>
+                    <Text style={styles.label}>
+                      {item.categoria.charAt(0).toUpperCase() +
+                        item.categoria.slice(1)}
+                    </Text>
+                    <View style={styles.counterContainer}>
+                      <TouchableOpacity
+                        style={styles.counterButton}
+                        onPress={() =>
+                          handleUpdateFluxo(item.id, item.quantidade, -1)
+                        }
+                      >
+                        <Text style={styles.counterButtonText}>-</Text>
+                      </TouchableOpacity>
+                      <Text style={styles.valorText}>{item.quantidade}</Text>
+                      <TouchableOpacity
+                        style={styles.counterButton}
+                        onPress={() =>
+                          handleUpdateFluxo(item.id, item.quantidade, 1)
+                        }
+                      >
+                        <Text style={styles.counterButtonText}>+</Text>
+                      </TouchableOpacity>
+                    </View>
+                  </View>
+                ))}
             </View>
-          ))}
 
-          {/* 🔥 Feminino */}
-          <Text style={styles.sectionTitle}>👩 Feminino</Text>
-          {['especulador', 'acompanhante', 'outros'].map((categoria) => (
-            <View key={`${categoria}_feminino`} style={styles.fluxoItem}>
-              <Text style={styles.label}>{categoria.charAt(0).toUpperCase() + categoria.slice(1).replace('_', ' ')}:</Text>
-              
-              <View style={styles.buttonContainer}>
-                <TouchableOpacity
-                  style={styles.buttonMinus}
-                  onPress={() => handleUpdateFluxo(categoria, 'feminino', -1)}
-                >
-                  <Text style={styles.buttonText}>-</Text>
-                </TouchableOpacity>
-                
-                <Text style={styles.valorText}>{fluxo[`${categoria}_feminino`] || 0}</Text>
-                
-                <TouchableOpacity
-                  style={styles.buttonPlus}
-                  onPress={() => handleUpdateFluxo(categoria, 'feminino', 1)}
-                >
-                  <Text style={styles.buttonText}>+</Text>
-                </TouchableOpacity>
-              </View>
+            {/* Feminino - Coluna direita */}
+            <View style={styles.column}>
+              <Text style={styles.headerText}>👩 Feminino</Text>
+              {Object.values(fluxo)
+                .filter((item) => item.sexo === "feminino")
+                .map((item) => (
+                  <View key={item.id} style={styles.counterGroup}>
+                    <Text style={styles.label}>
+                      {item.categoria.charAt(0).toUpperCase() +
+                        item.categoria.slice(1)}
+                    </Text>
+                    <View style={styles.counterContainer}>
+                      <TouchableOpacity
+                        style={styles.counterButton}
+                        onPress={() =>
+                          handleUpdateFluxo(item.id, item.quantidade, -1)
+                        }
+                      >
+                        <Text style={styles.counterButtonText}>-</Text>
+                      </TouchableOpacity>
+                      <Text style={styles.valorText}>{item.quantidade}</Text>
+                      <TouchableOpacity
+                        style={styles.counterButton}
+                        onPress={() =>
+                          handleUpdateFluxo(item.id, item.quantidade, 1)
+                        }
+                      >
+                        <Text style={styles.counterButtonText}>+</Text>
+                      </TouchableOpacity>
+                    </View>
+                  </View>
+                ))}
             </View>
-          ))}
+          </View>
         </>
       ) : (
         <Text style={styles.errorText}>Nenhum dado encontrado</Text>
@@ -132,5 +156,6 @@ const FluxoTab = ({ auditoriaId }) => {
     </View>
   );
 };
+
 
 export default FluxoTab;

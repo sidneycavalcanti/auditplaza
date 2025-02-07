@@ -150,32 +150,43 @@ const atualizarVenda = async (venda) => {
 
   const fetchFluxo = async (auditoriaId) => {
     try {
-      console.log("📡 Chamando API: /fluxo?auditoriaId=", auditoriaId);
-  
-      const response = await handleApiRequest(`/fluxo?auditoriaId=${auditoriaId}`);
-  
-      if (response && response.fluxopessoa) {
+        console.log(`📡 Chamando API: /fluxo?auditoriaId=${auditoriaId}`);
+
+        const response = await handleApiRequest(`/fluxo?auditoriaId=${auditoriaId}`);
+
+        if (!response || !response.fluxopessoa || !Array.isArray(response.fluxopessoa)) {
+            console.warn("⚠️ Resposta inesperada da API. Nenhum fluxo encontrado.");
+            return [];
+        }
+
         console.log("✅ Fluxo recebido:", response.fluxopessoa);
-        return response.fluxopessoa; // Ajustado para pegar a chave correta
-      } else {
-        throw new Error('Nenhum dado de fluxo encontrado.');
-      }
+        return response.fluxopessoa; // Garante que sempre retorna um array
     } catch (error) {
-      console.error('❌ Erro ao buscar fluxo:', error.message);
-      throw error;
+        console.error('❌ Erro ao buscar fluxo:', error.message);
+        return [];
     }
-  };
+};
+
   
 
-  const atualizarFluxo = async (auditoriaId, campo, novoValor) => {
+  const atualizarFluxo = async (fluxoId, dadosAtualizados) => {
     try {
-      await handleApiRequest(`/fluxo/${auditoriaId}`, 'PATCH', { [campo]: novoValor });
-    } catch (error) {
-      console.error('Erro ao atualizar fluxo:', error);
-      throw error;
-    }
-  };
+        console.log(`📡 Enviando PATCH para /fluxo/${fluxoId} com dados:`, JSON.stringify(dadosAtualizados, null, 2));
 
+        const response = await handleApiRequest(`/fluxo/${fluxoId}`, 'PATCH', dadosAtualizados);
+
+        console.log('✅ Fluxo atualizado com sucesso:', response);
+
+        return response; // Retorna a resposta para confirmar a atualização
+    } catch (error) {
+        console.error('❌ Erro ao atualizar fluxo:', error);
+        throw error;
+    }
+};
+
+
+  
+  
   // Funções de Perdas
   const cadastrarPerda = async (perda) => {
     try {
