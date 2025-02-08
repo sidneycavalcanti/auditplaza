@@ -31,13 +31,13 @@ const FluxoTab = ({ auditoriaId }) => {
     }
   }, [auditoriaId]);
 
-  // ➕➖ Atualiza os valores no banco em tempo real
+  // ➕➖ Atualiza os valores no banco em tempo real codigo massa.
   const handleUpdateFluxo = async (fluxoId, valorAtual, incremento) => {
     if (!fluxo || fluxo.length === 0) return;
 
-    const novoValor = Math.max(valorAtual + incremento, 0); // 🔥 Evita valores negativos
+    const novoValor = Math.max(valorAtual + incremento, 0);
 
-    // Atualiza o estado local primeiro para experiência do usuário
+    // 🔥 Atualiza a UI imediatamente
     setFluxo((prev) =>
         prev.map((item) =>
             item.id === fluxoId ? { ...item, quantidade: novoValor } : item
@@ -45,16 +45,19 @@ const FluxoTab = ({ auditoriaId }) => {
     );
 
     try {
-        const requestBody = { quantidade: novoValor }; // Pode precisar de ajustes
-        console.log(`📡 Enviando atualização para fluxo ID: ${fluxoId}, Novo Valor: ${novoValor}`);
-        console.log('🛠 Corpo da requisição:', JSON.stringify(requestBody, null, 2));
+        const requestBody = { quantidade: novoValor };
+        await atualizarFluxo(fluxoId, requestBody);
+        console.log(`✅ Atualização bem-sucedida: Fluxo ID ${fluxoId} agora tem ${novoValor}`);
 
-        const response = await atualizarFluxo(fluxoId, requestBody);
-        console.log('✅ Resposta do backend:', response);
+        // 🔄 Faz um polling rápido depois de 1 segundo para garantir que está certo
+        setTimeout(async () => {
+            await carregarFluxo();
+            console.log("🔄 Dados atualizados do servidor!");
+        }, 1000);
     } catch (error) {
         console.error('❌ Erro ao atualizar fluxo:', error.response?.data || error.message);
 
-        // Se falhar, reverte a mudança no estado local
+        // Se falhar, reverte a UI para o valor anterior
         setFluxo((prev) =>
             prev.map((item) =>
                 item.id === fluxoId ? { ...item, quantidade: valorAtual } : item
@@ -65,8 +68,10 @@ const FluxoTab = ({ auditoriaId }) => {
 
 
 
+
+
   
-  if (loading) {
+  if (loading) {  
     return (
       <View style={styles.loadingContainer}>
         <ActivityIndicator size="large" color="#20B2AA" />

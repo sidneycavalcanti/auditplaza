@@ -16,7 +16,7 @@ return(
       <Text style={styles.buttonText}>Pausa</Text>
     </TouchableOpacity>
     <TouchableOpacity style={styles.button}>
-      <Text style={styles.buttonText}>Operacional</Text>
+      <Text style={styles.buttonText}>Avaliação operacional</Text>
     </TouchableOpacity>
     <TouchableOpacity style={styles.button}>
       <Text style={styles.buttonText}>Calculadora</Text>

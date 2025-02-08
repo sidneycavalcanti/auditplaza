@@ -169,20 +169,20 @@ const atualizarVenda = async (venda) => {
 
   
 
-  const atualizarFluxo = async (fluxoId, dadosAtualizados) => {
-    try {
-        console.log(`📡 Enviando PATCH para /fluxo/${fluxoId} com dados:`, JSON.stringify(dadosAtualizados, null, 2));
+const atualizarFluxo = async (fluxoId, dadosAtualizados) => {
+  try {
+      console.log(`📡 Enviando PUT para /fluxo/${fluxoId} com dados:`, JSON.stringify(dadosAtualizados, null, 2));
 
-        const response = await handleApiRequest(`/fluxo/${fluxoId}`, 'PATCH', dadosAtualizados);
+      const response = await handleApiRequest(`/fluxo/${fluxoId}`, 'PUT', dadosAtualizados);
 
-        console.log('✅ Fluxo atualizado com sucesso:', response);
-
-        return response; // Retorna a resposta para confirmar a atualização
-    } catch (error) {
-        console.error('❌ Erro ao atualizar fluxo:', error);
-        throw error;
-    }
+      console.log('✅ Fluxo atualizado com sucesso:', response);
+      return response;
+  } catch (error) {
+      console.error('❌ Erro ao atualizar fluxo:', error);
+      throw error;
+  }
 };
+
 
 
   
@@ -331,7 +331,10 @@ const atualizarVenda = async (venda) => {
     try {
         console.log(`📡 Buscando anotações para auditoria ID: ${auditoriaId}, página ${page}`);
 
-        const response = await handleApiRequest(`/anotacoes?auditoriaId=${auditoriaId}&page=${page}&limit=${limit}`);
+        const response = await handleApiRequest(
+          `/anotacao?auditoriaId=${Number(auditoriaId)}&page=${Number(page)}&limit=${Number(limit)}`
+        );
+        
 
         console.log("📥 Dados recebidos da API:", response);
 

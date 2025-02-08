@@ -145,7 +145,7 @@ export default StyleSheet.create({
     fontSize: 14,
     fontWeight: 'bold',
     textAlign: 'center',
-    marginBottom: 10,
+    marginTop: 20,
     color: '#333',
   },
   checkboxContainer: {
