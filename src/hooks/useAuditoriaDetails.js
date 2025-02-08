@@ -326,6 +326,48 @@ const atualizarVenda = async (venda) => {
     setAnotacoes(anotacoesData);
   };
 
+
+  const fetchUltimasAnotacoes = async (auditoriaId, page = 1, limit = 10) => {
+    try {
+        console.log(`📡 Buscando anotações para auditoria ID: ${auditoriaId}, página ${page}`);
+
+        const response = await handleApiRequest(`/anotacoes?auditoriaId=${auditoriaId}&page=${page}&limit=${limit}`);
+
+        console.log("📥 Dados recebidos da API:", response);
+
+        if (response && response.anotacoes) {
+            return {
+                anotacoes: response.anotacoes,
+                totalPages: response.totalPages || 1,
+                totalItems: response.totalItems || response.anotacoes.length,
+                currentPage: response.currentPage || page,
+            };
+        } else {
+            console.warn("⚠️ Nenhuma anotação encontrada na API.");
+            return { anotacoes: [], totalPages: 1, totalItems: 0, currentPage: page };
+        }
+    } catch (error) {
+        console.error("❌ Erro ao buscar anotações:", error);
+        throw error;
+    }
+};
+
+
+  const excluirAnotacao = async (anotacaoId) => {
+    try {
+      // Requisição para excluir a venda usando o método DELETE
+      await handleApiRequest(`/anotacao/${anotacaoId}`, 'DELETE');
+      
+      // Atualiza o estado local, removendo a venda pelo ID
+      setAnotacoes((prev) => prev.filter((anotacao) => anotacao.id !== anotacaoId));
+      
+      console.log('Anotação excluída com sucesso!');
+    } catch (err) {
+      console.error('Erro ao Anotação perda:', err); // Log de erro
+      throw err; // Opcional: Propagar o erro para tratamento adicional
+    }
+  };
+
   // Funções de Operações
   const cadastrarOperacao = async (operacao) => {
     const novaOperacao = await handleApiRequest('/cadavoperacional', 'POST', operacao);
@@ -395,6 +437,7 @@ const atualizarVenda = async (venda) => {
     formasPagamento,
     sexos,
     motivoperdas,
+    excluirAnotacao,
     atualizarFluxo,
     atualizarPerda,
     atualizarVenda,
@@ -408,6 +451,7 @@ const atualizarVenda = async (venda) => {
     cadastrarPerda,
     fetchPerdas,
     cadastrarAnotacao,
+    fetchUltimasAnotacoes,
     fetchAnotacoes,
     cadastrarOperacao,
     fetchOperacoes,

@@ -24,15 +24,16 @@ import PerdasEditTab from '../components/Tabs/PerdasEditTab';
 
 import UltimasVendasTab from '../components/Tabs/UltimaVendasTab';
 import UltimasPerdasTab from '../components/Tabs/UltimaPerdasTab';
-import UltimasAnostacoesTab from '../components/Tabs/UltimasAnostacoesTab.js';
+import UltimasAnostacoesTab from '../components/Tabs/UltimaAnotacoesTab';
 
 const AuditoriaScreen = ({ route }) => {
   
+  const [selectedAnotacao, setSelectedAnotacao] = useState(null);
   const [selectedVenda, setSelectedVenda] = useState(null); // 🔥 Armazena a venda selecionada
   const [selectedPerda, setSelectedPerda] = useState(null);
   const [activeTab, setActiveTab] = useState('Vendas');
   const navigation = useNavigation();
-  const { lojaName, lojaId, data, userName, auditoriaId } = route.params || {
+  const { lojaName, usuarioId, lojaId, data, userName, auditoriaId } = route.params || {
     lojaName: 'Loja Desconhecida',
     data: 'Data Indisponível',
     userName: 'Auditor Desconhecido',
@@ -91,6 +92,17 @@ const AuditoriaScreen = ({ route }) => {
             perda={selectedPerda} // 🔥 Passa a venda selecionada
           />
         );
+        case 'AnotacoesEditTab':
+          return (
+            <AnotacoesEditTab
+              auditoriaId={auditoriaId}
+              lojaName={lojaName}
+              data={data}
+              userName={userName}
+              setActiveTab={setActiveTab} // 🔥 Mantém a função passando
+              anotacao={selectedAnotacao} // 🔥 Passa a venda selecionada
+            />
+          );
       case 'UltimasPerdas':
         return (
           <UltimasPerdasTab
@@ -114,6 +126,19 @@ const AuditoriaScreen = ({ route }) => {
               }} // 🔥 Agora passa a venda corretamente
             />
           );
+          case 'UltimasAnotacoes':
+            return (
+              <UltimasAnostacoesTab
+                auditoriaId={auditoriaId}
+                lojaName={lojaName}
+                data={data}
+                userName={userName}
+                setActiveTab={(tab, anotacao = null) => {
+                  setSelectedAnotacao(anotacao); // 🔥 Guarda a perda para edição
+                  setActiveTab(tab);
+                }}
+              />
+            );
       case 'Vendas':
         return (
           <VendasTab
@@ -149,9 +174,10 @@ const AuditoriaScreen = ({ route }) => {
         return (
           <AnotacoesTab
             auditoriaId={auditoriaId}
-            userName={userName}
-            lojaName={lojaName}
+            usuarioId={usuarioId}
+            lojaId={lojaId}
             data={data}
+            setActiveTab={setActiveTab} 
           />
         );
       case 'Outros':

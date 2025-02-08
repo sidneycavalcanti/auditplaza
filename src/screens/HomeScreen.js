@@ -19,30 +19,17 @@ const HomeScreen = ({ navigation }) => {
   const [searchQuery, setSearchQuery] = useState('');
   const { auditorias, loading, error, fetchAuditorias } = useAuditorias();
 
-  const handleAuditoria = (lojaId, lojaName, data, userName, userId, auditoriaId) => {
-    console.log('Iniciando auditoria com os parâmetros:', {
-      lojaId,
-      lojaName,
-      data,
-      userName,
-      userId,
-      auditoriaId,
-    });
-  
-    if (!auditoriaId || !lojaId || !userId) {
-      console.error('Erro: Parâmetros faltando antes da navegação');
-      return Alert.alert('Erro', 'Dados incompletos para iniciar auditoria.');
-    }
-  
+  const handleAuditoria = (lojaId, lojaName, data, userName, usuarioId, auditoriaId) => {
     navigation.navigate('Auditoria', {
-      lojaId, // Incluindo o ID da loja na navegação
+      lojaId,
       lojaName,
       data: format(data, 'dd/MM/yyyy HH:mm:ss'),
       userName,
-      userId,
+      usuarioId, // Agora está correto
       auditoriaId,
     });
   };
+  
   
 
   const handleSearch = (text) => {
