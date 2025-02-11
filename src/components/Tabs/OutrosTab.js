@@ -3,11 +3,15 @@ import {
   View,
   Text,
   TouchableOpacity,
+  Modal 
 } from 'react-native';
+import Calculadora from '../components/Calculadora';
 
 import styles from '../../styles/AuditoriaScreenStyles';
 
 const OutrosTab = () => {
+
+  const [modalVisible, setModalVisible] = useState(false);
 
 return( 
 
@@ -18,9 +22,15 @@ return(
     <TouchableOpacity style={styles.button}>
       <Text style={styles.buttonText}>Avaliação operacional</Text>
     </TouchableOpacity>
-    <TouchableOpacity style={styles.button}>
+    <TouchableOpacity style={styles.button} onPress={() => setModalVisible(true)}>
       <Text style={styles.buttonText}>Calculadora</Text>
     </TouchableOpacity>
+     {/* Modal para abrir a calculadora */}
+     <Modal visible={modalVisible} animationType="slide" transparent={true}>
+        <View style={styles.modalBackground}>
+          <Calculadora onClose={() => setModalVisible(false)} />
+        </View>
+      </Modal>
   </View>)
    
 };

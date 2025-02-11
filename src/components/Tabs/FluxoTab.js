@@ -35,7 +35,12 @@ const FluxoTab = ({ auditoriaId }) => {
   const handleUpdateFluxo = async (fluxoId, valorAtual, incremento) => {
     if (!fluxo || fluxo.length === 0) return;
 
-    const novoValor = Math.max(valorAtual + incremento, 0);
+    const novoValor = Math.max(valorAtual + incremento, 0); // 🔥 Evita valores negativos
+
+    if (novoValor === valorAtual) {
+        console.warn(`⚠️ Tentativa de reduzir abaixo de 0 bloqueada para Fluxo ID ${fluxoId}`);
+        return; // 🚫 Não faz requisição se o valor for o mesmo (ou menor que 0)
+    }
 
     // 🔥 Atualiza a UI imediatamente
     setFluxo((prev) =>
@@ -49,7 +54,7 @@ const FluxoTab = ({ auditoriaId }) => {
         await atualizarFluxo(fluxoId, requestBody);
         console.log(`✅ Atualização bem-sucedida: Fluxo ID ${fluxoId} agora tem ${novoValor}`);
 
-        // 🔄 Faz um polling rápido depois de 1 segundo para garantir que está certo
+        // 🔄 Polling rápido para sincronizar com o backend
         setTimeout(async () => {
             await carregarFluxo();
             console.log("🔄 Dados atualizados do servidor!");
@@ -65,6 +70,7 @@ const FluxoTab = ({ auditoriaId }) => {
         );
     }
 };
+
 
 
 
