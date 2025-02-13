@@ -5,21 +5,22 @@ import {
   TouchableOpacity,
   Modal 
 } from 'react-native';
-import Calculadora from '../components/Calculadora';
+
+import Calculadora from '../Calculadora';
 
 import styles from '../../styles/AuditoriaScreenStyles';
 
-const OutrosTab = () => {
+const OutrosTab = ( {auditoriaId, setActiveTab} ) => {
 
   const [modalVisible, setModalVisible] = useState(false);
 
 return( 
 
     <View style={styles.contentContainer}>
-    <TouchableOpacity style={styles.button}>
+    <TouchableOpacity style={styles.button} onPress={() => setActiveTab('Pausa')}>
       <Text style={styles.buttonText}>Pausa</Text>
     </TouchableOpacity>
-    <TouchableOpacity style={styles.button}>
+   <TouchableOpacity style={styles.button} onPress={() => setActiveTab('Avalicao')}>
       <Text style={styles.buttonText}>Avaliação operacional</Text>
     </TouchableOpacity>
     <TouchableOpacity style={styles.button} onPress={() => setModalVisible(true)}>

@@ -9,6 +9,7 @@ const useAuditoriaDetails = () => {
   const [motivoperdas, setMotivoperdas] = useState([]);
   const [anotacoes, setAnotacoes] = useState([]);
   const [operacoes, setOperacoes] = useState([]);
+  const [motivopausa, setMotivopausa] = useState([]);
   const [pausas, setPausas] = useState([]);
   const [formasPagamento, setFormasPagamento] = useState([]);
   const [sexos, setSexos] = useState([]);
@@ -383,15 +384,65 @@ const atualizarFluxo = async (fluxoId, dadosAtualizados) => {
   };
 
   // Funções de Pausas
-  const cadastrarPausa = async (pausa) => {
-    const novaPausa = await handleApiRequest('/pausa', 'POST', pausa);
-    setPausas((prev) => [...prev, novaPausa]);
-  };
-
   const fetchPausas = async () => {
     const pausasData = await handleApiRequest('/pausa');
     setPausas(pausasData);
   };
+
+  const cadastrarPausa = async (pausa) => {
+    try {
+      if (!pausa || !pausa.motivopausaId) {
+        throw new Error('Dados inválidos para cadastro da pausa.');
+      }
+  
+      console.log('📡 Enviando nova pausa para API:', JSON.stringify(pausa, null, 2));
+  
+      const novaPausa = await handleApiRequest('/pausa', 'POST', pausa);
+      console.log('✅ Nova perda cadastrada:', novaPausa);
+  
+      setPausas((prev) => [...prev, novaPausa]); // Atualiza o estado com a nova perda
+    } catch (error) {
+      console.error('❌ Erro ao cadastrar pausa:', error.message);
+      throw new Error('Erro ao cadastrar a pausa.');
+    }
+  };
+
+  const fetchMotivoPausa = async () => {
+  setLoading(true);
+  try {
+    const motivopausaData = await handleApiRequest('/motivodepausa');
+    console.log('Dados de pausa:', motivopausaData);
+
+    if (motivopausaData.motivodepausa && Array.isArray(motivopausaData.motivodepausa)) {
+      // Filtra apenas os itens que tenham situacao === true
+      const dadosFiltrados = motivopausaData.motivodepausa.filter(
+        (item) => item.situacao === true
+      );
+
+      // Caso queira normalizar chaves ou usar do jeito que já vem
+      // Exemplo de normalização (opcional):
+      // const dadosNormalizados = dadosFiltrados.map((item) => ({
+      //   id: item.id,
+      //   name: item.name,
+      //   situacao: item.situacao,
+      //   createdAt: item.createdAt,
+      //   updatedAt: item.updatedAt,
+      // }));
+
+      // Seta o estado apenas com os itens filtrados
+      console.log('Dados de teste:',dadosFiltrados)
+      setMotivopausa(dadosFiltrados);
+    } else {
+      
+      setMotivopausa([]);
+    }
+  } catch (error) {
+    console.error('Erro ao buscar pausa:', error);
+  } finally {
+    setLoading(false);
+  }
+};
+
 
   // Buscar Formas de Pagamento
   const fetchFormasPagamento = async () => {
@@ -440,6 +491,7 @@ const atualizarFluxo = async (fluxoId, dadosAtualizados) => {
     formasPagamento,
     sexos,
     motivoperdas,
+    motivopausa,
     excluirAnotacao,
     atualizarFluxo,
     atualizarPerda,
@@ -460,6 +512,7 @@ const atualizarFluxo = async (fluxoId, dadosAtualizados) => {
     fetchOperacoes,
     cadastrarPausa,
     fetchPausas,
+    fetchMotivoPausa,
     fetchFormasPagamento,
     fetchSexos,
     fetchMotivoPerdas,
