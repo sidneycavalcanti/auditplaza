@@ -31,12 +31,14 @@ import PerdasEditTab from '../components/Tabs/PerdasEditTab';
 import UltimasVendasTab from '../components/Tabs/UltimaVendasTab';
 import UltimasPerdasTab from '../components/Tabs/UltimaPerdasTab';
 import UltimasAnostacoesTab from '../components/Tabs/UltimaAnotacoesTab';
+import UltimasPausaTab from '../components/Tabs/UltimaPausaTab';
 
 const AuditoriaScreen = ({ route }) => {
 
   const [selectedAnotacao, setSelectedAnotacao] = useState(null);
   const [selectedVenda, setSelectedVenda] = useState(null); // 🔥 Armazena a venda selecionada
   const [selectedPerda, setSelectedPerda] = useState(null);
+  const [selectedPausa, setSelectedPausa] = useState(null);
   const [activeTab, setActiveTab] = useState('Vendas');
   const navigation = useNavigation();
   const { lojaName, usuarioId, lojaId, data, userName, auditoriaId } = route.params || {
@@ -127,6 +129,19 @@ const AuditoriaScreen = ({ route }) => {
             }}
           />
         );
+        case 'UltimasPausas':
+          return (
+            <UltimasPausaTab
+              auditoriaId={auditoriaId}
+              lojaName={lojaName}
+              data={data}
+              userName={userName}
+              setActiveTab={(tab, pausa = null) => {
+                setSelectedPausa(pausa); // 🔥 Guarda a perda para edição
+                setActiveTab(tab);
+              }}
+            />
+          );
       case 'UltimasVendas':
         return (
           <UltimasVendasTab

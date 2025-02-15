@@ -443,6 +443,52 @@ const atualizarFluxo = async (fluxoId, dadosAtualizados) => {
   }
 };
 
+const fetchUltimasPausas = async (auditoriaId, page = 1, limit = 10) => {
+  try {
+    const response = await handleApiRequest(
+      `/pausa?auditoriaId=${auditoriaId}&page=${page}&limit=${limit}`
+    );
+
+    console.log("📡 Pausa recebidas:", response);
+
+    if (response && response.pausas) {
+      return {
+        pausas: response.pausas
+          .map(pausa => ({
+            ...pausa,
+            motivopausa: pausa.motivopausa || { id: '', name: 'Desconhecido' }, 
+          }))
+          .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)), // 🔥 Ordenação do mais recente para o mais antigo
+
+        totalPages: response.totalPages, 
+        totalItems: response.totalItems,
+        currentPage: response.currentPage,
+      };
+    } else {
+      throw new Error('Dados de perdas não encontrados.');
+    }
+  } catch (error) {
+    console.error('Erro ao buscar perdas:', error.message);
+    throw error;
+  }
+};
+
+const excluirPausa = async (IdPausa) => {
+  try {
+    // Requisição para excluir a venda usando o método DELETE
+    await handleApiRequest(`/pausa/${IdPausa}`, 'DELETE');
+    
+    // Atualiza o estado local, removendo a venda pelo ID
+    setPausas((prev) => prev.filter((pausa) => pausa.id !== IdPausa));
+    
+    console.log('Pausa excluída com sucesso!');
+  } catch (err) {
+    console.error('Erro ao excluir Pausa:', err); // Log de erro
+    throw err; // Opcional: Propagar o erro para tratamento adicional
+  }
+};
+
+
 
   // Buscar Formas de Pagamento
   const fetchFormasPagamento = async () => {
@@ -498,9 +544,11 @@ const atualizarFluxo = async (fluxoId, dadosAtualizados) => {
     atualizarVenda,
     excluirVenda,
     excluirPerda,
+    excluirPausa,
     cadastrarVenda,
     fetchUltimasVendas,
     fetchUltimasPerdas,
+    fetchUltimasPausas,
     cadastrarFluxo,
     fetchFluxo,
     cadastrarPerda,

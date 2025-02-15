@@ -14,34 +14,34 @@ import useAuditoriaDetails from '../../hooks/useAuditoriaDetails';
 const UltimasPausaTab = ({ auditoriaId, setActiveTab }) => {
   console.log("🔍 setActiveTab recebido:", setActiveTab);
 
-  const [perdas, setPerdas] = useState([]);
+  const [pausas, setpausas] = useState([]);
   const [loading, setLoading] = useState(true);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
 
-  const { fetchUltimasPerdas, excluirPerda } = useAuditoriaDetails();
+  const { fetchUltimasPausas, excluirPausa} = useAuditoriaDetails();
 
   useEffect(() => {
-    carregarPerdas(currentPage);
+    carregarPausas(currentPage);
   }, [currentPage]);
 
-  const carregarPerdas = async (page) => {
+  const carregarPausas = async (page) => {
 
     try {
       setLoading(true)
-      const response = await fetchUltimasPerdas(auditoriaId, page);
+      const response = await fetchUltimasPausas(auditoriaId, page);
 
-      setPerdas(response.perdas); // Garante que perdas não seja null
+      setPausas(response.pausas); // Garante que pausas não seja null
       setTotalPages(response.totalPages)
     } catch (error) {
-      console.error('Erro ao carregar perdas:', error);
-      Alert.alert('Erro', 'Não foi possível carregar as últimas perdas.');
+      console.error('Erro ao carregar pausas:', error);
+      Alert.alert('Erro', 'Não foi possível carregar as últimas pausas.');
     } finally {
       setLoading(false);
     }
   };
 
-  const handleExcluirPerda = (perdaId) => {
+  const handleExcluirPerda = (pausaId) => {
     Alert.alert(
       'Confirmação',
       'Deseja excluir esta perda?',
@@ -52,7 +52,7 @@ const UltimasPausaTab = ({ auditoriaId, setActiveTab }) => {
           onPress: async () => {
             try {
               await excluirPerda(perdaId);
-              setPerdas(perdas.filter((perda) => perda.id !== perdaId));
+              setPausas(pausas.filter((perda) => perda.id !== perdaId));
               Alert.alert('Sucesso', 'Perda excluída com sucesso!');
             } catch (error) {
               Alert.alert('Erro', 'Erro ao excluir a perda.');
@@ -68,13 +68,12 @@ const UltimasPausaTab = ({ auditoriaId, setActiveTab }) => {
     <View style={styles.perdaItem}>
       {/* Motivo e Descrição */}
       <View>
-        <Text style={styles.valorText}> {item.motivoperdas?.name || 'Não informado'}</Text>
-        <Text style={styles.obstext}>Observacão: {item.obs || 'Sem observação'}</Text>
+        <Text style={styles.valorText}> {item.motivopausas?.name || 'Não informado'}</Text>
       </View>
 
       {/* Botões de Ações */}
       <View style={styles.buttonsContainer}>
-        <TouchableOpacity style={styles.editButton} onPress={() => setActiveTab('PerdasEditTab', item)}>
+        <TouchableOpacity style={styles.editButton} onPress={() => setActiveTab('PausasEditTab', item)}>
           <Text style={styles.buttonText}>Editar</Text>
         </TouchableOpacity>
         <TouchableOpacity
@@ -89,17 +88,17 @@ const UltimasPausaTab = ({ auditoriaId, setActiveTab }) => {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>📋 Últimas Perdas</Text>
+      <Text style={styles.title}>📋 Últimas Pausas</Text>
       {loading ? (
         <ActivityIndicator size="large" color="#20B2AA" />
-      ) : perdas.length === 0 ? (
+      ) : pausas.length === 0 ? (
         <Text style={styles.emptyText}>Nenhuma perda cadastrada.</Text>
       ) : (
 
         <>
           <ScrollView nestedScrollEnabled={true}>
             <FlatList
-              data={perdas || []}
+              data={pausas || []}
               keyExtractor={(item) => item.id.toString()}
               renderItem={renderPerda}
               scrollEnabled={false} // Impede que a FlatList role

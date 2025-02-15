@@ -80,7 +80,7 @@ const PausasTab = ({ auditoriaId, setActiveTab }) => {
         <Text style={styles.buttonText}>Adicionar</Text>
       </TouchableOpacity>
 
-      <TouchableOpacity style={styles.button} onPress={() => setActiveTab('UltimasPausa')}>
+      <TouchableOpacity style={styles.button} onPress={() => setActiveTab('UltimasPausas')}>
         <Text style={styles.buttonText}>Últimas Pausas</Text>
       </TouchableOpacity>
 
