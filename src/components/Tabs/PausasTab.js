@@ -15,6 +15,8 @@ const PausasTab = ({ auditoriaId, setActiveTab }) => {
 
   // Declaração de estados
   const [selectedMotivoPausa, setSelectedMotivoPausa] = useState('');
+  const [pausaAtiva, setPausaAtiva] = useState(null);
+  const [modalVisible, setModalVisible] = useState(false);
 
   // Busca os motivos de perda ao montar o componente
   useEffect(() => {
@@ -31,7 +33,7 @@ const PausasTab = ({ auditoriaId, setActiveTab }) => {
 
     try {
       const pausa = {
-        motivopausaId: parseInt(selectedMotivoPausa, 10), // ID do motivo da perda
+        motivodepausaId: parseInt(selectedMotivoPausa, 10), // ✅ Nome correto conforme o backend
         auditoriaId: parseInt(auditoriaId, 10)
       };
 

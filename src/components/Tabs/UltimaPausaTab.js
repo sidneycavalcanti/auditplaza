@@ -14,7 +14,7 @@ import useAuditoriaDetails from '../../hooks/useAuditoriaDetails';
 const UltimasPausaTab = ({ auditoriaId, setActiveTab }) => {
   console.log("🔍 setActiveTab recebido:", setActiveTab);
 
-  const [pausas, setpausas] = useState([]);
+  const [pausas, setPausas] = useState([]);
   const [loading, setLoading] = useState(true);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
@@ -41,21 +41,21 @@ const UltimasPausaTab = ({ auditoriaId, setActiveTab }) => {
     }
   };
 
-  const handleExcluirPerda = (pausaId) => {
+  const handleExcluirPausa = (pausaId) => {
     Alert.alert(
       'Confirmação',
-      'Deseja excluir esta perda?',
+      'Deseja excluir esta pausa?',
       [
         { text: 'Cancelar', style: 'cancel' },
         {
           text: 'Excluir',
           onPress: async () => {
             try {
-              await excluirPerda(perdaId);
-              setPausas(pausas.filter((perda) => perda.id !== perdaId));
-              Alert.alert('Sucesso', 'Perda excluída com sucesso!');
+              await excluirPausa(pausaId);
+              setPausas(pausas.filter((pausa) => pausa.id !== pausaId));
+              Alert.alert('Sucesso', 'Pausa excluída com sucesso!');
             } catch (error) {
-              Alert.alert('Erro', 'Erro ao excluir a perda.');
+              Alert.alert('Erro', 'Erro ao excluir a pausa.');
             }
           },
         },
@@ -68,21 +68,22 @@ const UltimasPausaTab = ({ auditoriaId, setActiveTab }) => {
     <View style={styles.perdaItem}>
       {/* Motivo e Descrição */}
       <View>
-        <Text style={styles.valorText}> {item.motivopausas?.name || 'Não informado'}</Text>
+        <Text style={styles.valorText}> {item.motivodepausa?.name || 'Não informado'}</Text>
       </View>
 
-      {/* Botões de Ações */}
+      {/* Botões de Ações 
       <View style={styles.buttonsContainer}>
         <TouchableOpacity style={styles.editButton} onPress={() => setActiveTab('PausasEditTab', item)}>
           <Text style={styles.buttonText}>Editar</Text>
         </TouchableOpacity>
         <TouchableOpacity
           style={styles.deleteButton}
-          onPress={() => handleExcluirPerda(item.id)}
+          onPress={() => handleExcluirPausa(item.id)}
         >
           <Text style={styles.buttonText}>Excluir</Text>
         </TouchableOpacity>
       </View>
+      */}
     </View>
   );
 

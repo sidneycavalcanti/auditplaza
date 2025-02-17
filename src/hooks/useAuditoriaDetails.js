@@ -391,7 +391,7 @@ const atualizarFluxo = async (fluxoId, dadosAtualizados) => {
 
   const cadastrarPausa = async (pausa) => {
     try {
-      if (!pausa || !pausa.motivopausaId) {
+      if (!pausa || !pausa.motivodepausaId) {
         throw new Error('Dados inválidos para cadastro da pausa.');
       }
   
