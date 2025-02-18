@@ -527,31 +527,18 @@ const encerrarPausa = async (pausaId) => {
 
     console.log(`📡 Enviando requisição para encerrar a pausa com ID: ${pausaId}`);
 
-    // 🔥 Envia a requisição para atualizar `updatedAt`
+    // 🔥 Envia a requisição para atualizar apenas `updatedAt`
     const response = await handleApiRequest(`/pausa/${pausaId}`, "PUT", {}); 
 
     console.log("✅ Pausa encerrada e atualizada na API:", response);
 
-    // 🔄 Aguarda um pequeno delay e busca a lista atualizada de pausas
-    setTimeout(async () => {
-      console.log("🔄 Atualizando lista de pausas...");
-      const novasPausas = await fetchUltimasPausas(auditoriaId, 1, 10); 
-
-      if (novasPausas.pausas.length > 0) {
-        setPausas(novasPausas.pausas); // Atualiza lista de pausas no estado global do hook
-        console.log("✅ Lista de pausas atualizada!", novasPausas.pausas);
-      } else {
-        console.warn("⚠️ Nenhuma pausa encontrada após atualização.");
-      }
-    }, 1000);
-
-    return response; // Retorna a pausa atualizada
-
+    return response;
   } catch (error) {
     console.error("❌ Erro ao encerrar pausa:", error);
     throw new Error("Erro ao encerrar pausa.");
   }
 };
+
 
 
 
