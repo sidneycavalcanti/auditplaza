@@ -59,46 +59,36 @@ const PausasTab = ({ auditoriaId, setActiveTab }) => {
 
   // Encerrar a pausa e desbloquear a interface
   const handleEncerrarPausa = async () => {
-    console.log("🚀 Tentando encerrar a pausa...");
-  
     if (!pausaAtiva || !pausaAtiva.id) {
-      console.log("⚠️ Nenhuma pausa ativa encontrada ou ID inválido.", pausaAtiva);
       Alert.alert('Erro', 'Nenhuma pausa ativa encontrada.');
       return;
     }
   
-    console.log(`📡 Tentando encerrar a pausa com ID: ${pausaAtiva.id}`);
-  
     try {
-      // 🔥 Envia a requisição para encerrar a pausa
-      const pausaEncerrada = await handleApiRequest(`/pausa/${pausaAtiva.id}`, 'PUT', {});
+      console.log(`📡 Encerrando pausa com ID: ${pausaAtiva.id}`);
+      await encerrarPausa(pausaAtiva.id); // ✅ Usa o hook diretamente
   
-      console.log("✅ Pausa encerrada e estado atualizado!", pausaEncerrada);
-  
-      // 🔄 Aguarda 1 segundo e busca a pausa da API para garantir que os dados completos sejam carregados
+      // 🔄 Atualiza a lista de pausas após encerrar
       setTimeout(async () => {
         console.log("🔄 Atualizando lista de pausas...");
-        const novasPausas = await fetchUltimasPausas(auditoriaId, 1, 10); // Busca pausas atualizadas
+        const novasPausas = await fetchUltimasPausas(auditoriaId, 1, 10); 
   
         if (novasPausas.pausas.length > 0) {
-          setPausaAtiva(novasPausas.pausas[0]); // 🔥 Atualiza corretamente com os novos dados
-          console.log("✅ Estado atualizado com a pausa encerrada:", novasPausas.pausas[0]);
+          setPausas(novasPausas.pausas);
+          console.log("✅ Lista de pausas atualizada!");
         } else {
-          setPausaAtiva(null);
           console.warn("⚠️ Nenhuma pausa encontrada após atualização.");
         }
       }, 1000);
   
-      setModalVisible(false); // 🔥 Fecha o modal
       Alert.alert('Sucesso', 'Pausa encerrada com sucesso!');
+      setModalVisible(false); // 🔥 Fecha o modal
   
     } catch (error) {
       console.error("❌ Erro ao encerrar pausa:", error);
       Alert.alert('Erro', 'Não foi possível encerrar a pausa.');
     }
   };
-  
-  
   
   
   // Renderiza um indicador de carregamento enquanto os dados estão sendo buscados

@@ -519,24 +519,37 @@ const excluirPausa = async (IdPausa) => {
   }
 };
 
-const encerrarPausa = async (idPausa) => {
+const encerrarPausa = async (pausaId) => {
   try {
-    console.log(`📡 Enviando requisição PUT para /pausa/${idPausa}`);
+    if (!pausaId) {
+      throw new Error("ID da pausa é obrigatório para encerrar.");
+    }
 
-    await handleApiRequest(`/pausa/${idPausa}`, 'PUT');
+    console.log(`📡 Enviando requisição para encerrar a pausa com ID: ${pausaId}`);
 
-    console.log('✅ Requisição enviada com sucesso! Atualizando estado.');
+    // 🔥 Envia a requisição para atualizar `updatedAt`
+    const response = await handleApiRequest(`/pausa/${pausaId}`, "PUT", {}); 
 
-    setPausas((prev) =>
-      prev.map((pausa) =>
-        pausa.id === idPausa ? { ...pausa, updatedAt: new Date().toISOString() } : pausa
-      )
-    );
+    console.log("✅ Pausa encerrada e atualizada na API:", response);
 
-    console.log('✅ Pausa encerrada e estado atualizado!');
+    // 🔄 Aguarda um pequeno delay e busca a lista atualizada de pausas
+    setTimeout(async () => {
+      console.log("🔄 Atualizando lista de pausas...");
+      const novasPausas = await fetchUltimasPausas(auditoriaId, 1, 10); 
+
+      if (novasPausas.pausas.length > 0) {
+        setPausas(novasPausas.pausas); // Atualiza lista de pausas no estado global do hook
+        console.log("✅ Lista de pausas atualizada!", novasPausas.pausas);
+      } else {
+        console.warn("⚠️ Nenhuma pausa encontrada após atualização.");
+      }
+    }, 1000);
+
+    return response; // Retorna a pausa atualizada
+
   } catch (error) {
-    console.error('❌ Erro ao encerrar pausa:', error.message);
-    throw new Error('Erro ao encerrar a pausa.');
+    console.error("❌ Erro ao encerrar pausa:", error);
+    throw new Error("Erro ao encerrar pausa.");
   }
 };
 
