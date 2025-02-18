@@ -398,14 +398,17 @@ const atualizarFluxo = async (fluxoId, dadosAtualizados) => {
       console.log('📡 Enviando nova pausa para API:', JSON.stringify(pausa, null, 2));
   
       const novaPausa = await handleApiRequest('/pausa', 'POST', pausa);
-      console.log('✅ Nova perda cadastrada:', novaPausa);
+      console.log('✅ Nova pausa cadastrada:', novaPausa);
   
-      setPausas((prev) => [...prev, novaPausa]); // Atualiza o estado com a nova perda
+      setPausas((prev) => [...prev, novaPausa]); // Atualiza a lista localmente
+  
+      return novaPausa; // 🔥 Agora retorna a nova pausa corretamente
     } catch (error) {
       console.error('❌ Erro ao cadastrar pausa:', error.message);
       throw new Error('Erro ao cadastrar a pausa.');
     }
   };
+  
 
   const fetchMotivoPausa = async () => {
   setLoading(true);
@@ -449,29 +452,57 @@ const fetchUltimasPausas = async (auditoriaId, page = 1, limit = 10) => {
       `/pausa?auditoriaId=${auditoriaId}&page=${page}&limit=${limit}`
     );
 
-    console.log("📡 Pausa recebidas:", response);
+    console.log("📡 Pausas recebidas:", response);
 
     if (response && response.pausas) {
       return {
         pausas: response.pausas
-          .map(pausa => ({
-            ...pausa,
-            motivopausa: pausa.motivopausa || { id: '', name: 'Desconhecido' }, 
-          }))
+          .map(pausa => {
+            const createdAt = new Date(pausa.createdAt);
+            const updatedAt = new Date(pausa.updatedAt);
+
+            // Calcula a diferença em milissegundos
+            const diffMs = updatedAt - createdAt;
+
+            // Converte para segundos, minutos e horas
+            const diffSeconds = Math.floor(diffMs / 1000);
+            const diffMinutes = Math.floor(diffSeconds / 60);
+            const diffHours = Math.floor(diffMinutes / 60);
+            const remainingMinutes = diffMinutes % 60;
+            const remainingSeconds = diffSeconds % 60;
+
+            // 🔥 Formata a string de tempo gasto
+            let tempoGasto = "";
+            if (diffHours > 0) {
+              tempoGasto += `${diffHours}h `;
+            }
+            if (remainingMinutes > 0 || diffHours > 0) {
+              tempoGasto += `${remainingMinutes}min `;
+            }
+            tempoGasto += `${remainingSeconds}s`; // Sempre exibir os segundos
+
+            return {
+              ...pausa,
+              motivodepausa: pausa.motivodepausa || { id: '', name: 'Desconhecido' },
+              tempoGasto, // 🔥 Agora inclui horas, minutos e segundos
+            };
+          })
           .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)), // 🔥 Ordenação do mais recente para o mais antigo
 
-        totalPages: response.totalPages, 
+        totalPages: response.totalPages,
         totalItems: response.totalItems,
         currentPage: response.currentPage,
       };
     } else {
-      throw new Error('Dados de perdas não encontrados.');
+      throw new Error('Dados de pausas não encontrados.');
     }
   } catch (error) {
-    console.error('Erro ao buscar perdas:', error.message);
+    console.error('Erro ao buscar pausas:', error.message);
     throw error;
   }
 };
+
+
 
 const excluirPausa = async (IdPausa) => {
   try {
@@ -487,6 +518,29 @@ const excluirPausa = async (IdPausa) => {
     throw err; // Opcional: Propagar o erro para tratamento adicional
   }
 };
+
+const encerrarPausa = async (idPausa) => {
+  try {
+    console.log(`📡 Enviando requisição PUT para /pausa/${idPausa}`);
+
+    await handleApiRequest(`/pausa/${idPausa}`, 'PUT');
+
+    console.log('✅ Requisição enviada com sucesso! Atualizando estado.');
+
+    setPausas((prev) =>
+      prev.map((pausa) =>
+        pausa.id === idPausa ? { ...pausa, updatedAt: new Date().toISOString() } : pausa
+      )
+    );
+
+    console.log('✅ Pausa encerrada e estado atualizado!');
+  } catch (error) {
+    console.error('❌ Erro ao encerrar pausa:', error.message);
+    throw new Error('Erro ao encerrar a pausa.');
+  }
+};
+
+
 
 
 
@@ -538,6 +592,7 @@ const excluirPausa = async (IdPausa) => {
     sexos,
     motivoperdas,
     motivopausa,
+    encerrarPausa,
     excluirAnotacao,
     atualizarFluxo,
     atualizarPerda,

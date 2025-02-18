@@ -71,6 +71,13 @@ const UltimasPausaTab = ({ auditoriaId, setActiveTab }) => {
         <Text style={styles.valorText}> {item.motivodepausa?.name || 'Não informado'}</Text>
       </View>
 
+      {/* Tempo da Pausa */}
+  
+      <Text style={styles.valorText}>
+        ⏳ Tempo: {item.tempoGasto || 'Calculando...'}
+      </Text>
+   
+
       {/* Botões de Ações 
       <View style={styles.buttonsContainer}>
         <TouchableOpacity style={styles.editButton} onPress={() => setActiveTab('PausasEditTab', item)}>
