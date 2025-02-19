@@ -527,17 +527,17 @@ const encerrarPausa = async (pausaId) => {
 
     console.log(`📡 Enviando requisição para encerrar a pausa com ID: ${pausaId}`);
 
-    // 🔥 Envia a requisição para atualizar apenas `updatedAt`
-    const response = await handleApiRequest(`/pausa/${pausaId}`, "PUT", {}); 
+    const response = await handleApiRequest(`/pausa/${pausaId}`, "PUT", {});
 
-    console.log("✅ Pausa encerrada e atualizada na API:", response);
+    console.log("✅ Resposta da API:", response);
 
     return response;
   } catch (error) {
-    console.error("❌ Erro ao encerrar pausa:", error);
-    throw new Error("Erro ao encerrar pausa.");
+    console.error("❌ ERRO ao encerrar pausa:", error.message);
+    throw error;
   }
 };
+
 
 
 
