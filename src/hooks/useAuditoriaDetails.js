@@ -58,6 +58,17 @@ const useAuditoriaDetails = () => {
   };
   
 
+
+  const checkAuthentication = async () => {
+      const token = await AsyncStorage.getItem('token');
+      if (!token) {
+        Alert.alert('Sessão expirada', 'Por favor, faça login novamente.');
+        navigation.navigate('Login');
+      }
+    };
+
+
+
   // Funções de Vendas
   const cadastrarVenda = async (venda) => {
     try {
@@ -397,17 +408,24 @@ const atualizarFluxo = async (fluxoId, dadosAtualizados) => {
   
       console.log('📡 Enviando nova pausa para API:', JSON.stringify(pausa, null, 2));
   
+      // ✅ Verifica se a API realmente retorna os dados da nova pausa
       const novaPausa = await handleApiRequest('/pausa', 'POST', pausa);
+  
+      if (!novaPausa || !novaPausa.id) {
+        throw new Error("A API não retornou a nova pausa corretamente");
+      }
+  
       console.log('✅ Nova pausa cadastrada:', novaPausa);
   
-      setPausas((prev) => [...prev, novaPausa]); // Atualiza a lista localmente
+      setPausas((prev) => [...prev, novaPausa]); // Atualiza o estado com a nova pausa
   
-      return novaPausa; // 🔥 Agora retorna a nova pausa corretamente
+      return novaPausa; // ✅ Agora sempre retorna os dados corretos
     } catch (error) {
       console.error('❌ Erro ao cadastrar pausa:', error.message);
       throw new Error('Erro ao cadastrar a pausa.');
     }
   };
+  
   
 
   const fetchMotivoPausa = async () => {
@@ -619,6 +637,7 @@ const encerrarPausa = async (pausaId) => {
     fetchFormasPagamento,
     fetchSexos,
     fetchMotivoPerdas,
+    checkAuthentication,
     loading,
     error,
   };

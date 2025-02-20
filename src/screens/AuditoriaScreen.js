@@ -4,11 +4,7 @@ import {
   Text,
   TouchableOpacity,
   ScrollView,
-  Alert,
 } from 'react-native';
-
-
-import { format, parseISO } from 'date-fns';
 
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useNavigation } from '@react-navigation/native';
@@ -33,13 +29,28 @@ import UltimasPerdasTab from '../components/Tabs/UltimaPerdasTab';
 import UltimasAnostacoesTab from '../components/Tabs/UltimaAnotacoesTab';
 import UltimasPausaTab from '../components/Tabs/UltimaPausaTab';
 
+// 🔥 Importa o Modal de Pausa
+import PausaModal from '../components/PausaModal';
+import usePausa from '../hooks/usePausa';
+
 const AuditoriaScreen = ({ route }) => {
+  
+  const { pausaAtiva, modalVisible, loading, handleEncerrarPausa } = usePausa(auditoriaId);
+
+  //const [pausaAtiva, setPausaAtiva] = useState(null);
+  //const [loading, setLoading] = useState(true);
+  //const [modalVisible, setModalVisible] = useState(false);
 
   const [selectedAnotacao, setSelectedAnotacao] = useState(null);
   const [selectedVenda, setSelectedVenda] = useState(null); // 🔥 Armazena a venda selecionada
   const [selectedPerda, setSelectedPerda] = useState(null);
+  
   const [selectedPausa, setSelectedPausa] = useState(null);
   const [activeTab, setActiveTab] = useState('Vendas');
+
+  
+  
+  
   const navigation = useNavigation();
   const { lojaName, usuarioId, lojaId, data, userName, auditoriaId } = route.params || {
 
@@ -62,16 +73,10 @@ const AuditoriaScreen = ({ route }) => {
   const firstName = userName && userName.trim() !== '' ? userName.split(' ')[0] : 'Auditor';
   const formattedDate = data.split(' ')[0];
 
-  const { auditoriadetails } = useAuditoriaDetails();
+  const { fetchUltimasPausas, checkAuthentication } = useAuditoriaDetails();
 
   // Verificar a autenticação do usuário
-  const checkAuthentication = async () => {
-    const token = await AsyncStorage.getItem('token');
-    if (!token) {
-      Alert.alert('Sessão expirada', 'Por favor, faça login novamente.');
-      navigation.navigate('Login');
-    }
-  };
+  
 
   useEffect(() => {
     checkAuthentication();
@@ -251,6 +256,10 @@ const AuditoriaScreen = ({ route }) => {
 
   return (
     <View style={styles.container}>
+      {/* Bloqueia a interface se houver uma pausa ativa */}
+      <PausaModal visible={modalVisible} pausaAtiva={pausaAtiva} onClose={handleEncerrarPausa} />
+
+
       {/* Barra com o nome da loja, data/hora e nome do usuário */}
       <View style={styles.header}>
         <Text style={styles.headerText}>Loja: {lojaName}</Text>

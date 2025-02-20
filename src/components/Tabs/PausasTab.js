@@ -1,96 +1,52 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, TouchableOpacity, Alert, ActivityIndicator, Modal } from 'react-native';
+import { View, Text, TouchableOpacity, ActivityIndicator} from 'react-native';
 import { Picker } from '@react-native-picker/picker';
 import styles from '../../styles/AuditoriaScreenStyles';
 import useAuditoriaDetails from '../../hooks/useAuditoriaDetails';
 
-const PausasTab = ({ auditoriaId, setActiveTab }) => {
-  const {
-    cadastrarPausa,
-    fetchMotivoPausa,
-    encerrarPausa,
-    motivopausa,
-    loading,
-    error
-  } = useAuditoriaDetails();
+// 🔥 Hook personalizado para controle da pausa
+import usePausa from '../../hooks/usePausa';
+// 🔥 Componente de modal externo
+import PausaModal from '../PausaModal';
 
-  // Declaração de estados
+const PausasTab = ({ auditoriaId, setActiveTab }) => {
+  const { fetchMotivoPausa, motivopausa, loading, error } = useAuditoriaDetails();
+
+  // Hook de controle de pausa
+  const { handleCadastrarPausa, handleEncerrarPausa, pausaAtiva, modalVisible, setModalVisible } = usePausa(auditoriaId);
   const [selectedMotivoPausa, setSelectedMotivoPausa] = useState('');
-  const [pausaAtiva, setPausaAtiva] = useState(null);
-  const [modalVisible, setModalVisible] = useState(false);
 
   // Busca os motivos de pausa ao montar o componente
   useEffect(() => {
     fetchMotivoPausa();
   }, []);
 
+  useEffect(() => {
+    console.log("🔄 selectedMotivoPausa atualizado:", selectedMotivoPausa);
+  }, [selectedMotivoPausa]);
+  
+
   // Criar uma nova pausa e bloquear a interface
-  const handleCadPausa = async () => {
+  const handleNovaPausa = async () => {
+    console.log("🟡 Motivo de pausa selecionado antes de cadastrar:", selectedMotivoPausa);
+  
     if (!selectedMotivoPausa) {
       Alert.alert('Erro', 'Selecione um motivo para a pausa.');
       return;
     }
   
-    try {
-      const pausa = {
-        motivodepausaId: parseInt(selectedMotivoPausa, 10),
-        auditoriaId: parseInt(auditoriaId, 10)
-      };
+    const result = await handleCadastrarPausa(selectedMotivoPausa);
   
-      console.log("📡 Enviando nova pausa para API:", JSON.stringify(pausa, null, 2));
-
-      const novaPausa = await cadastrarPausa(pausa);
-  
-      console.log("✅ Nova pausa cadastrada:", novaPausa);
-
-      setPausaAtiva(novaPausa); // 🔥 Aqui o estado é atualizado
-      console.log("🔥 Estado atualizado: ", pausaAtiva);
-  
-      setModalVisible(true); // 🔥 Abre o modal
-  
-      // Limpa os campos após o cadastro
-      setSelectedMotivoPausa('');
-    } catch (err) {
-      console.error('❌ Erro ao cadastrar pausa:', err);
-      Alert.alert('Erro', 'Não foi possível cadastrar a pausa.');
-    }
-  };
-  
-
-  // Encerrar a pausa e desbloquear a interface
-  const handleEncerrarPausa = async () => {
-    if (!pausaAtiva || !pausaAtiva.id) {
-      Alert.alert('Erro', 'Nenhuma pausa ativa encontrada.');
-      return;
-    }
-  
-    try {
-      console.log(`📡 Encerrando pausa com ID: ${pausaAtiva.id}`);
-      await encerrarPausa(pausaAtiva.id); // ✅ Usa o hook diretamente
-  
-      // 🔄 Atualiza a lista de pausas após encerrar
-      setTimeout(async () => {
-        console.log("🔄 Atualizando lista de pausas...");
-        const novasPausas = await fetchUltimasPausas(auditoriaId, 1, 10); 
-  
-        if (novasPausas.pausas.length > 0) {
-          setPausas(novasPausas.pausas);
-          console.log("✅ Lista de pausas atualizada!");
-        } else {
-          console.warn("⚠️ Nenhuma pausa encontrada após atualização.");
-        }
-      }, 1000);
-  
-      Alert.alert('Sucesso', 'Pausa encerrada com sucesso!');
-      setModalVisible(false); // 🔥 Fecha o modal
-  
-    } catch (error) {
-      console.error("❌ Erro ao encerrar pausa:", error);
-      Alert.alert('Erro', 'Não foi possível encerrar a pausa.');
+    if (result.error) {
+      Alert.alert('Erro', result.error);
+    } else {
+      console.log("✅ Pausa cadastrada com sucesso!", result);
+      setSelectedMotivoPausa(''); // 🔥 Limpa o campo após o cadastro
     }
   };
   
   
+
   // Renderiza um indicador de carregamento enquanto os dados estão sendo buscados
   if (loading) {
     return (
@@ -106,17 +62,22 @@ const PausasTab = ({ auditoriaId, setActiveTab }) => {
     <View style={styles.contentContainer}>
       <Text style={styles.sectionTitle}>Motivo da Pausa:</Text>
       <Picker
-        selectedValue={selectedMotivoPausa}
-        onValueChange={(itemValue) => setSelectedMotivoPausa(String(itemValue))}
-        style={styles.picker}
-      >
-        <Picker.Item label="Selecione um motivo" value="" />
-        {motivopausa.map((motivo) => (
-          <Picker.Item key={motivo.id} label={motivo.name} value={String(motivo.id)} />
-        ))}
-      </Picker>
+  selectedValue={selectedMotivoPausa}
+  onValueChange={(itemValue) => {
+    console.log("📌 Novo motivo de pausa selecionado:", itemValue); // 🔍 Verifica se o valor está sendo atualizado corretamente
+    setSelectedMotivoPausa(String(itemValue));
+  }}
+  style={styles.picker}
+>
+  <Picker.Item label="Selecione um motivo" value="" />
+  {motivopausa.map((motivo) => (
+    <Picker.Item key={motivo.id} label={motivo.name} value={String(motivo.id)} />
+  ))}
+</Picker>
 
-      <TouchableOpacity style={styles.button} onPress={handleCadPausa}>
+
+
+      <TouchableOpacity style={styles.button} onPress={handleNovaPausa}>
         <Text style={styles.buttonText}>Adicionar</Text>
       </TouchableOpacity>
 
@@ -124,50 +85,10 @@ const PausasTab = ({ auditoriaId, setActiveTab }) => {
         <Text style={styles.buttonText}>Últimas Pausas</Text>
       </TouchableOpacity>
 
-      {/* Renderiza uma mensagem de erro, se houver */}
-      {error && <Text style={styles.errorText}>{error}</Text>}
-
-      {/* 🔥 MODAL PARA BLOQUEAR A INTERFACE DURANTE A PAUSA 🔥 */}
-      <Modal visible={modalVisible} transparent={true} animationType="slide">
-        <View style={styles.modalContainer}>
-          <Text style={styles.modalText}>⏳ Pausa em andamento</Text>
-          
-          <TouchableOpacity style={styles.modalButton} onPress={handleEncerrarPausa}>
-  <Text style={styles.modalButtonText}>Encerrar Pausa</Text>
-</TouchableOpacity>
-
-        </View>
-      </Modal>
+      {/* 🔥 Modal de Pausa Externo para bloquear a interface */}
+      <PausaModal visible={modalVisible} pausaAtiva={pausaAtiva} onClose={handleEncerrarPausa} />
     </View>
   );
 };
-
-// 🔥 Estilos para melhorar a UX
-const modalStyles = {
-  modalContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: 'rgba(0,0,0,0.5)',
-  },
-  modalText: {
-    fontSize: 18,
-    color: 'white',
-    marginBottom: 20,
-  },
-  modalButton: {
-    backgroundColor: '#FF6347',
-    padding: 15,
-    borderRadius: 10,
-  },
-  modalButtonText: {
-    color: 'white',
-    fontSize: 16,
-    fontWeight: 'bold',
-  },
-};
-
-// 🔥 Une os estilos existentes com os novos estilos de modal
-Object.assign(styles, modalStyles);
 
 export default PausasTab;
