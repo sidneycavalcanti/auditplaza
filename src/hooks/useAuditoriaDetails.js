@@ -466,46 +466,34 @@ const atualizarFluxo = async (fluxoId, dadosAtualizados) => {
 
 const fetchUltimasPausas = async (auditoriaId, page = 1, limit = 10) => {
   try {
+    console.time("⏳ Tempo de resposta da API - fetchUltimasPausas");
+
     const response = await handleApiRequest(
       `/pausa?auditoriaId=${auditoriaId}&page=${page}&limit=${limit}`
     );
 
-    console.log("📡 Pausas recebidas:", response);
+    console.timeEnd("⏳ Tempo de resposta da API - fetchUltimasPausas");
 
-    if (response && response.pausas) {
+    if (response?.pausas) {
       return {
-        pausas: response.pausas
-          .map(pausa => {
-            const createdAt = new Date(pausa.createdAt);
-            const updatedAt = new Date(pausa.updatedAt);
+        pausas: response.pausas.map(pausa => {
+          const createdAt = new Date(pausa.createdAt);
+          const updatedAt = new Date(pausa.updatedAt || new Date());
 
-            // Calcula a diferença em milissegundos
-            const diffMs = updatedAt - createdAt;
+          // 🔥 Diferencial otimizado
+          const diffMs = Math.max(updatedAt - createdAt, 0);
+          const diffSeconds = Math.floor(diffMs / 1000);
+          const diffMinutes = Math.floor(diffSeconds / 60);
+          const diffHours = Math.floor(diffMinutes / 60);
 
-            // Converte para segundos, minutos e horas
-            const diffSeconds = Math.floor(diffMs / 1000);
-            const diffMinutes = Math.floor(diffSeconds / 60);
-            const diffHours = Math.floor(diffMinutes / 60);
-            const remainingMinutes = diffMinutes % 60;
-            const remainingSeconds = diffSeconds % 60;
+          const tempoGasto = `${diffHours > 0 ? `${diffHours}h ` : ""}${diffMinutes % 60}min ${diffSeconds % 60}s`;
 
-            // 🔥 Formata a string de tempo gasto
-            let tempoGasto = "";
-            if (diffHours > 0) {
-              tempoGasto += `${diffHours}h `;
-            }
-            if (remainingMinutes > 0 || diffHours > 0) {
-              tempoGasto += `${remainingMinutes}min `;
-            }
-            tempoGasto += `${remainingSeconds}s`; // Sempre exibir os segundos
-
-            return {
-              ...pausa,
-              motivodepausa: pausa.motivodepausa || { id: '', name: 'Desconhecido' },
-              tempoGasto, // 🔥 Agora inclui horas, minutos e segundos
-            };
-          })
-          .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)), // 🔥 Ordenação do mais recente para o mais antigo
+          return {
+            ...pausa,
+            motivodepausa: pausa.motivodepausa || { id: '', name: 'Desconhecido' },
+            tempoGasto,
+          };
+        }),
 
         totalPages: response.totalPages,
         totalItems: response.totalItems,
@@ -515,10 +503,40 @@ const fetchUltimasPausas = async (auditoriaId, page = 1, limit = 10) => {
       throw new Error('Dados de pausas não encontrados.');
     }
   } catch (error) {
-    console.error('Erro ao buscar pausas:', error.message);
+    console.error('❌ Erro ao buscar pausas:', error.message);
     throw error;
   }
 };
+
+
+const verificarPausaAtiva = async (auditoriaId) => {
+  if (!auditoriaId) {
+    console.warn("⚠️ Nenhuma auditoriaId fornecida. Pulando verificação de pausa.");
+    return null;
+  }
+
+  try {
+    console.log(`📡 Buscando pausa ativa para auditoriaId: ${auditoriaId}`);
+
+    const response = await handleApiRequest(`/pausa/ativas/${auditoriaId}`);
+
+    if (response?.pausas?.length > 0) {
+      console.log("✅ Pausa ativa encontrada:", response.pausas[0]);
+      return {
+        ...response.pausas[0],
+        motivodepausa: response.pausas[0].motivodepausa || { id: '', name: 'Desconhecido' },
+      };
+    } else {
+      console.log("✅ Nenhuma pausa ativa encontrada.");
+      return null;
+    }
+  } catch (error) {
+    console.error('❌ Erro ao verificar pausa ativa:', error);
+    return null;
+  }
+};
+
+
 
 
 
@@ -537,7 +555,7 @@ const excluirPausa = async (IdPausa) => {
   }
 };
 
-const encerrarPausa = async (pausaId) => {
+const encerrarPausa = async (pausaId, updateData = {}) => {
   try {
     if (!pausaId) {
       throw new Error("ID da pausa é obrigatório para encerrar.");
@@ -545,14 +563,15 @@ const encerrarPausa = async (pausaId) => {
 
     console.log(`📡 Enviando requisição para encerrar a pausa com ID: ${pausaId}`);
 
-    const response = await handleApiRequest(`/pausa/${pausaId}`, "PUT", {});
+    // 🔥 Envia a requisição **alterando apenas o `status`**
+    const response = await handleApiRequest(`/pausa/${pausaId}`, "PUT", { status: 0, ...updateData });
 
-    console.log("✅ Resposta da API:", response);
+    console.log("✅ Pausa encerrada e atualizada na API:", response);
 
     return response;
   } catch (error) {
-    console.error("❌ ERRO ao encerrar pausa:", error.message);
-    throw error;
+    console.error("❌ Erro ao encerrar pausa:", error);
+    throw new Error("Erro ao encerrar pausa.");
   }
 };
 
@@ -638,6 +657,7 @@ const encerrarPausa = async (pausaId) => {
     fetchSexos,
     fetchMotivoPerdas,
     checkAuthentication,
+    verificarPausaAtiva,
     loading,
     error,
   };

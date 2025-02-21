@@ -6,7 +6,7 @@ import {
   ScrollView,
 } from 'react-native';
 
-import AsyncStorage from '@react-native-async-storage/async-storage';
+//import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useNavigation } from '@react-navigation/native';
 import useAuditoriaDetails from '../hooks/useAuditoriaDetails';
 
@@ -30,12 +30,10 @@ import UltimasAnostacoesTab from '../components/Tabs/UltimaAnotacoesTab';
 import UltimasPausaTab from '../components/Tabs/UltimaPausaTab';
 
 // 🔥 Importa o Modal de Pausa
-import PausaModal from '../components/PausaModal';
-import usePausa from '../hooks/usePausa';
 
 const AuditoriaScreen = ({ route }) => {
   
-  const { pausaAtiva, modalVisible, loading, handleEncerrarPausa } = usePausa(auditoriaId);
+
 
   //const [pausaAtiva, setPausaAtiva] = useState(null);
   //const [loading, setLoading] = useState(true);
@@ -256,10 +254,6 @@ const AuditoriaScreen = ({ route }) => {
 
   return (
     <View style={styles.container}>
-      {/* Bloqueia a interface se houver uma pausa ativa */}
-      <PausaModal visible={modalVisible} pausaAtiva={pausaAtiva} onClose={handleEncerrarPausa} />
-
-
       {/* Barra com o nome da loja, data/hora e nome do usuário */}
       <View style={styles.header}>
         <Text style={styles.headerText}>Loja: {lojaName}</Text>

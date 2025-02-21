@@ -14,9 +14,17 @@ import { Picker } from '@react-native-picker/picker';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'; // 🔥 Importa o ajuste para o teclado
 import useAuditoriaDetails from '../../hooks/useAuditoriaDetails';
 
+
+import usePausa from '../../hooks/usePausa';
+import PausaModal from '../PausaModal';
+
 import styles from '../../styles/AuditoriaScreenStyles';
 
 const VendasTab = ({ auditoriaId, userId, lojaId, setActiveTab }) => {
+
+  const { pausaAtiva, modalVisible, handleEncerrarPausa } = usePausa(auditoriaId ?? null);
+
+
   const {
     fetchSexos,
     fetchFormasPagamento,
@@ -99,10 +107,14 @@ const VendasTab = ({ auditoriaId, userId, lojaId, setActiveTab }) => {
   };
 
   return (
+
+    
     <KeyboardAvoidingView 
       behavior={Platform.OS === "ios" ? "padding" : "height"} 
       style={{ flex: 1 }}
     >
+       {/* 🔥 Exibe o modal se houver uma pausa ativa */}
+       <PausaModal visible={modalVisible} pausaAtiva={pausaAtiva} onClose={handleEncerrarPausa} />
       <KeyboardAwareScrollView 
         style={{ flex: 1 }} 
         contentContainerStyle={styles.contentContainer} 
