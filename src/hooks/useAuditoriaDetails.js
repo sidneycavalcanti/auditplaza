@@ -400,31 +400,40 @@ const atualizarFluxo = async (fluxoId, dadosAtualizados) => {
     setPausas(pausasData);
   };
 
-  const cadastrarPausa = async (pausa) => {
+  const cadastrarPausa = async (pausa, auditoriaId, setPausaAtiva, setModalVisible) => {
     try {
-      if (!pausa || !pausa.motivodepausaId) {
-        throw new Error('Dados inválidos para cadastro da pausa.');
-      }
-  
-      console.log('📡 Enviando nova pausa para API:', JSON.stringify(pausa, null, 2));
-  
-      // ✅ Verifica se a API realmente retorna os dados da nova pausa
-      const novaPausa = await handleApiRequest('/pausa', 'POST', pausa);
-  
-      if (!novaPausa || !novaPausa.id) {
-        throw new Error("A API não retornou a nova pausa corretamente");
-      }
-  
-      console.log('✅ Nova pausa cadastrada:', novaPausa);
-  
-      setPausas((prev) => [...prev, novaPausa]); // Atualiza o estado com a nova pausa
-  
-      return novaPausa; // ✅ Agora sempre retorna os dados corretos
+        if (!pausa || !pausa.motivodepausaId) {
+            throw new Error('Dados inválidos para cadastro da pausa.');
+        }
+
+        console.log('📡 Enviando nova pausa para API:', JSON.stringify(pausa, null, 2));
+
+        // ✅ Chama a API para cadastrar a nova pausa
+        const novaPausa = await handleApiRequest('/pausa', 'POST', pausa);
+
+        if (!novaPausa || !novaPausa.id) {
+            throw new Error("A API não retornou a nova pausa corretamente");
+        }
+
+        console.log('✅ Nova pausa cadastrada:', novaPausa);
+
+        // 🔄 Atualiza o estado local com a nova pausa
+        setPausas((prev) => [...prev, novaPausa]);
+
+        // 🔥 Após cadastrar, verifica se a pausa está ativa e atualiza o estado
+        const pausaAtivaAtualizada = await verificarPausaAtiva(auditoriaId);
+        if (pausaAtivaAtualizada) {
+            setPausaAtiva(pausaAtivaAtualizada);
+            setModalVisible(true); // Abre o modal
+        }
+
+        return novaPausa; // ✅ Agora sempre retorna os dados corretos
     } catch (error) {
-      console.error('❌ Erro ao cadastrar pausa:', error.message);
-      throw new Error('Erro ao cadastrar a pausa.');
+        console.error('❌ Erro ao cadastrar pausa:', error.message);
+        throw new Error('Erro ao cadastrar a pausa.');
     }
-  };
+};
+
   
   
 

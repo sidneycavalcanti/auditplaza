@@ -38,35 +38,32 @@ const usePausa = (auditoriaId) => {
   // 🔥 Criar uma nova pausa e bloquear a interface
   const handleCadastrarPausa = async (selectedMotivoPausa) => {
     if (!selectedMotivoPausa) {
-      Alert.alert('Erro', 'Selecione um motivo para a pausa.');
-      return { error: 'Selecione um motivo para a pausa.' };
+        return { error: 'Selecione um motivo para a pausa.' };
     }
 
     try {
-      const pausa = {
-        motivodepausaId: parseInt(selectedMotivoPausa, 10),
-        auditoriaId: parseInt(auditoriaId, 10),
-      };
+        const pausa = {
+            motivodepausaId: parseInt(selectedMotivoPausa, 10),
+            auditoriaId: parseInt(auditoriaId, 10),
+        };
 
-      console.log("📡 Enviando nova pausa para API:", JSON.stringify(pausa, null, 2));
+        console.log("📡 Enviando nova pausa para API:", JSON.stringify(pausa, null, 2));
 
-      const novaPausa = await cadastrarPausa(pausa);
-      
-      if (!novaPausa) {
-        throw new Error("A API não retornou os dados esperados");
-      }
+        const novaPausa = await cadastrarPausa(pausa, auditoriaId, setPausaAtiva, setModalVisible);
 
-      console.log("✅ Nova pausa cadastrada:", novaPausa);
+        if (!novaPausa) {
+            throw new Error("A API não retornou os dados esperados");
+        }
 
-      setPausaAtiva(novaPausa);
-      setModalVisible(true);
+        console.log("✅ Nova pausa cadastrada:", novaPausa);
 
-      return novaPausa;
+        return novaPausa;
     } catch (err) {
-      console.error('❌ Erro ao cadastrar pausa:', err);
-      return { error: 'Não foi possível cadastrar a pausa.' };
+        console.error('❌ Erro ao cadastrar pausa:', err);
+        return { error: 'Não foi possível cadastrar a pausa.' };
     }
-  };
+};
+
 
   // 🔥 Encerrar a pausa (muda status para 0)
   const handleEncerrarPausa = async () => {
