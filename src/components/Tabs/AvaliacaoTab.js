@@ -7,57 +7,65 @@ import useAuditoriaDetails from '../../hooks/useAuditoriaDetails';
 const AvaliacaoTab = ({ auditoriaId, setActiveTab }) => {
   const {
     cadastrarAvaliacao,
-    fetchMotivoPerdas,
-    motivoperdas,
+    fetchPerguntasAvaliacao,
+    perguntas,
     loading,
     error
   } = useAuditoriaDetails();
 
   // Declaração de estados
-  const [selectedMotivoPerda, setSelectedMotivoPerda] = useState('');
-  const [selectedObs, setSelectedObs] = useState('');
+  const [selectedPergunta, setSelectedPergunta] = useState('');
+  const [selectedResposta, setSelectedResposta] = useState('');
 
-  // Busca os motivos de perda ao montar o componente
+  // ✅ Busca as perguntas disponíveis ao carregar o componente
   useEffect(() => {
-    fetchMotivoPerdas();
+    const fetchData = async () => {
+      await fetchPerguntasAvaliacao();
+    };
+    fetchData();
   }, []);
 
-  // Função para cadastrar uma perda
-  const handleCadPerdas = async () => {
-    if (!selectedMotivoPerda) {
-      Alert.alert('Erro', 'Selecione um motivo para a perda.');
+  useEffect(() => {
+    console.log("📡 Perguntas disponíveis:", perguntas);
+  }, [perguntas]);
+
+  // ✅ Função para cadastrar uma nova avaliação
+  const handleCadAvalicao = async () => {
+    if (!selectedPergunta) {
+      Alert.alert('Erro', 'Selecione uma pergunta.');
       return;
     }
-    if (!selectedObs) {
-      Alert.alert('Erro', 'Digite uma descrição para a perda.');
+    if (!selectedResposta.trim()) {
+      Alert.alert('Erro', 'Digite uma resposta válida.');
       return;
     }
 
     try {
-      const perda = {
-        motivoperdasId: parseInt(selectedMotivoPerda, 10), // ID do motivo da perda
-        obs: selectedObs,
+      const avaliacao = {
+        perguntaID: parseInt(selectedPergunta, 10), 
+        resposta: selectedResposta,
         auditoriaId: parseInt(auditoriaId, 10)
       };
 
-      console.log("📡 Enviando nova perda para API:", JSON.stringify(perda, null, 2));
+      console.log("📡 Enviando nova avaliação para API:", JSON.stringify(avaliacao, null, 2));
 
-      await cadastrarPerda(perda);
-      Alert.alert('Sucesso', 'Perda cadastrada com sucesso!');
+      await cadastrarAvaliacao(avaliacao);
+      Alert.alert('Sucesso', 'Avaliação cadastrada com sucesso!');
 
-      // Limpa os campos após o cadastro
-      setSelectedMotivoPerda('');
-      setSelectedObs('');
+      // 🔥 Limpa os campos após o cadastro
+      setSelectedPergunta('');
+      setSelectedResposta('');
 
-      // Redireciona para a lista de perdas
-      //setActiveTab('UltimasPerdas');
+      // 🔄 Atualiza a lista de perguntas após o cadastro
+      fetchPerguntasAvaliacao();
+
     } catch (err) {
-      console.error('❌ Erro ao cadastrar perda:', err);
-      Alert.alert('Erro', 'Não foi possível cadastrar a perda.');
+      console.error('❌ Erro ao cadastrar avaliação:', err);
+      Alert.alert('Erro', 'Não foi possível cadastrar a avaliação.');
     }
   };
 
-  // Renderiza um indicador de carregamento enquanto os dados estão sendo buscados
+  // ✅ Renderiza um indicador de carregamento enquanto os dados estão sendo buscados
   if (loading) {
     return (
       <View style={styles.loadingContainer}>
@@ -67,41 +75,45 @@ const AvaliacaoTab = ({ auditoriaId, setActiveTab }) => {
     );
   }
 
-  // Renderiza o conteúdo principal
+  // ✅ Renderiza o conteúdo principal
   return (
     <View style={styles.contentContainer}>
-      <Text style={styles.sectionTitle}>Motivo da Perda:</Text>
+      <Text style={styles.sectionTitle}>Pergunta:</Text>
       <Picker
-        selectedValue={selectedMotivoPerda}
-        onValueChange={(itemValue) => setSelectedMotivoPerda(String(itemValue))}
+        selectedValue={selectedPergunta}
+        onValueChange={(itemValue) => setSelectedPergunta(String(itemValue))}
         style={styles.picker}
       >
-        <Picker.Item label="Selecione um motivo" value="" />
-        {motivoperdas.map((motivo) => (
-          <Picker.Item key={motivo.id} label={motivo.name} value={String(motivo.id)} />
-        ))}
+        <Picker.Item label="Selecione uma pergunta" value="" />
+        {perguntas.length > 0 ? (
+          perguntas.map((pergunta) => (
+            <Picker.Item key={pergunta.id} label={pergunta.descricao} value={String(pergunta.id)} />
+          ))
+        ) : (
+          <Picker.Item label="Nenhuma pergunta disponível" value="" />
+        )}
       </Picker>
 
-      <Text style={styles.sectionTitle}>Observação:</Text>
+      <Text style={styles.sectionTitle}>Resposta:</Text>
       <TextInput
         style={styles.textArea}
-        placeholder="Digite suas observações"
+        placeholder="Digite sua resposta"
         placeholderTextColor="#888"
         multiline
         numberOfLines={4}
-        value={selectedObs}
-        onChangeText={setSelectedObs}
+        value={selectedResposta}
+        onChangeText={setSelectedResposta}
       />
 
-      <TouchableOpacity style={styles.button} onPress={handleCadPerdas}>
+      <TouchableOpacity style={styles.button} onPress={handleCadAvalicao}>
         <Text style={styles.buttonText}>Adicionar</Text>
       </TouchableOpacity>
 
-      <TouchableOpacity style={styles.button} onPress={() => setActiveTab('UltimasPerdas')}>
-        <Text style={styles.buttonText}>Últimas Perdas</Text>
+      <TouchableOpacity style={styles.button} onPress={() => setActiveTab('UltimasAvaliacoes')}>
+        <Text style={styles.buttonText}>Últimas Avaliações</Text>
       </TouchableOpacity>
 
-      {/* Renderiza uma mensagem de erro, se houver */}
+      {/* 🔥 Renderiza uma mensagem de erro, se houver */}
       {error && <Text style={styles.errorText}>{error}</Text>}
     </View>
   );

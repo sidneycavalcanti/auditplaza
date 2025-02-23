@@ -11,51 +11,51 @@ import {
 } from 'react-native';
 import useAuditoriaDetails from '../../hooks/useAuditoriaDetails';
 
-const UltimasPerdasTab = ({ auditoriaId, setActiveTab }) => {
+const UltimasAvaliacaoTab = ({ auditoriaId, setActiveTab }) => {
   console.log("🔍 setActiveTab recebido:", setActiveTab);
 
-  const [perdas, setPerdas] = useState([]);
+  const [avaliacao, setAvaliacao] = useState([]);
   const [loading, setLoading] = useState(true);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
 
-  const { fetchUltimasPerdas, excluirPerda } = useAuditoriaDetails();
+  const { fetchUltimasAvaliacoes, excluirAvaliacao } = useAuditoriaDetails();
 
   useEffect(() => {
-    carregarPerdas(currentPage);
+    carregarAvaliacao(currentPage);
   }, [currentPage]);
 
-  const carregarPerdas = async (page) => {
+  const carregarAvaliacao = async (page) => {
 
     try {
       setLoading(true)
-      const response = await fetchUltimasPerdas(auditoriaId, page);
+      const response = await fetchUltimasAvaliacoes(auditoriaId, page);
 
-      setPerdas(response.perdas); // Garante que perdas não seja null
+      setAvaliacao(response.avaliacoes); // Garante que avaliações não seja null
       setTotalPages(response.totalPages)
     } catch (error) {
-      console.error('Erro ao carregar perdas:', error);
-      Alert.alert('Erro', 'Não foi possível carregar as últimas perdas.');
+      console.error('Erro ao carregar avaliação:', error);
+      Alert.alert('Erro', 'Não foi possível carregar as últimas avaliações.');
     } finally {
       setLoading(false);
     }
   };
 
-  const handleExcluirPerda = (perdaId) => {
+  const handleExcluirAvaliacao = (avaliacaoId) => {
     Alert.alert(
       'Confirmação',
-      'Deseja excluir esta perda?',
+      'Deseja excluir esta avaliação?',
       [
         { text: 'Cancelar', style: 'cancel' },
         {
           text: 'Excluir',
           onPress: async () => {
             try {
-              await excluirPerda(perdaId);
-              setPerdas(perdas.filter((perda) => perda.id !== perdaId));
-              Alert.alert('Sucesso', 'Perda excluída com sucesso!');
+              await excluirAvaliacao(avaliacaoId);
+              setAvaliacao(avaliacao.filter((avaliacao) => avaliacao.id !== avaliacaoId));
+              Alert.alert('Sucesso', 'Avaliação excluída com sucesso!');
             } catch (error) {
-              Alert.alert('Erro', 'Erro ao excluir a perda.');
+              Alert.alert('Erro', 'Erro ao excluir a avaliação.');
             }
           },
         },
@@ -64,7 +64,7 @@ const UltimasPerdasTab = ({ auditoriaId, setActiveTab }) => {
     );
   };
 
-  const renderPerda = ({ item }) => (
+  const renderAvaliacao = ({ item }) => (
     <View style={styles.perdaItem}>
       {/* Motivo e Descrição */}
       <View>
@@ -79,7 +79,7 @@ const UltimasPerdasTab = ({ auditoriaId, setActiveTab }) => {
         </TouchableOpacity>
         <TouchableOpacity
           style={styles.deleteButton}
-          onPress={() => handleExcluirPerda(item.id)}
+          onPress={() => handleExcluirAvaliacao(item.id)}
         >
           <Text style={styles.buttonText}>Excluir</Text>
         </TouchableOpacity>
@@ -89,11 +89,11 @@ const UltimasPerdasTab = ({ auditoriaId, setActiveTab }) => {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>📋 Últimas Perdas</Text>
+      <Text style={styles.title}>📋 Últimas Avaliações</Text>
       {loading ? (
         <ActivityIndicator size="large" color="#20B2AA" />
       ) : perdas.length === 0 ? (
-        <Text style={styles.emptyText}>Nenhuma perda cadastrada.</Text>
+        <Text style={styles.emptyText}>Nenhuma avaliação cadastrada.</Text>
       ) : (
 
         <>
@@ -101,7 +101,7 @@ const UltimasPerdasTab = ({ auditoriaId, setActiveTab }) => {
             <FlatList
               data={perdas || []}
               keyExtractor={(item) => item.id.toString()}
-              renderItem={renderPerda}
+              renderItem={renderAvaliacao}
               scrollEnabled={false} // Impede que a FlatList role
               contentContainerStyle={styles.listContainer}
             />
@@ -214,4 +214,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default UltimasPerdasTab;
+export default UltimasAvaliacaoTab;

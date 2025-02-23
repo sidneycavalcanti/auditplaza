@@ -13,7 +13,9 @@ import PerdasEditTab from '../components/Tabs/PerdasEditTab';
 
 import UltimasVendasTab from '../components/Tabs/UltimaVendasTab';
 import UltimasPerdasTab from '../components/Tabs/UltimaPerdasTab';
-import UltimasPausaTab from '../components/Tabs/UltimaPausaTab'
+import UltimasPausaTab from '../components/Tabs/UltimaPausaTab';
+import UltimasAvaliacaoTab from '../components/Tabs/UltimaPausaTab';
+
  
 const Stack = createStackNavigator();
 
@@ -29,6 +31,7 @@ const AppNavigator = () => {
         <Stack.Screen name="UltimasVendas" component={UltimasVendasTab} /> 
         <Stack.Screen name="UltimasPerdas" component={UltimasPerdasTab} /> 
         <Stack.Screen name="UltimasPausa" component={UltimasPausaTab} /> 
+        <Stack.Screen name="UltimasAvaliacoes" component={UltimasAvaliacaoTab} /> 
 
         <Stack.Screen name="VendasEditTab" component={VendasEditTab} options={{ title: 'Editar Venda' }} />
         <Stack.Screen name="PerdasEditTab" component={PerdasEditTab} options={{ title: 'Editar Perda' }} />

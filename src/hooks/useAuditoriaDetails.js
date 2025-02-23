@@ -5,8 +5,13 @@ import axios from 'axios';
 const useAuditoriaDetails = () => {
   const [vendas, setVendas] = useState([]);
   const [fluxo, setFluxo] = useState([]);
+
   const [perdas, setPerdas] = useState([]);
   const [motivoperdas, setMotivoperdas] = useState([]);
+
+  const [avaliacao, setAvaliacao] = useState([]);
+  const [perguntas, setPerguntas] = useState([]);
+  
   const [anotacoes, setAnotacoes] = useState([]);
   const [operacoes, setOperacoes] = useState([]);
   const [motivopausa, setMotivopausa] = useState([]);
@@ -56,8 +61,6 @@ const useAuditoriaDetails = () => {
       setLoading(false); // Sempre desabilitar o estado de carregamento
     }
   };
-  
-
 
   const checkAuthentication = async () => {
       const token = await AsyncStorage.getItem('token');
@@ -66,8 +69,6 @@ const useAuditoriaDetails = () => {
         navigation.navigate('Login');
       }
     };
-
-
 
   // Funções de Vendas
   const cadastrarVenda = async (venda) => {
@@ -110,10 +111,6 @@ const useAuditoriaDetails = () => {
     }
   };
   
-
-  
-  
-
 const atualizarVenda = async (venda) => {
   try {
     if (!venda.id) {
@@ -136,8 +133,6 @@ const atualizarVenda = async (venda) => {
     throw err;
   }
 };
-
-  
 
   const excluirVenda = async (idVenda) => {
     try {
@@ -179,8 +174,6 @@ const atualizarVenda = async (venda) => {
     }
 };
 
-  
-
 const atualizarFluxo = async (fluxoId, dadosAtualizados) => {
   try {
       console.log(`📡 Enviando PUT para /fluxo/${fluxoId} com dados:`, JSON.stringify(dadosAtualizados, null, 2));
@@ -195,7 +188,135 @@ const atualizarFluxo = async (fluxoId, dadosAtualizados) => {
   }
 };
 
+ // Funções de Avalicao
+ const cadastrarAvaliacao = async (novaAvaliacao) => {
+  try {
+    if (!novaAvaliacao || !novaAvaliacao.perguntaID) {
+      throw new Error('❌ Dados inválidos para cadastro da avaliação.');
+    }
 
+    console.log('📡 Enviando nova avaliação para API:', JSON.stringify(novaAvaliacao, null, 2));
+
+    const response = await handleApiRequest('/avoperacional', 'POST', novaAvaliacao);
+
+    console.log('✅ Nova avaliação cadastrada:', response);
+
+    setAvaliacao((prev) => [...prev, response]);
+
+    return response;
+  } catch (error) {
+    console.error('❌ Erro ao cadastrar avaliação:', error.response ? error.response.data : error.message);
+    setError(error.message);
+    throw error;
+  }
+};
+
+const excluirAvaliacao = async (idAvaliacao) => {
+  try {
+    await handleApiRequest(`/avoperacional/${idAvaliacao}`, 'DELETE');
+    setAvaliacao((prev) => prev.filter((avaliacao) => avaliacao.id !== idAvaliacao));
+    console.log('✅ Avaliação excluída com sucesso!');
+  } catch (err) {
+    console.error('❌ Erro ao excluir avaliação:', err);
+    setError(err.message);
+    throw err;
+  }
+};
+
+
+const fetchAvaliacao = async () => {
+  try {
+    setLoading(true);
+    const response = await handleApiRequest('/avoperacional');
+    setAvaliacao(response.avaliacao || []);
+  } catch (error) {
+    console.error('❌ Erro ao buscar avaliações:', error);
+    setError(error.message);
+  } finally {
+    setLoading(false);
+  }
+};
+
+
+const fetchUltimasAvaliacoes = async (auditoriaId, page = 1, limit = 10) => {
+  try {
+    const response = await handleApiRequest(`/avoperacional?auditoriaId=${auditoriaId}&page=${page}&limit=${limit}`);
+
+    console.log("📡 Avaliações recebidas:", response);
+
+    if (response && response.avaliacao) {
+      return {
+        avaliacoes: response.avaliacao.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)),
+        totalPages: response.totalPages,
+        totalItems: response.totalItems,
+        currentPage: response.currentPage,
+      };
+    } else {
+      throw new Error('❌ Nenhuma avaliação encontrada.');
+    }
+  } catch (error) {
+    console.error('❌ Erro ao buscar últimas avaliações:', error.message);
+    setError(error.message);
+    throw error;
+  }
+};
+
+
+const fetchPerguntasAvaliacao = async () => {
+  setLoading(true);
+  try {
+    const response = await handleApiRequest('/cadavoperacional');
+    
+    console.log('📡 Dados de perguntas recebidos:', response);
+
+    // 🔥 Certifica-se de acessar corretamente a chave correta na API
+    if (response && response.cadavoperacional && Array.isArray(response.cadavoperacional)) {
+      // 🔥 Filtra apenas perguntas onde `situacao === true`
+      const perguntasAtivas = response.cadavoperacional.filter(pergunta => pergunta.situacao === true);
+      
+      console.log("✅ Perguntas ativas carregadas:", perguntasAtivas);
+      
+      setPerguntas(perguntasAtivas);
+    } else {
+      console.log("⚠️ Nenhuma pergunta disponível");
+      setPerguntas([]);
+    }
+  } catch (error) {
+    console.error('❌ Erro ao buscar perguntas de avaliação operacional:', error);
+    setError(error.message);
+  } finally {
+    setLoading(false);
+  }
+};
+
+
+const atualizarAvaliacao = async (avaliacaoAtualizada) => {
+  try {
+    setLoading(true);
+
+    if (!avaliacaoAtualizada.id) {
+      throw new Error("❌ ID da avaliação é obrigatório para atualizar.");
+    }
+
+    console.log(`📡 Atualizando avaliação com ID: ${avaliacaoAtualizada.id}`, avaliacaoAtualizada);
+
+    const response = await handleApiRequest(`/avoperacional/${avaliacaoAtualizada.id}`, 'PUT', avaliacaoAtualizada);
+
+    setAvaliacao((prevAvaliacoes) =>
+      prevAvaliacoes.map((a) => (a.id === avaliacaoAtualizada.id ? response : a))
+    );
+
+    console.log('✅ Avaliação operacional atualizada na API:', response);
+
+    return response;
+  } catch (err) {
+    console.error("❌ Erro ao atualizar avaliação operacional:", err);
+    setError(err.message);
+    throw err;
+  } finally {
+    setLoading(false);
+  }
+};
 
   
   
@@ -233,8 +354,6 @@ const atualizarFluxo = async (fluxoId, dadosAtualizados) => {
     }
   };
   
-  
-
   const fetchPerdas = async () => {
     setLoading(true); // Ativa o estado de carregamento antes da chamada específica
     try {
@@ -367,7 +486,6 @@ const atualizarFluxo = async (fluxoId, dadosAtualizados) => {
     }
 };
 
-
   const excluirAnotacao = async (anotacaoId) => {
     try {
       // Requisição para excluir a venda usando o método DELETE
@@ -425,8 +543,6 @@ const atualizarFluxo = async (fluxoId, dadosAtualizados) => {
       throw new Error('Erro ao cadastrar a pausa.');
     }
   };
-  
-  
 
   const fetchMotivoPausa = async () => {
   setLoading(true);
@@ -508,7 +624,6 @@ const fetchUltimasPausas = async (auditoriaId, page = 1, limit = 10) => {
   }
 };
 
-
 const verificarPausaAtiva = async (auditoriaId) => {
   if (!auditoriaId) {
     console.warn("⚠️ Nenhuma auditoriaId fornecida. Pulando verificação de pausa.");
@@ -535,10 +650,6 @@ const verificarPausaAtiva = async (auditoriaId) => {
     return null;
   }
 };
-
-
-
-
 
 const excluirPausa = async (IdPausa) => {
   try {
@@ -574,12 +685,6 @@ const encerrarPausa = async (pausaId, updateData = {}) => {
     throw new Error("Erro ao encerrar pausa.");
   }
 };
-
-
-
-
-
-
 
   // Buscar Formas de Pagamento
   const fetchFormasPagamento = async () => {
@@ -629,6 +734,8 @@ const encerrarPausa = async (pausaId, updateData = {}) => {
     sexos,
     motivoperdas,
     motivopausa,
+    perguntas,
+    avaliacao,
     encerrarPausa,
     excluirAnotacao,
     atualizarFluxo,
@@ -658,6 +765,12 @@ const encerrarPausa = async (pausaId, updateData = {}) => {
     fetchMotivoPerdas,
     checkAuthentication,
     verificarPausaAtiva,
+    cadastrarAvaliacao,
+    excluirAvaliacao,
+    fetchAvaliacao,
+    fetchUltimasAvaliacoes,
+    fetchPerguntasAvaliacao,
+    atualizarAvaliacao,
     loading,
     error,
   };

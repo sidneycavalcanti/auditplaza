@@ -27,7 +27,8 @@ import PerdasEditTab from '../components/Tabs/PerdasEditTab';
 import UltimasVendasTab from '../components/Tabs/UltimaVendasTab';
 import UltimasPerdasTab from '../components/Tabs/UltimaPerdasTab';
 import UltimasAnostacoesTab from '../components/Tabs/UltimaAnotacoesTab';
-import UltimasPausaTab from '../components/Tabs/UltimaPausaTab';
+import UltimasPausaTab from '../components/Tabs/UltimaPausaTab'; 
+import UltimasAvaliacaoTab from '../components/Tabs/UltimaPausaTab';
 
 // 🔥 Importa o Modal de Pausa
 
@@ -42,6 +43,8 @@ const AuditoriaScreen = ({ route }) => {
   const [selectedAnotacao, setSelectedAnotacao] = useState(null);
   const [selectedVenda, setSelectedVenda] = useState(null); // 🔥 Armazena a venda selecionada
   const [selectedPerda, setSelectedPerda] = useState(null);
+  const [selectedAvaliacao, setSelectedAvaliacao] = useState(null);
+
   
   const [selectedPausa, setSelectedPausa] = useState(null);
   const [activeTab, setActiveTab] = useState('Vendas');
@@ -97,6 +100,17 @@ const AuditoriaScreen = ({ route }) => {
             venda={selectedVenda} // 🔥 Passa a venda selecionada
           />
         );
+        case 'AvaliacaoEditTab':
+          return (
+            <PerdasEditTab
+              auditoriaId={auditoriaId}
+              lojaName={lojaName}
+              data={data}
+              userName={userName}
+              setActiveTab={setActiveTab} // 🔥 Mantém a função passando
+              avaliacao={selectedAvaliacao} // 🔥 Passa a venda selecionada
+            />
+          );
       case 'PerdasEditTab':
         return (
           <PerdasEditTab
@@ -119,6 +133,19 @@ const AuditoriaScreen = ({ route }) => {
             anotacao={selectedAnotacao} // 🔥 Passa a venda selecionada
           />
         );
+      case 'UltimasAvaliacoes':
+          return (
+            <UltimasAvaliacaoTab
+              auditoriaId={auditoriaId}
+              lojaName={lojaName}
+              data={data}
+              userName={userName}
+              setActiveTab={(tab, avaliacao = null) => {
+                setSelectedAvaliacao(avaliacao); // 🔥 Guarda a avaliação para edição
+                setActiveTab(tab);
+          }}
+        />
+      );
       case 'UltimasPerdas':
         return (
           <UltimasPerdasTab
@@ -127,7 +154,7 @@ const AuditoriaScreen = ({ route }) => {
             data={data}
             userName={userName}
             setActiveTab={(tab, perda = null) => {
-              setSelectedPerda(perda); // 🔥 Guarda a perda para edição
+              setSelectedAvalicao(perda); // 🔥 Guarda a perda para edição
               setActiveTab(tab);
             }}
           />
