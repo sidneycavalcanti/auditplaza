@@ -12,34 +12,37 @@ import {
 import useAuditoriaDetails from '../../hooks/useAuditoriaDetails';
 
 const UltimasAvaliacaoTab = ({ auditoriaId, setActiveTab }) => {
-  console.log("🔍 setActiveTab recebido:", setActiveTab);
-
   const [avaliacao, setAvaliacao] = useState([]);
   const [loading, setLoading] = useState(true);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
 
+  // Importa a função de busca e exclusão
   const { fetchUltimasAvaliacoes, excluirAvaliacao } = useAuditoriaDetails();
 
+  // Carrega as avaliações ao montar o componente ou mudar de página
   useEffect(() => {
-    carregarAvaliacao(currentPage);
+    carregarAvaliacoes(currentPage);
   }, [currentPage]);
 
-  const carregarAvaliacao = async (page) => {
+ // ...
+const carregarAvaliacoes = async (page) => {
+  try {
+    setLoading(true);
+    const response = await fetchUltimasAvaliacoes(auditoriaId, page);
+    // Esperamos { avaliacoes: [...], totalPages, ... }
+    setAvaliacao(response.avaliacoes || []);
+    setTotalPages(response.totalPages || 1);
+  } catch (error) {
+    console.error("Erro ao carregar avaliações:", error);
+    Alert.alert("Erro", "Não foi possível carregar as últimas avaliações.");
+  } finally {
+    setLoading(false);
+  }
+};
+// ...
 
-    try {
-      setLoading(true)
-      const response = await fetchUltimasAvaliacoes(auditoriaId, page);
-
-      setAvaliacao(response.avaliacoes); // Garante que avaliações não seja null
-      setTotalPages(response.totalPages)
-    } catch (error) {
-      console.error('Erro ao carregar avaliação:', error);
-      Alert.alert('Erro', 'Não foi possível carregar as últimas avaliações.');
-    } finally {
-      setLoading(false);
-    }
-  };
+  
 
   const handleExcluirAvaliacao = (avaliacaoId) => {
     Alert.alert(
@@ -52,7 +55,9 @@ const UltimasAvaliacaoTab = ({ auditoriaId, setActiveTab }) => {
           onPress: async () => {
             try {
               await excluirAvaliacao(avaliacaoId);
-              setAvaliacao(avaliacao.filter((avaliacao) => avaliacao.id !== avaliacaoId));
+              setAvaliacao((prev) =>
+                prev.filter((item) => item.id !== avaliacaoId)
+              );
               Alert.alert('Sucesso', 'Avaliação excluída com sucesso!');
             } catch (error) {
               Alert.alert('Erro', 'Erro ao excluir a avaliação.');
@@ -65,18 +70,26 @@ const UltimasAvaliacaoTab = ({ auditoriaId, setActiveTab }) => {
   };
 
   const renderAvaliacao = ({ item }) => (
-    <View style={styles.perdaItem}>
-      {/* Motivo e Descrição */}
-      <View>
-        <Text style={styles.valorText}> {item.motivoperdas?.name || 'Não informado'}</Text>
-        <Text style={styles.obstext}>Observacão: {item.obs || 'Sem observação'}</Text>
+    <View style={styles.avaliacaoItem}>
+      {/* Pergunta e Resposta */}
+      <View style={{ flex: 1, marginRight: 10 }}>
+      <Text style={styles.valorText}>
+  Pergunta: {item.cadavoperacional?.descricao || 'Não informada'}
+</Text>
+        <Text style={styles.obstext}>
+          Resposta: {item.resposta || 'Sem resposta'}
+        </Text>
       </View>
 
       {/* Botões de Ações */}
       <View style={styles.buttonsContainer}>
-        <TouchableOpacity style={styles.editButton} onPress={() => setActiveTab('PerdasEditTab', item)}>
+        <TouchableOpacity
+          style={styles.editButton}
+          onPress={() => setActiveTab('AvaliacaoEditTab', item)}
+        >
           <Text style={styles.buttonText}>Editar</Text>
         </TouchableOpacity>
+
         <TouchableOpacity
           style={styles.deleteButton}
           onPress={() => handleExcluirAvaliacao(item.id)}
@@ -90,37 +103,48 @@ const UltimasAvaliacaoTab = ({ auditoriaId, setActiveTab }) => {
   return (
     <View style={styles.container}>
       <Text style={styles.title}>📋 Últimas Avaliações</Text>
+
       {loading ? (
         <ActivityIndicator size="large" color="#20B2AA" />
-      ) : perdas.length === 0 ? (
+      ) : avaliacao.length === 0 ? (
         <Text style={styles.emptyText}>Nenhuma avaliação cadastrada.</Text>
       ) : (
-
         <>
           <ScrollView nestedScrollEnabled={true}>
             <FlatList
-              data={perdas || []}
+              data={avaliacao}
               keyExtractor={(item) => item.id.toString()}
               renderItem={renderAvaliacao}
-              scrollEnabled={false} // Impede que a FlatList role
+              scrollEnabled={false} // O ScrollView controla a rolagem
               contentContainerStyle={styles.listContainer}
             />
           </ScrollView>
-          {/* 🔥 Botões de Paginação */}
+
+          {/* Paginação */}
           <View style={styles.paginationContainer}>
             <TouchableOpacity
-              style={[styles.pageButton, currentPage === 1 && styles.disabledButton]}
+              style={[
+                styles.pageButton,
+                currentPage === 1 && styles.disabledButton
+              ]}
               onPress={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
               disabled={currentPage === 1}
             >
               <Text style={styles.buttonText}>Anterior</Text>
             </TouchableOpacity>
 
-            <Text style={styles.pageInfo}>Página {currentPage} de {totalPages}</Text>
+            <Text style={styles.pageInfo}>
+              Página {currentPage} de {totalPages}
+            </Text>
 
             <TouchableOpacity
-              style={[styles.pageButton, currentPage === totalPages && styles.disabledButton]}
-              onPress={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
+              style={[
+                styles.pageButton,
+                currentPage === totalPages && styles.disabledButton
+              ]}
+              onPress={() =>
+                setCurrentPage((prev) => Math.min(prev + 1, totalPages))
+              }
               disabled={currentPage === totalPages}
             >
               <Text style={styles.buttonText}>Próxima</Text>
@@ -138,15 +162,13 @@ const styles = StyleSheet.create({
     padding: 20,
     backgroundColor: '#f5f5f5',
   },
-
-
   title: {
     fontSize: 20,
     fontWeight: 'bold',
     marginBottom: 10,
     textAlign: 'center',
   },
-  perdaItem: {
+  avaliacaoItem: {
     backgroundColor: '#fff',
     padding: 10,
     borderRadius: 5,
@@ -154,22 +176,19 @@ const styles = StyleSheet.create({
     borderColor: '#ccc',
     borderWidth: 1,
     flexDirection: 'row',
-    justifyContent: 'space-between',
     alignItems: 'center',
   },
   valorText: {
     fontSize: 16,
     fontWeight: 'bold',
+    marginBottom: 4,
   },
   obstext: {
     fontSize: 14,
     color: '#555',
-    flexShrink: 1, // 🔥 Permite que o texto quebre sem aumentar o tamanho do container
-    flexWrap: 'wrap', // 🔥 Quebra a linha corretamente
-    textAlign: 'left', // 🔥 Mantém um alinhamento legível
-    maxWidth: '60%', // 🔥 Garante que o texto ocupe no máximo 70% do espaço e não empurre os botões
+    flexWrap: 'wrap',
+    textAlign: 'left',
   },
-  
   buttonsContainer: {
     flexDirection: 'row',
   },
@@ -192,6 +211,9 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     color: '#777',
     marginTop: 20,
+  },
+  listContainer: {
+    paddingBottom: 10,
   },
   paginationContainer: {
     flexDirection: 'row',

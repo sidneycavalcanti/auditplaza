@@ -28,7 +28,7 @@ import UltimasVendasTab from '../components/Tabs/UltimaVendasTab';
 import UltimasPerdasTab from '../components/Tabs/UltimaPerdasTab';
 import UltimasAnostacoesTab from '../components/Tabs/UltimaAnotacoesTab';
 import UltimasPausaTab from '../components/Tabs/UltimaPausaTab'; 
-import UltimasAvaliacaoTab from '../components/Tabs/UltimaPausaTab';
+import UltimasAvaliacaoTab from '../components/Tabs/UltimaAvaliacaoTab';
 
 // 🔥 Importa o Modal de Pausa
 

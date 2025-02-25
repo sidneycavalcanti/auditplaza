@@ -10,11 +10,12 @@ import AuditoriaScreen  from '../screens/AuditoriaScreen';
 
 import VendasEditTab from '../components/Tabs/VendasEditTab';
 import PerdasEditTab from '../components/Tabs/PerdasEditTab';
+import AvaliacaoEditTab from '../components/Tabs/PerdasEditTab';
 
 import UltimasVendasTab from '../components/Tabs/UltimaVendasTab';
 import UltimasPerdasTab from '../components/Tabs/UltimaPerdasTab';
 import UltimasPausaTab from '../components/Tabs/UltimaPausaTab';
-import UltimasAvaliacaoTab from '../components/Tabs/UltimaPausaTab';
+import UltimasAvaliacaoTab from '../components/Tabs/UltimaAvaliacaoTab';
 
  
 const Stack = createStackNavigator();
@@ -35,6 +36,7 @@ const AppNavigator = () => {
 
         <Stack.Screen name="VendasEditTab" component={VendasEditTab} options={{ title: 'Editar Venda' }} />
         <Stack.Screen name="PerdasEditTab" component={PerdasEditTab} options={{ title: 'Editar Perda' }} />
+        <Stack.Screen name="AvaliacaoEditTab" component={AvaliacaoEditTab} options={{ title: 'Editar Avaliacao' }} />
 
       </Stack.Navigator>
     </NavigationContainer>

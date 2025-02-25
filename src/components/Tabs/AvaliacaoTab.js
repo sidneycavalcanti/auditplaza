@@ -31,34 +31,41 @@ const AvaliacaoTab = ({ auditoriaId, setActiveTab }) => {
 
   // ✅ Função para cadastrar uma nova avaliação
   const handleCadAvalicao = async () => {
+    // Verifica se escolheu a pergunta
     if (!selectedPergunta) {
       Alert.alert('Erro', 'Selecione uma pergunta.');
       return;
     }
+    // Verifica se digitou algo na resposta
     if (!selectedResposta.trim()) {
       Alert.alert('Erro', 'Digite uma resposta válida.');
       return;
     }
 
     try {
+      // Monta o objeto com "cadavoperacionalId"
       const avaliacao = {
-        perguntaID: parseInt(selectedPergunta, 10), 
+        cadavoperacionalId: parseInt(selectedPergunta, 10),
         resposta: selectedResposta,
-        auditoriaId: parseInt(auditoriaId, 10)
+        auditoriaId: parseInt(auditoriaId, 10),
       };
 
-      console.log("📡 Enviando nova avaliação para API:", JSON.stringify(avaliacao, null, 2));
+      console.log(
+        '📡 Enviando nova avaliação para API:',
+        JSON.stringify(avaliacao, null, 2)
+      );
 
+      // Chama a função do hook
       await cadastrarAvaliacao(avaliacao);
+
       Alert.alert('Sucesso', 'Avaliação cadastrada com sucesso!');
 
-      // 🔥 Limpa os campos após o cadastro
+      // Limpa os campos após cadastrar
       setSelectedPergunta('');
       setSelectedResposta('');
 
-      // 🔄 Atualiza a lista de perguntas após o cadastro
+      // (Opcional) recarrega perguntas, caso queira atualizar alguma lista
       fetchPerguntasAvaliacao();
-
     } catch (err) {
       console.error('❌ Erro ao cadastrar avaliação:', err);
       Alert.alert('Erro', 'Não foi possível cadastrar a avaliação.');
