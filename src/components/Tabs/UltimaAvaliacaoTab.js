@@ -85,7 +85,7 @@ const carregarAvaliacoes = async (page) => {
       <View style={styles.buttonsContainer}>
         <TouchableOpacity
           style={styles.editButton}
-          onPress={() => setActiveTab('AvaliacaoEditTab', item)}
+          onPress={() => setActiveTab('AvaliacoesEditTab', item)}
         >
           <Text style={styles.buttonText}>Editar</Text>
         </TouchableOpacity>

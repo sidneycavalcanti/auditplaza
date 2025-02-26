@@ -8,8 +8,8 @@ import {
   Image,
   ActivityIndicator,
   SafeAreaView,
-  Alert,
 } from 'react-native';
+import Icon from 'react-native-vector-icons/Ionicons';
 import { format, isToday, parseISO } from 'date-fns';
 
 import useAuditorias from '../hooks/useAuditorias';
@@ -19,48 +19,42 @@ const HomeScreen = ({ navigation }) => {
   const [searchQuery, setSearchQuery] = useState('');
   const { auditorias, loading, error, fetchAuditorias } = useAuditorias();
 
-  const handleAuditoria = (lojaId, lojaName, data, userName, usuarioId, auditoriaId) => {
+  const handleAuditoria = (
+    lojaId,
+    lojaName,
+    data,
+    userName,
+    usuarioId,
+    auditoriaId
+  ) => {
     navigation.navigate('Auditoria', {
       lojaId,
       lojaName,
       data: format(data, 'dd/MM/yyyy HH:mm:ss'),
       userName,
-      usuarioId, // Agora está correto
+      usuarioId,
       auditoriaId,
     });
   };
-  
-  
 
   const handleSearch = (text) => {
     setSearchQuery(text);
   };
 
-  // Ordenar auditorias e converter datas
   const sortedAuditorias = auditorias
     ?.map((item) => ({
       ...item,
-      data: parseISO(item.data), // Converte a data para um formato manipulável
+      data: parseISO(item.data),
     }))
-    .sort((a, b) => b.data - a.data); // Ordena da mais recente para a mais antiga
+    .sort((a, b) => b.data - a.data);
 
-  // Filtrar auditorias pelo texto de busca
   const filteredAuditorias = sortedAuditorias?.filter((item) =>
     item.loja?.name?.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
   const renderAuditoria = ({ item }) => {
     const isDisponivel = isToday(item.data);
-  
-    console.log('Renderizando auditoria:', {
-      lojaId: item.loja?.id,
-      lojaName: item.loja?.name,
-      data: item.data,
-      userName: item.usuario?.name,
-      userId: item.usuario?.id,
-      auditoriaId: item.id,
-    });
-  
+
     return (
       <View style={styles.auditoriaItem}>
         <Text style={styles.auditoriaText}>
@@ -70,10 +64,14 @@ const HomeScreen = ({ navigation }) => {
           <Text style={styles.label}>Data:</Text> {format(item.data, 'dd/MM/yyyy')}
         </Text>
         <Text style={styles.auditoriaText}>
-          <Text style={styles.label}>Status:</Text> {isDisponivel ? 'Disponível' : 'Indisponível'}
+          <Text style={styles.label}>Status:</Text>{' '}
+          {isDisponivel ? 'Disponível' : 'Indisponível'}
         </Text>
         <TouchableOpacity
-          style={[styles.button, isDisponivel ? styles.buttonAtivo : styles.buttonInativo]}
+          style={[
+            styles.button,
+            isDisponivel ? styles.buttonAtivo : styles.buttonInativo,
+          ]}
           disabled={!isDisponivel}
           onPress={() =>
             handleAuditoria(
@@ -93,15 +91,20 @@ const HomeScreen = ({ navigation }) => {
       </View>
     );
   };
-  
+
   return (
     <SafeAreaView style={styles.safeContainer}>
       <View style={styles.container}>
-        {/* Logo e título */}
-        <Image style={styles.logo} source={require('../assets/logo.png')} />
+        {/* Header: Logo e botão de configuração */}
+        <View style={styles.header}>
+          <Image style={styles.logo} source={require('../assets/logo.png')} />
+          <TouchableOpacity onPress={() => navigation.navigate('ProfileConfig')}>
+            <Icon name="settings-outline" size={30} color="#000" />
+          </TouchableOpacity>
+        </View>
+
         <Text style={styles.title}>Minhas Auditorias</Text>
 
-        {/* Campo de busca */}
         <View style={styles.inputContainer}>
           <TextInput
             style={styles.input}
@@ -112,7 +115,6 @@ const HomeScreen = ({ navigation }) => {
           />
         </View>
 
-        {/* Botão de atualizar */}
         <TouchableOpacity
           style={styles.refreshButton}
           onPress={fetchAuditorias}
@@ -123,24 +125,26 @@ const HomeScreen = ({ navigation }) => {
           </Text>
         </TouchableOpacity>
 
-        {/* Indicador de carregamento */}
         {loading && <ActivityIndicator size="large" color="#20B2AA" />}
 
-        {/* Mensagem de erro */}
-        {error && <Text style={styles.errorText}>Erro ao buscar auditorias: {error}</Text>}
+        {error && (
+          <Text style={styles.errorText}>
+            Erro ao buscar auditorias: {error}
+          </Text>
+        )}
 
-        {/* Lista de auditorias */}
         {!loading && !error && filteredAuditorias?.length > 0 ? (
           <FlatList
             data={filteredAuditorias}
             keyExtractor={(item) => item.id?.toString()}
             renderItem={renderAuditoria}
             contentContainerStyle={styles.listContainer}
-            style={{ width: '100%' }} // Preenche toda a largura
+            style={{ width: '100%' }}
             showsVerticalScrollIndicator={false}
           />
         ) : (
-          !loading && !error && (
+          !loading &&
+          !error && (
             <Text style={styles.noResultsText}>Nenhuma auditoria encontrada.</Text>
           )
         )}

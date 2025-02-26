@@ -22,7 +22,7 @@ import AvaliacaoTab from '../components/Tabs/AvaliacaoTab';
 
 import VendasEditTab from '../components/Tabs/VendasEditTab';
 import PerdasEditTab from '../components/Tabs/PerdasEditTab';
-
+import AvaliacoesEditTab from '../components/Tabs/AvaliacoesEditTab';
 
 import UltimasVendasTab from '../components/Tabs/UltimaVendasTab';
 import UltimasPerdasTab from '../components/Tabs/UltimaPerdasTab';
@@ -100,9 +100,9 @@ const AuditoriaScreen = ({ route }) => {
             venda={selectedVenda} // 🔥 Passa a venda selecionada
           />
         );
-        case 'AvaliacaoEditTab':
+        case 'AvaliacoesEditTab':
           return (
-            <PerdasEditTab
+            <AvaliacoesEditTab
               auditoriaId={auditoriaId}
               lojaName={lojaName}
               data={data}
@@ -154,7 +154,7 @@ const AuditoriaScreen = ({ route }) => {
             data={data}
             userName={userName}
             setActiveTab={(tab, perda = null) => {
-              setSelectedAvalicao(perda); // 🔥 Guarda a perda para edição
+              setSelectedPerda(perda); // 🔥 Guarda a perda para edição
               setActiveTab(tab);
             }}
           />

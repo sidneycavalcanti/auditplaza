@@ -1,6 +1,13 @@
 import { StyleSheet } from 'react-native';
 
 export default StyleSheet.create({
+  header: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    width: '100%',
+    marginBottom: 20,
+  },
     safeContainer: {
       flex: 1,
       backgroundColor: '#f5f5f5',
@@ -11,8 +18,8 @@ export default StyleSheet.create({
       padding: 20,
     },
     logo: {
-      width: 100,
-      height: 100,
+      width: 60,
+      height: 60,
       borderRadius: 50,
       resizeMode: 'cover',
       marginBottom: 10,
