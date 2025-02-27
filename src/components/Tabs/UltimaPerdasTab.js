@@ -11,6 +11,8 @@ import {
 } from 'react-native';
 import useAuditoriaDetails from '../../hooks/useAuditoriaDetails';
 
+import styles from '../../styles/UltimaStyles';
+
 const UltimasPerdasTab = ({ auditoriaId, setActiveTab }) => {
   console.log("🔍 setActiveTab recebido:", setActiveTab);
 
@@ -65,7 +67,7 @@ const UltimasPerdasTab = ({ auditoriaId, setActiveTab }) => {
   };
 
   const renderPerda = ({ item }) => (
-    <View style={styles.perdaItem}>
+    <View style={styles.Item}>
       {/* Motivo e Descrição */}
       <View>
         <Text style={styles.valorText}> {item.motivoperdas?.name || 'Não informado'}</Text>
@@ -91,7 +93,7 @@ const UltimasPerdasTab = ({ auditoriaId, setActiveTab }) => {
     <View style={styles.container}>
       <Text style={styles.title}>📋 Últimas Perdas</Text>
       {loading ? (
-        <ActivityIndicator size="large" color="#20B2AA" />
+        <ActivityIndicator size="large" color="#778899" />
       ) : perdas.length === 0 ? (
         <Text style={styles.emptyText}>Nenhuma perda cadastrada.</Text>
       ) : (
@@ -132,86 +134,5 @@ const UltimasPerdasTab = ({ auditoriaId, setActiveTab }) => {
   );
 };
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    padding: 20,
-    backgroundColor: '#f5f5f5',
-  },
-
-
-  title: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    marginBottom: 10,
-    textAlign: 'center',
-  },
-  perdaItem: {
-    backgroundColor: '#fff',
-    padding: 10,
-    borderRadius: 5,
-    marginBottom: 10,
-    borderColor: '#ccc',
-    borderWidth: 1,
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-  },
-  valorText: {
-    fontSize: 16,
-    fontWeight: 'bold',
-  },
-  obstext: {
-    fontSize: 14,
-    color: '#555',
-    flexShrink: 1, // 🔥 Permite que o texto quebre sem aumentar o tamanho do container
-    flexWrap: 'wrap', // 🔥 Quebra a linha corretamente
-    textAlign: 'left', // 🔥 Mantém um alinhamento legível
-    maxWidth: '60%', // 🔥 Garante que o texto ocupe no máximo 70% do espaço e não empurre os botões
-  },
-  
-  buttonsContainer: {
-    flexDirection: 'row',
-  },
-  editButton: {
-    backgroundColor: '#4CAF50',
-    padding: 10,
-    borderRadius: 5,
-    marginRight: 5,
-  },
-  deleteButton: {
-    backgroundColor: '#F44336',
-    padding: 10,
-    borderRadius: 5,
-  },
-  buttonText: {
-    color: '#fff',
-    fontWeight: 'bold',
-  },
-  emptyText: {
-    textAlign: 'center',
-    color: '#777',
-    marginTop: 20,
-  },
-  paginationContainer: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginTop: 10,
-  },
-  pageButton: {
-    backgroundColor: '#20B2AA',
-    padding: 10,
-    borderRadius: 5,
-    marginHorizontal: 5,
-  },
-  disabledButton: {
-    backgroundColor: '#B0C4DE',
-  },
-  pageInfo: {
-    fontSize: 16,
-    fontWeight: 'bold',
-  },
-});
 
 export default UltimasPerdasTab;

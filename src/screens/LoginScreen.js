@@ -57,29 +57,30 @@ const LoginScreen = ({ navigation }) => {
           {/* Logo */}
           <Image style={styles.logo} source={require('../assets/logo.png')} />
 
-          {/* Título */}
-          <Text style={styles.title}>Auditoria Plaza</Text>
+          {/* Título 
+          {/*<Text style={styles.title}>Auditoria Plaza</Text>*/}
 
           {/* Mensagem de erro (se existir) */}
           {error && <Text style={styles.errorText}>{error}</Text>}
 
-          {/* Campo de E-mail */}
+          {/* Campo de uisuario */}
           <View style={styles.inputContainer}>
             <TextInput
               style={styles.input}
-              placeholder="Digite seu usuário"
+              placeholder="Usuário"
               placeholderTextColor="#888"
-              keyboardType="email-address"
+              keyboardType="Nome"
               value={email}
               onChangeText={setEmail}
             />
           </View>
+          
 
           {/* Campo de Senha */}
           <View style={styles.inputContainer}>
             <TextInput
               style={styles.input}
-              placeholder="Digite sua senha"
+              placeholder="Senha"
               placeholderTextColor="#888"
               secureTextEntry
               value={password}
@@ -110,11 +111,11 @@ const styles = StyleSheet.create({
     padding: 20,
   },
   logo: {
-    width: 150,
-    height: 150,
-    borderRadius: 100,
-    resizeMode: 'cover',
-    elevation: 20,
+    width: 200,
+    height: 200,
+    //borderRadius: 100,
+    //resizeMode: 'cover',
+    //elevation: 20,
     marginBottom: 20,
     marginTop: -50,
   },
@@ -125,14 +126,14 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   inputContainer: {
-    width: '100%',
+    width: '80%',
     marginBottom: 20,
   },
   input: {
     width: '100%',
     height: 50,
     backgroundColor: '#ffffff',
-    borderRadius: 25,
+    borderRadius: 10,
     paddingHorizontal: 15,
     fontSize: 16,
     shadowColor: '#000',
@@ -144,12 +145,12 @@ const styles = StyleSheet.create({
     borderWidth: 1,
   },
   button: {
-    width: '100%',
-    height: 50,
-    backgroundColor: '#20B2AA',
+    width: '70%',
+    height: 40,
+    backgroundColor: '#007BFF',
     justifyContent: 'center',
     alignItems: 'center',
-    borderRadius: 25,
+    borderRadius: 10,
     marginTop: 20,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },

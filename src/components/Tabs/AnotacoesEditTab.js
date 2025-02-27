@@ -86,7 +86,7 @@ const AnotacoesEditTab = ({ anotacoes, setActiveTab }) => {
 
       {loading && (
         <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', marginVertical: 10 }}>
-          <ActivityIndicator size="large" color="#20B2AA" />
+          <ActivityIndicator size="large"  color="#778899" />
           <Text>Carregando...</Text>
         </View>
       )}

@@ -11,6 +11,8 @@ import {
 } from 'react-native';
 import useAuditoriaDetails from '../../hooks/useAuditoriaDetails';
 
+import styles from '../../styles/UltimaStyles';
+
 const UltimaAnotacoesTab = ({ auditoriaId, setActiveTab }) => {
   console.log("🔍 setActiveTab recebido:", setActiveTab);
 
@@ -68,7 +70,7 @@ const UltimaAnotacoesTab = ({ auditoriaId, setActiveTab }) => {
   };
 
   const renderAnotacao = ({ item }) => (
-    <View style={styles.anotacaoItem}>
+    <View style={styles.Item}>
       {/* Descrição da Anotação */}
       <View>
         <Text style={styles.valorText}>Descrição:</Text>
@@ -88,7 +90,7 @@ const UltimaAnotacoesTab = ({ auditoriaId, setActiveTab }) => {
     <View style={styles.container}>
       <Text style={styles.title}>📋 Últimas Anotações</Text>
       {loading ? (
-        <ActivityIndicator size="large" color="#20B2AA" />
+        <ActivityIndicator size="large"  color="#778899"  />
       ) : anotacoes.length === 0 ? (
         <Text style={styles.emptyText}>Nenhuma anotação cadastrada.</Text>
       ) : (
@@ -129,6 +131,8 @@ const UltimaAnotacoesTab = ({ auditoriaId, setActiveTab }) => {
   );
 };
 
+
+/*
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -141,7 +145,7 @@ const styles = StyleSheet.create({
     marginBottom: 10,
     textAlign: 'center',
   },
-  anotacaoItem: {
+  Item: {
     backgroundColor: '#fff',
     padding: 10,
     borderRadius: 5,
@@ -201,5 +205,6 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
   },
 });
+*/
 
 export default UltimaAnotacoesTab;

@@ -25,9 +25,9 @@ export default StyleSheet.create({
       marginBottom: 10,
     },
     title: {
-      fontSize: 28,
+      fontSize: 20,
       fontWeight: 'bold',
-      color: '#20B2AA',
+      color: '#33333',
       marginBottom: 10,
     },
     inputContainer: {
@@ -38,7 +38,7 @@ export default StyleSheet.create({
       width: '100%',
       height: 50,
       backgroundColor: '#ffffff',
-      borderRadius: 25,
+      borderRadius: 10,
       paddingHorizontal: 15,
       fontSize: 16,
       shadowColor: '#000',
@@ -79,11 +79,11 @@ export default StyleSheet.create({
       height: 40,
       justifyContent: 'center',
       alignItems: 'center',
-      borderRadius: 25,
+      borderRadius: 10,
       marginTop: 10,
     },
     buttonAtivo: {
-      backgroundColor: '#20B2AA',
+      backgroundColor: '#007BFF',
     },
     buttonInativo: {
       backgroundColor: '#ccc',
@@ -106,10 +106,10 @@ export default StyleSheet.create({
       textAlign: 'center',
     },
     refreshButton: {
-      backgroundColor: '#20B2AA',
+      backgroundColor: '#007BFF',
       paddingVertical: 10,
       paddingHorizontal: 20,
-      borderRadius: 25,
+      borderRadius: 10,
       marginBottom: 20,
     },
     refreshButtonText: {

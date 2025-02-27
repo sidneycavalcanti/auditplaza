@@ -11,6 +11,9 @@ import {
 } from 'react-native';
 import useAuditoriaDetails from '../../hooks/useAuditoriaDetails';
 
+
+import styles from '../../styles/UltimaStyles';
+
 const UltimasVendasTab = ({ auditoriaId, setActiveTab }) => {
   console.log("🔍 setActiveTab recebido:", setActiveTab);
 
@@ -65,7 +68,7 @@ const UltimasVendasTab = ({ auditoriaId, setActiveTab }) => {
   };
 
   const renderVenda = ({ item }) => (
-    <View style={styles.vendaItem}>
+    <View style={styles.Item}>
       <View>
         <Text style={styles.valorText}>
           Valor: R$ {item.valor ? Number(item.valor).toFixed(2) : '0.00'}
@@ -91,7 +94,7 @@ const UltimasVendasTab = ({ auditoriaId, setActiveTab }) => {
       <Text style={styles.title}>📋 Últimas Vendas</Text>
 
       {loading ? (
-        <ActivityIndicator size="large" color="#20B2AA" />
+        <ActivityIndicator size="large" color="#778899" />
       ) : vendas.length === 0 ? (
         <Text style={styles.emptyText}>Nenhuma venda cadastrada.</Text>
       ) : (
@@ -133,6 +136,7 @@ const UltimasVendasTab = ({ auditoriaId, setActiveTab }) => {
   );
 };
 
+/*
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -210,5 +214,6 @@ const styles = StyleSheet.create({
     paddingBottom: 20, // Evita que o último item fique cortado
   }
 });
+*/
 
 export default UltimasVendasTab;

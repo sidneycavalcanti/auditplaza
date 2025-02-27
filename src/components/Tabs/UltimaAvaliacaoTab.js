@@ -11,6 +11,8 @@ import {
 } from 'react-native';
 import useAuditoriaDetails from '../../hooks/useAuditoriaDetails';
 
+import styles from '../../styles/UltimaStyles';
+
 const UltimasAvaliacaoTab = ({ auditoriaId, setActiveTab }) => {
   const [avaliacao, setAvaliacao] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -70,7 +72,7 @@ const carregarAvaliacoes = async (page) => {
   };
 
   const renderAvaliacao = ({ item }) => (
-    <View style={styles.avaliacaoItem}>
+    <View style={styles.Item}>
       {/* Pergunta e Resposta */}
       <View style={{ flex: 1, marginRight: 10 }}>
       <Text style={styles.valorText}>
@@ -105,7 +107,7 @@ const carregarAvaliacoes = async (page) => {
       <Text style={styles.title}>📋 Últimas Avaliações</Text>
 
       {loading ? (
-        <ActivityIndicator size="large" color="#20B2AA" />
+        <ActivityIndicator size="large"  color="#778899"  />
       ) : avaliacao.length === 0 ? (
         <Text style={styles.emptyText}>Nenhuma avaliação cadastrada.</Text>
       ) : (
@@ -156,6 +158,8 @@ const carregarAvaliacoes = async (page) => {
   );
 };
 
+
+/*
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -235,5 +239,6 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
   },
 });
+*/
 
 export default UltimasAvaliacaoTab;

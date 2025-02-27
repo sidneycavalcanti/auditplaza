@@ -109,7 +109,7 @@ const AvaliacoesEditTab = ({ avaliacao, setActiveTab }) => {
             marginVertical: 10,
           }}
         >
-          <ActivityIndicator size="large" color="#20B2AA" />
+          <ActivityIndicator size="large"  color="#778899"  />
           <Text>Carregando...</Text>
         </View>
       )}

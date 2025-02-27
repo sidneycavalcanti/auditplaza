@@ -60,11 +60,11 @@ const AnotacoesTab = ({ auditoriaId, usuarioId, lojaId, setActiveTab }) => {
   if (loading) {
     return (
       <View style={styles.loadingContainer}>
-        <ActivityIndicator size="large" color="#20B2AA" />
+        <ActivityIndicator size="large"  color="#778899"  />
         <Text>Carregando informações...</Text>
       </View>
     );
-  }
+  }s
 
   return (
     <View style={styles.contentContainer}>

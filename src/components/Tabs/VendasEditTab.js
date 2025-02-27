@@ -90,7 +90,7 @@ const VendasEditTab = ({ venda, setActiveTab }) => {
 
       {loading && (
         <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', marginVertical: 10 }}>
-          <ActivityIndicator size="large" color="#20B2AA" />
+          <ActivityIndicator size="large"  color="#778899"  />
           <Text>Carregando...</Text>
         </View>
       )}
@@ -162,8 +162,8 @@ const VendasEditTab = ({ venda, setActiveTab }) => {
               <Switch
                 value={isTrocaChecked}
                 onValueChange={setIsTrocaChecked}
-                trackColor={{ false: '#767577', true: '#20B2AA' }}
-                thumbColor={isTrocaChecked ? '#20B2AA' : '#f4f3f4'}
+                trackColor={{ false: '#767577', true: '#778899'  }}
+                thumbColor={isTrocaChecked ? '#778899' : '#f4f3f4'}
               />
             </View>
           </View>

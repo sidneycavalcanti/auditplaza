@@ -6,7 +6,7 @@ export default StyleSheet.create({
     backgroundColor: '#f5f5f5',
   },
   header: {
-    backgroundColor: '#20B2AA',
+    backgroundColor: '#778899',
     padding: 15,
     alignItems: 'center',
     justifyContent: 'center',
@@ -19,7 +19,7 @@ export default StyleSheet.create({
     shadowRadius: 4,
   },
   headerText: {
-    color: '#333',
+    color: '#333333',
     fontSize: 18,
     fontWeight: 'bold',
     textAlign: 'center',
@@ -39,7 +39,7 @@ export default StyleSheet.create({
   },
   activeTab: {
     borderBottomWidth: 3,
-    borderBottomColor: '#20B2AA',
+    borderBottomColor: '#778899',
   },
   tabText: {
     fontSize: 14,
@@ -47,7 +47,7 @@ export default StyleSheet.create({
     color: '#333',
   },
   activeTabText: {
-    color: '#20B2AA',
+    color: '#375A7F',
   },
   contentContainer: {
     padding: 20,
@@ -79,7 +79,7 @@ export default StyleSheet.create({
     marginBottom: 15,
   },
   button: {
-    backgroundColor: '#20B2AA',
+    backgroundColor: '#778899',
     paddingVertical: 15,
     borderRadius: 10,
     marginBottom: 15,
@@ -124,7 +124,7 @@ export default StyleSheet.create({
     marginTop: 5,
   },
   counterButton: {
-    backgroundColor: '#20B2AA',
+    backgroundColor: '#778899',
     borderRadius: 8,
     padding: 10,
     marginHorizontal: 5,
@@ -209,7 +209,7 @@ export default StyleSheet.create({
     alignItems: 'center',
   },
   button: {
-    backgroundColor: '#20B2AA',
+    backgroundColor: '#778899',
     padding: 15,
     borderRadius: 5,
     alignItems: 'center',

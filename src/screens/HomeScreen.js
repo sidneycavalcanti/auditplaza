@@ -97,13 +97,13 @@ const HomeScreen = ({ navigation }) => {
       <View style={styles.container}>
         {/* Header: Logo e botão de configuração */}
         <View style={styles.header}>
-          <Image style={styles.logo} source={require('../assets/logo.png')} />
-          <TouchableOpacity onPress={() => navigation.navigate('ProfileConfig')}>
-            <Icon name="settings-outline" size={30} color="#000" />
-          </TouchableOpacity>
+          <Image style={styles.logo} source={require('../assets/user.png')} />
+          <TouchableOpacity onPress={() => navigation.navigate('Profile', { userId: 1 })}>
+  <Icon name="settings-outline" size={30} color="#000" />
+</TouchableOpacity>
         </View>
 
-        <Text style={styles.title}>Minhas Auditorias</Text>
+     
 
         <View style={styles.inputContainer}>
           <TextInput
@@ -115,6 +115,8 @@ const HomeScreen = ({ navigation }) => {
           />
         </View>
 
+        
+
         <TouchableOpacity
           style={styles.refreshButton}
           onPress={fetchAuditorias}
@@ -125,7 +127,9 @@ const HomeScreen = ({ navigation }) => {
           </Text>
         </TouchableOpacity>
 
-        {loading && <ActivityIndicator size="large" color="#20B2AA" />}
+        <Text style={styles.title}>Minhas Auditorias</Text>
+
+        {loading && <ActivityIndicator size="large" color="#778899" />}
 
         {error && (
           <Text style={styles.errorText}>

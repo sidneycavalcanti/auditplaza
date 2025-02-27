@@ -11,6 +11,8 @@ import {
 } from 'react-native';
 import useAuditoriaDetails from '../../hooks/useAuditoriaDetails';
 
+import styles from '../../styles/UltimaStyles';
+
 const UltimasPausaTab = ({ auditoriaId, setActiveTab }) => {
   console.log("🔍 setActiveTab recebido:", setActiveTab);
 
@@ -65,7 +67,7 @@ const UltimasPausaTab = ({ auditoriaId, setActiveTab }) => {
   };
 
   const renderPerda = ({ item }) => (
-    <View style={styles.perdaItem}>
+    <View style={styles.Item}>
       {/* Motivo e Descrição */}
       <View>
         <Text style={styles.valorText}> {item.motivodepausa?.name || 'Não informado'}</Text>
@@ -98,7 +100,7 @@ const UltimasPausaTab = ({ auditoriaId, setActiveTab }) => {
     <View style={styles.container}>
       <Text style={styles.title}>📋 Últimas Pausas</Text>
       {loading ? (
-        <ActivityIndicator size="large" color="#20B2AA" />
+        <ActivityIndicator size="large" color="#778899"  />
       ) : pausas.length === 0 ? (
         <Text style={styles.emptyText}>Nenhuma perda cadastrada.</Text>
       ) : (
@@ -139,6 +141,8 @@ const UltimasPausaTab = ({ auditoriaId, setActiveTab }) => {
   );
 };
 
+
+/* 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -220,5 +224,5 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
   },
 });
-
+*/
 export default UltimasPausaTab;

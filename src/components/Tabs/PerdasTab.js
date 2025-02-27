@@ -61,7 +61,7 @@ const PerdasTab = ({ auditoriaId, setActiveTab }) => {
   if (loading) {
     return (
       <View style={styles.loadingContainer}>
-        <ActivityIndicator size="large" color="#20B2AA" />
+        <ActivityIndicator size="large" color="#375A7F" />
         <Text>Carregando informações...</Text>
       </View>
     );
