@@ -64,7 +64,7 @@ const AnotacoesTab = ({ auditoriaId, usuarioId, lojaId, setActiveTab }) => {
         <Text>Carregando informações...</Text>
       </View>
     );
-  }s
+  }
 
   return (
     <View style={styles.contentContainer}>

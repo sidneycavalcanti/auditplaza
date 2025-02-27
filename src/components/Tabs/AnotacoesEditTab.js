@@ -12,8 +12,8 @@ import { Picker } from '@react-native-picker/picker';
 import useAuditoriaDetails from '../../hooks/useAuditoriaDetails';
 import styles from '../../styles/AuditoriaScreenStyles';
 
-const AnotacoesEditTab = ({ anotacoes, setActiveTab }) => {
-  if (!anotacoes) {
+const AnotacoesEditTab = ({ anotacao, setActiveTab }) => {
+  if (!anotacao) {
     return (
       <View style={styles.container}>
         <Text style={styles.errorText}>Erro: Nenhuma anotacão selecionada.</Text>
@@ -129,4 +129,4 @@ const AnotacoesEditTab = ({ anotacoes, setActiveTab }) => {
   );
 };
 
-export default PerdasEditTab;
+export default AnotacoesEditTab;
