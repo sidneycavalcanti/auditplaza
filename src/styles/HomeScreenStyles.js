@@ -16,7 +16,9 @@ export default StyleSheet.create({
       flex: 1,
       alignItems: 'center',
       padding: 20,
+      paddingTop: 40, // Ajuste esse valor conforme necessário
     },
+    
     logo: {
       width: 60,
       height: 60,

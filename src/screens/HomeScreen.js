@@ -97,10 +97,10 @@ const HomeScreen = ({ navigation }) => {
       <View style={styles.container}>
         {/* Header: Logo e botão de configuração */}
         <View style={styles.header}>
-          <Image style={styles.logo} source={require('../assets/user.png')} />
-          <TouchableOpacity onPress={() => navigation.navigate('Profile', { userId: 1 })}>
+          <Image style={styles.logo} source={require('../assets/user.png')} /> 
+         {/*  <TouchableOpacity onPress={() => navigation.navigate('Profile', { userId: 1 })}> 
   <Icon name="settings-outline" size={30} color="#000" />
-</TouchableOpacity>
+</TouchableOpacity> */}
         </View>
 
      

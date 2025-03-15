@@ -41,32 +41,42 @@ const usePausa = (auditoriaId) => {
       Alert.alert('Erro', 'Selecione um motivo para a pausa.');
       return { error: 'Selecione um motivo para a pausa.' };
     }
-
+  
     try {
       const pausa = {
         motivodepausaId: parseInt(selectedMotivoPausa, 10),
         auditoriaId: parseInt(auditoriaId, 10),
       };
-
+  
       console.log("📡 Enviando nova pausa para API:", JSON.stringify(pausa, null, 2));
-
+  
       const novaPausa = await cadastrarPausa(pausa);
       
       if (!novaPausa) {
         throw new Error("A API não retornou os dados esperados");
       }
-
+  
       console.log("✅ Nova pausa cadastrada:", novaPausa);
-
-      setPausaAtiva(novaPausa);
-      setModalVisible(true);
-
+  
+      // Aguarda um pequeno delay antes de verificar se a pausa foi registrada corretamente
+      await new Promise((resolve) => setTimeout(resolve, 1000)); // 1 segundo de atraso
+  
+      const pausaRegistrada = await verificarPausaAtiva(auditoriaId);
+      
+      if (pausaRegistrada && pausaRegistrada.motivodepausaId) {
+        setPausaAtiva(pausaRegistrada);
+        setModalVisible(true);
+      } else {
+        Alert.alert('Erro', 'O motivo da pausa não foi registrado corretamente. Tente novamente.');
+      }
+  
       return novaPausa;
     } catch (err) {
       console.error('❌ Erro ao cadastrar pausa:', err);
       return { error: 'Não foi possível cadastrar a pausa.' };
     }
   };
+  
 
   // 🔥 Encerrar a pausa (muda status para 0)
   const handleEncerrarPausa = async () => {
