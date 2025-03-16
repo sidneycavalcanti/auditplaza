@@ -19,14 +19,7 @@ const HomeScreen = ({ navigation }) => {
   const [searchQuery, setSearchQuery] = useState('');
   const { auditorias, loading, error, fetchAuditorias } = useAuditorias();
 
-  const handleAuditoria = (
-    lojaId,
-    lojaName,
-    data,
-    userName,
-    usuarioId,
-    auditoriaId
-  ) => {
+  const handleAuditoria = (lojaId, lojaName, data, userName, usuarioId, auditoriaId) => {
     navigation.navigate('Auditoria', {
       lojaId,
       lojaName,
@@ -39,6 +32,10 @@ const HomeScreen = ({ navigation }) => {
 
   const handleSearch = (text) => {
     setSearchQuery(text);
+  };
+
+  const handleLogout = () => {
+    navigation.replace('Login'); // Substitua 'Login' pelo nome da tela de login na navegação
   };
 
   const sortedAuditorias = auditorias
@@ -95,15 +92,15 @@ const HomeScreen = ({ navigation }) => {
   return (
     <SafeAreaView style={styles.safeContainer}>
       <View style={styles.container}>
-        {/* Header: Logo e botão de configuração */}
+        {/* Header: Logo e botões */}
         <View style={styles.header}>
-          <Image style={styles.logo} source={require('../assets/user.png')} /> 
-         {/*  <TouchableOpacity onPress={() => navigation.navigate('Profile', { userId: 1 })}> 
-  <Icon name="settings-outline" size={30} color="#000" />
-</TouchableOpacity> */}
+          <Image style={styles.logo} source={require('../assets/user.png')} />
+          <View style={styles.headerButtons}>
+            <TouchableOpacity onPress={handleLogout} style={styles.logoutButton}>
+              <Icon name="log-out-outline" size={30} color="#000" />
+            </TouchableOpacity>
+          </View>
         </View>
-
-     
 
         <View style={styles.inputContainer}>
           <TextInput
@@ -115,13 +112,7 @@ const HomeScreen = ({ navigation }) => {
           />
         </View>
 
-        
-
-        <TouchableOpacity
-          style={styles.refreshButton}
-          onPress={fetchAuditorias}
-          disabled={loading}
-        >
+        <TouchableOpacity style={styles.refreshButton} onPress={fetchAuditorias} disabled={loading}>
           <Text style={styles.refreshButtonText}>
             {loading ? 'Atualizando...' : 'Atualizar'}
           </Text>
@@ -131,11 +122,7 @@ const HomeScreen = ({ navigation }) => {
 
         {loading && <ActivityIndicator size="large" color="#778899" />}
 
-        {error && (
-          <Text style={styles.errorText}>
-            Erro ao buscar auditorias: {error}
-          </Text>
-        )}
+        {error && <Text style={styles.errorText}>Erro ao buscar auditorias: {error}</Text>}
 
         {!loading && !error && filteredAuditorias?.length > 0 ? (
           <FlatList
@@ -147,10 +134,7 @@ const HomeScreen = ({ navigation }) => {
             showsVerticalScrollIndicator={false}
           />
         ) : (
-          !loading &&
-          !error && (
-            <Text style={styles.noResultsText}>Nenhuma auditoria encontrada.</Text>
-          )
+          !loading && !error && <Text style={styles.noResultsText}>Nenhuma auditoria encontrada.</Text>
         )}
       </View>
     </SafeAreaView>

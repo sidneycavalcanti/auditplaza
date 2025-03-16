@@ -42,6 +42,8 @@ const usePausa = (auditoriaId) => {
       return { error: 'Selecione um motivo para a pausa.' };
     }
   
+    setLoading(true); // 🔥 Ativa o carregamento na UI
+  
     try {
       const pausa = {
         motivodepausaId: parseInt(selectedMotivoPausa, 10),
@@ -58,8 +60,8 @@ const usePausa = (auditoriaId) => {
   
       console.log("✅ Nova pausa cadastrada:", novaPausa);
   
-      // Aguarda um pequeno delay antes de verificar se a pausa foi registrada corretamente
-      await new Promise((resolve) => setTimeout(resolve, 1000)); // 1 segundo de atraso
+      // 🔥 Aguarda um pequeno delay antes de verificar se a pausa foi registrada corretamente
+      //await new Promise((resolve) => setTimeout(resolve, 1000)); // 1 segundo de atraso
   
       const pausaRegistrada = await verificarPausaAtiva(auditoriaId);
       
@@ -73,9 +75,13 @@ const usePausa = (auditoriaId) => {
       return novaPausa;
     } catch (err) {
       console.error('❌ Erro ao cadastrar pausa:', err);
+      Alert.alert('Erro', 'Não foi possível cadastrar a pausa.');
       return { error: 'Não foi possível cadastrar a pausa.' };
+    } finally {
+      setLoading(false); // 🔥 Desativa o carregamento, independentemente do sucesso ou erro
     }
   };
+  
   
 
   // 🔥 Encerrar a pausa (muda status para 0)
@@ -87,12 +93,13 @@ const usePausa = (auditoriaId) => {
 
     try {
       console.log(`📡 Encerrando pausa com ID: ${pausaAtiva.id}`);
-      await encerrarPausa(pausaAtiva.id, { status: 0 });
-
+      
+      // 🚀 Otimização: Atualiza localmente antes da resposta da API
       setPausaAtiva(null);
       setModalVisible(false);
 
-      //Alert.alert('Sucesso', 'Pausa encerrada com sucesso.');
+      await encerrarPausa(pausaAtiva.id, { status: 0 });
+
       return { success: true };
     } catch (error) {
       console.error("❌ Erro ao encerrar pausa:", error);

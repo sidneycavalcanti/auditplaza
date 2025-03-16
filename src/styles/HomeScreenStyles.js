@@ -119,4 +119,13 @@ export default StyleSheet.create({
       fontSize: 16,
       fontWeight: 'bold',
     },
+    logoutButton: {
+      padding: 10,
+      alignItems: 'center',
+      justifyContent: 'center',
+    },
+    headerButtons: {
+      flexDirection: 'row',
+      alignItems: 'center',
+    },
   });
