@@ -7,84 +7,103 @@ import useAuditoriaDetails from '../../hooks/useAuditoriaDetails';
 const AvaliacaoTab = ({ auditoriaId, setActiveTab }) => {
   const {
     cadastrarAvaliacao,
+    fetchCadAvaliacao,
     fetchPerguntasAvaliacao,
+    cadAvaliacao,
     perguntas,
     loading,
     error
   } = useAuditoriaDetails();
 
-  // Declaração de estados
+  // Estados para avaliação, pergunta, nota e resposta
+  const [selectedAvaliacao, setSelectedAvaliacao] = useState('');
   const [selectedPergunta, setSelectedPergunta] = useState('');
+  const [selectedNota, setSelectedNota] = useState('');
   const [selectedResposta, setSelectedResposta] = useState('');
 
-  // ✅ Busca as perguntas disponíveis ao carregar o componente
+  // Busca as perguntas disponíveis ao carregar o componente
   useEffect(() => {
     const fetchData = async () => {
-      await fetchPerguntasAvaliacao();
+      await fetchCadAvaliacao();
     };
     fetchData();
   }, []);
 
+  // Quando a avaliação é selecionada, recarrega as perguntas
   useEffect(() => {
-    console.log("📡 Perguntas disponíveis:", perguntas);
-  }, [perguntas]);
+    if (selectedAvaliacao) {
+      // Chama fetchPerguntasAvaliacao passando o ID
+      fetchPerguntasAvaliacao(selectedAvaliacao);
+    }
+  }, [selectedAvaliacao]);
 
-  // ✅ Função para cadastrar uma nova avaliação
-  const handleCadAvalicao = async () => {
-    // Verifica se escolheu a pergunta
+  // Função para cadastrar uma nova avaliação
+  const handleCadAvaliacao = async () => {
     if (!selectedPergunta) {
       Alert.alert('Erro', 'Selecione uma pergunta.');
       return;
     }
-    // Verifica se digitou algo na resposta
+    if (!selectedNota) {
+      Alert.alert('Erro', 'Selecione uma nota.');
+      return;
+    }
     if (!selectedResposta.trim()) {
       Alert.alert('Erro', 'Digite uma resposta válida.');
       return;
     }
-
     try {
-      // Monta o objeto com "cadavoperacionalId"
       const avaliacao = {
-        cadavoperacionalId: parseInt(selectedPergunta, 10),
-        resposta: selectedResposta,
+        cadavoperacionalId: parseInt(selectedAvaliacao, 10),
+        cadquestoesId: parseInt(selectedPergunta, 10), // <-- usar cadquestoesId
         auditoriaId: parseInt(auditoriaId, 10),
+        nota: parseInt(selectedNota, 10),
+        resposta: selectedResposta
       };
 
-      console.log(
-        '📡 Enviando nova avaliação para API:',
-        JSON.stringify(avaliacao, null, 2)
-      );
-
-      // Chama a função do hook
+      console.log('Enviando avaliação:', avaliacao);
       await cadastrarAvaliacao(avaliacao);
-
       Alert.alert('Sucesso', 'Avaliação cadastrada com sucesso!');
 
-      // Limpa os campos após cadastrar
+      // Limpa os campos após cadastro
       setSelectedPergunta('');
+      setSelectedNota('');
       setSelectedResposta('');
-
-      // (Opcional) recarrega perguntas, caso queira atualizar alguma lista
-      fetchPerguntasAvaliacao();
     } catch (err) {
-      console.error('❌ Erro ao cadastrar avaliação:', err);
+      console.error('Erro ao cadastrar avaliação:', err);
       Alert.alert('Erro', 'Não foi possível cadastrar a avaliação.');
     }
   };
 
-  // ✅ Renderiza um indicador de carregamento enquanto os dados estão sendo buscados
+
+  // Renderiza um indicador de carregamento enquanto os dados estão sendo buscados
   if (loading) {
     return (
       <View style={styles.loadingContainer}>
-        <ActivityIndicator size="large"  color="#778899"  />
+        <ActivityIndicator size="large" color="#778899" />
         <Text>Carregando informações...</Text>
       </View>
     );
   }
 
-  // ✅ Renderiza o conteúdo principal
+  // Renderiza o conteúdo principal
   return (
     <View style={styles.contentContainer}>
+      <Text style={styles.sectionTitle}>Avaliação:</Text>
+      <Picker
+        selectedValue={selectedAvaliacao}
+        onValueChange={(itemValue) => setSelectedAvaliacao(String(itemValue))}
+        style={styles.picker}
+      >
+        <Picker.Item label="Selecione a avaliação" value="" />
+        {cadAvaliacao && cadAvaliacao.length > 0 ? (
+          cadAvaliacao.map((item) => (
+            <Picker.Item key={item.id} label={item.descricao} value={String(item.id)} />
+          ))
+        ) : (
+          <Picker.Item label="Nenhuma avaliação disponível" value="" />
+        )}
+      </Picker>
+
       <Text style={styles.sectionTitle}>Pergunta:</Text>
       <Picker
         selectedValue={selectedPergunta}
@@ -92,13 +111,25 @@ const AvaliacaoTab = ({ auditoriaId, setActiveTab }) => {
         style={styles.picker}
       >
         <Picker.Item label="Selecione uma pergunta" value="" />
-        {perguntas.length > 0 ? (
-          perguntas.map((pergunta) => (
-            <Picker.Item key={pergunta.id} label={pergunta.descricao} value={String(pergunta.id)} />
-          ))
+        {perguntas && perguntas.length > 0 ? (
+  perguntas.map((p) => (
+    <Picker.Item key={p.id} label={p.name} value={String(p.id)} />
+  ))
         ) : (
-          <Picker.Item label="Nenhuma pergunta disponível" value="" />
-        )}
+        <Picker.Item label="Nenhuma pergunta disponível" value="" />
+            )}
+      </Picker>
+
+      <Text style={styles.sectionTitle}>Nota:</Text>
+      <Picker
+        selectedValue={selectedNota}
+        onValueChange={(itemValue) => setSelectedNota(String(itemValue))}
+        style={styles.picker}
+      >
+        <Picker.Item label="Selecione uma nota" value="" />
+        {[1,2,3,4,5,6,7,8,9,10].map((num) => (
+          <Picker.Item key={num} label={String(num)} value={String(num)} />
+        ))}
       </Picker>
 
       <Text style={styles.sectionTitle}>Resposta:</Text>
@@ -112,7 +143,7 @@ const AvaliacaoTab = ({ auditoriaId, setActiveTab }) => {
         onChangeText={setSelectedResposta}
       />
 
-      <TouchableOpacity style={styles.button} onPress={handleCadAvalicao}>
+      <TouchableOpacity style={styles.button} onPress={handleCadAvaliacao}>
         <Text style={styles.buttonText}>Adicionar</Text>
       </TouchableOpacity>
 
@@ -120,7 +151,6 @@ const AvaliacaoTab = ({ auditoriaId, setActiveTab }) => {
         <Text style={styles.buttonText}>Últimas Avaliações</Text>
       </TouchableOpacity>
 
-      {/* 🔥 Renderiza uma mensagem de erro, se houver */}
       {error && <Text style={styles.errorText}>{error}</Text>}
     </View>
   );

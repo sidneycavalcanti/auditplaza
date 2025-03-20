@@ -8,6 +8,7 @@ const useAuditoriaDetails = () => {
   const [perdas, setPerdas] = useState([]);
   const [motivoperdas, setMotivoperdas] = useState([]);
   const [avaliacoes, setAvaliacoes] = useState([]);
+  const [cadAvaliacao, setCadAvaliacao] = useState([]);
   const [perguntas, setPerguntas] = useState([]);
   const [anotacoes, setAnotacoes] = useState([]);
   const [operacoes, setOperacoes] = useState([]);
@@ -24,12 +25,11 @@ const useAuditoriaDetails = () => {
   const handleApiRequest = async (url, method = 'GET', data = null, additionalHeaders = {}) => {
     setLoading(true);
     setError(null);
-
+  
     try {
-      // Recuperar o token de autenticação (pode-se otimizar armazenando em variável global)
       const token = await AsyncStorage.getItem('token');
       if (!token) throw new Error('Token não encontrado');
-
+  
       const config = {
         method,
         url: `https://back-auditoria.onrender.com${url}`,
@@ -38,9 +38,10 @@ const useAuditoriaDetails = () => {
           'Content-Type': 'application/json',
           ...additionalHeaders,
         },
-        ...(data && { data }),
+        // Somente anexa 'data' se existir e não for GET
+        ...(data && method !== 'GET' ? { data } : {}),
       };
-
+  
       // Requisição via axios
       const response = await axios(config);
       return response.data;
@@ -52,6 +53,7 @@ const useAuditoriaDetails = () => {
       setLoading(false);
     }
   };
+  
 
   // --------------------------------------
   // Verificar se há token no AsyncStorage
@@ -178,20 +180,41 @@ const useAuditoriaDetails = () => {
     throw new Error('Dados de avaliações não encontrados.');
   };
 
-  const fetchPerguntasAvaliacao = async () => {
+  const fetchCadAvaliacao = async () => {
     setLoading(true);
     try {
       const response = await handleApiRequest('/cadavoperacional');
       if (response?.cadavoperacional && Array.isArray(response.cadavoperacional)) {
-        const perguntasAtivas = response.cadavoperacional.filter((p) => p.situacao === true);
-        setPerguntas(perguntasAtivas);
+        const avaliacaoAtivas = response.cadavoperacional.filter((p) => p.situacao === true);
+        setCadAvaliacao(avaliacaoAtivas);
       } else {
-        setPerguntas([]);
+        setCadAvaliacao([]);
       }
     } finally {
       setLoading(false);
     }
   };
+
+// Exemplo de função no hook useAuditoriaDetails.js
+const fetchPerguntasAvaliacao = async (avaliacaoId) => {
+  setLoading(true);
+  try {
+    // Passa o ID como query param na URL
+    const response = await handleApiRequest(
+      `/cadquestoes?cadavoperacionalId=${avaliacaoId}`,
+      'GET'
+    );
+    if (response?.cadquestoes && Array.isArray(response.cadquestoes)) {
+      const perguntasAtivas = response.cadquestoes.filter((p) => p.situacao === true);
+      setPerguntas(perguntasAtivas);
+    } else {
+      setPerguntas([]);
+    }
+  } finally {
+    setLoading(false);
+  }
+};
+
 
   const atualizarAvaliacao = async (avaliacaoAtualizada) => {
     if (!avaliacaoAtualizada.id) {
@@ -462,6 +485,7 @@ const useAuditoriaDetails = () => {
     operacoes,
     pausas,
     formasPagamento,
+    cadAvaliacao,
     sexos,
     motivoperdas,
     motivopausa,
@@ -488,6 +512,7 @@ const useAuditoriaDetails = () => {
     fetchUltimasAvaliacoes,
     fetchPerguntasAvaliacao,
     atualizarAvaliacao,
+    fetchCadAvaliacao,
 
     cadastrarPerda,
     excluirPerda,
