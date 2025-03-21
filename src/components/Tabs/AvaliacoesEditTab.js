@@ -13,7 +13,6 @@ import useAuditoriaDetails from '../../hooks/useAuditoriaDetails';
 import styles from '../../styles/AuditoriaScreenStyles';
 
 const AvaliacoesEditTab = ({ avaliacao, setActiveTab }) => {
-  // Se não vier uma avaliação, exibe erro
   if (!avaliacao) {
     return (
       <View style={styles.container}>
@@ -23,74 +22,81 @@ const AvaliacoesEditTab = ({ avaliacao, setActiveTab }) => {
   }
 
   const {
-    fetchAvaliacao,
+    fetchCadAvaliacao,
     fetchPerguntasAvaliacao,
     atualizarAvaliacao,
-    avaliacoes,
+    cadAvaliacao,
     perguntas,
     loading,
   } = useAuditoriaDetails();
 
-  // Estados locais para armazenar a pergunta selecionada e a resposta
-  // Usamos o ID de cadavoperacional que veio em 'avaliacao'
-  const [selectedPergunta, setSelectedPergunta] = useState(
-    avaliacao?.cadavoperacional?.id?.toString() || ''
-  );
-  const [selectedResposta, setSelectedResposta] = useState(
-    avaliacao?.resposta || ''
-  );
+  // Valores iniciais extraídos da avaliação recebida
+  const initialAvaliacao = avaliacao?.cadavoperacional?.id?.toString() || '';
+  const initialPergunta = avaliacao?.cadquestoes?.id?.toString() || '';
 
-  // Carrega as avaliações e as perguntas disponíveis ao montar o componente
+  const [selectedAvaliacao, setSelectedAvaliacao] = useState(initialAvaliacao);
+  const [selectedPergunta, setSelectedPergunta] = useState(initialPergunta);
+  const [selectedResposta, setSelectedResposta] = useState(avaliacao?.resposta || '');
+  const [selectedNota, setSelectedNota] = useState(avaliacao?.nota?.toString() || '');
+
+  // Carrega as avaliações disponíveis ao montar o componente
   useEffect(() => {
-    const loadData = async () => {
-      await fetchAvaliacao();          // Se quiser atualizar a lista de avaliações
-      await fetchPerguntasAvaliacao(); // Para preencher o Picker com as perguntas
-    };
-    loadData();
+    fetchCadAvaliacao();
   }, []);
 
-  // Logs de depuração
+  // Quando a avaliação selecionada muda, carrega as perguntas correspondentes.
+  // Se o usuário alterar a avaliação (diferente do valor inicial), reseta a pergunta.
   useEffect(() => {
-    console.log('📥 Avaliação recebida para edição:', avaliacao);
-    console.log('🗂️ Pergunta selecionada (ID):', selectedPergunta);
-    console.log('📋 Lista de avaliações carregada:', avaliacoes);
-    console.log('🔎 Lista de perguntas carregadas:', perguntas);
-  }, [avaliacao, selectedPergunta, avaliacoes, perguntas]);
+    if (selectedAvaliacao) {
+      fetchPerguntasAvaliacao(selectedAvaliacao);
+      if (selectedAvaliacao !== initialAvaliacao) {
+        setSelectedPergunta('');
+      }
+      // Caso seja a mesma avaliação da edição, o selectedPergunta permanecerá com o valor do banco.
+    }
+  }, [selectedAvaliacao]);
 
-  // Função para salvar as alterações da avaliação
+  useEffect(() => {
+    console.log('Avaliação recebida:', avaliacao);
+    console.log('Lista de avaliações (cadAvaliacao):', cadAvaliacao);
+    console.log('Lista de perguntas:', perguntas);
+  }, [avaliacao, cadAvaliacao, perguntas]);
+
   const handleEditarAvaliacao = async () => {
-    // Verifica se escolheu uma pergunta
+    if (!selectedAvaliacao) {
+      Alert.alert('Erro', 'Por favor, selecione uma avaliação.');
+      return;
+    }
     if (!selectedPergunta) {
       Alert.alert('Erro', 'Por favor, selecione uma pergunta.');
       return;
     }
+    if (!selectedNota) {
+      Alert.alert('Erro', 'Por favor, selecione uma nota.');
+      return;
+    }
 
-    // Monta o objeto de atualização
     const avaliacaoAtualizada = {
       id: avaliacao.id,
       auditoriaId: avaliacao.auditoriaId,
-      cadavoperacionalId: parseInt(selectedPergunta, 10), // Campo que o backend espera
+      cadavoperacionalId: parseInt(selectedAvaliacao, 10),
+      cadquestoesId: parseInt(selectedPergunta, 10),
       resposta: selectedResposta,
+      nota: parseInt(selectedNota, 10),
     };
 
-    console.log(
-      '📡 Enviando atualização da avaliação:',
-      JSON.stringify(avaliacaoAtualizada, null, 2)
-    );
+    console.log('Enviando atualização da avaliação:', JSON.stringify(avaliacaoAtualizada, null, 2));
 
     try {
       const response = await atualizarAvaliacao(avaliacaoAtualizada);
-      console.log('🔍 Resposta da API ao atualizar avaliação:', response);
-
-      // Se a API retornou um objeto com ID, consideramos que deu certo
       if (response && response.id) {
         Alert.alert('Sucesso', 'Avaliação atualizada com sucesso!');
-        setActiveTab('UltimasAvaliacoes'); // Volta para a lista de avaliações
+        setActiveTab('UltimasAvaliacoes');
       } else {
         throw new Error('A resposta da API não confirmou a atualização.');
       }
     } catch (err) {
-      console.error('❌ Erro ao atualizar avaliação:', err);
+      console.error('Erro ao atualizar avaliação:', err);
       Alert.alert('Erro', 'Não foi possível atualizar a avaliação.');
     }
   };
@@ -99,40 +105,71 @@ const AvaliacoesEditTab = ({ avaliacao, setActiveTab }) => {
     <ScrollView style={styles.contentContainer}>
       <Text style={styles.title}>📋 Editar Avaliação</Text>
 
-      {/* Indicador de carregamento */}
       {loading && (
-        <View
-          style={{
-            flex: 1,
-            justifyContent: 'center',
-            alignItems: 'center',
-            marginVertical: 10,
-          }}
-        >
-          <ActivityIndicator size="large"  color="#778899"  />
+        <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', marginVertical: 10 }}>
+          <ActivityIndicator size="large" color="#778899" />
           <Text>Carregando...</Text>
         </View>
       )}
 
-      {/* Formulário de edição (exibido quando não está carregando) */}
       {!loading && (
         <>
+          {/* Campo Avaliação */}
+          <Text style={styles.sectionTitle}>Avaliação:</Text>
+          <Picker
+            selectedValue={selectedAvaliacao}
+            onValueChange={(itemValue) => setSelectedAvaliacao(String(itemValue))}
+            style={styles.picker}
+          >
+            <Picker.Item label="Selecione a avaliação" value="" />
+            {cadAvaliacao && cadAvaliacao.length > 0 ? (
+              cadAvaliacao.map((item) => (
+                <Picker.Item 
+                  key={item.id} 
+                  label={item.descricao} 
+                  value={String(item.id)} 
+                />
+              ))
+            ) : (
+              <Picker.Item label="Nenhuma avaliação encontrada" value="" />
+            )}
+          </Picker>
+
+          {/* Campo Pergunta */}
           <Text style={styles.sectionTitle}>Pergunta:</Text>
           <Picker
             selectedValue={selectedPergunta}
-            onValueChange={(itemValue) => setSelectedPergunta(itemValue)}
+            onValueChange={(itemValue) => setSelectedPergunta(String(itemValue))}
             style={styles.picker}
           >
-            <Picker.Item label="Selecione a Pergunta" value="" />
-            {perguntas.map((pergunta) => (
-              <Picker.Item
-                key={pergunta.id}
-                label={pergunta.descricao} // Ajuste se a pergunta tiver outro campo de texto
-                value={String(pergunta.id)}
-              />
+            <Picker.Item label="Selecione a pergunta" value="" />
+            {perguntas && perguntas.length > 0 ? (
+              perguntas.map((pergunta) => (
+                <Picker.Item
+                  key={pergunta.id}
+                  label={pergunta.name}
+                  value={String(pergunta.id)}
+                />
+              ))
+            ) : (
+              <Picker.Item label="Nenhuma pergunta encontrada" value="" />
+            )}
+          </Picker>
+
+          {/* Campo Nota */}
+          <Text style={styles.notaTitle}>Nota:</Text>
+          <Picker
+            selectedValue={selectedNota}
+            onValueChange={(itemValue) => setSelectedNota(String(itemValue))}
+            style={styles.notaPicker}
+          >
+            <Picker.Item label="Selecione uma nota" value="" />
+            {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((num) => (
+              <Picker.Item key={num} label={String(num)} value={String(num)} />
             ))}
           </Picker>
 
+          {/* Campo Resposta */}
           <Text style={styles.sectionTitle}>Resposta:</Text>
           <TextInput
             style={styles.textArea}

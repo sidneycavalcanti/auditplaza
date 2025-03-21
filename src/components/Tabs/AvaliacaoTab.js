@@ -54,7 +54,7 @@ const AvaliacaoTab = ({ auditoriaId, setActiveTab }) => {
     try {
       const avaliacao = {
         cadavoperacionalId: parseInt(selectedAvaliacao, 10),
-        cadquestoesId: parseInt(selectedPergunta, 10), // <-- usar cadquestoesId
+        cadquestoesId: parseInt(selectedPergunta, 10),
         auditoriaId: parseInt(auditoriaId, 10),
         nota: parseInt(selectedNota, 10),
         resposta: selectedResposta
@@ -120,11 +120,11 @@ const AvaliacaoTab = ({ auditoriaId, setActiveTab }) => {
             )}
       </Picker>
 
-      <Text style={styles.sectionTitle}>Nota:</Text>
+      <Text style={styles.notaTitle}>Nota:</Text>
       <Picker
         selectedValue={selectedNota}
         onValueChange={(itemValue) => setSelectedNota(String(itemValue))}
-        style={styles.picker}
+        style={styles.notaPicker}
       >
         <Picker.Item label="Selecione uma nota" value="" />
         {[1,2,3,4,5,6,7,8,9,10].map((num) => (

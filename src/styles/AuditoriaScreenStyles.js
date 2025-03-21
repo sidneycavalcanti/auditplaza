@@ -58,6 +58,15 @@ export default StyleSheet.create({
     marginBottom: 10,
     color: '#333',
   },
+  notaTitle: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    marginBottom: 10,
+    color: '#333',
+    alignSelf: 'center'
+  },
+
+  
   input: {
     backgroundColor: '#fff',
     borderRadius: 10,
@@ -158,15 +167,8 @@ export default StyleSheet.create({
     fontSize: 16,
     color: '#333',
   },
-  picker: {
-    height: 50,
-    width: '100%',
-    borderWidth: 1,
-    borderColor: '#ccc',
-    borderRadius: 5,
-    marginBottom: 15,
-    backgroundColor: '#f9f9f9',
-  },
+  
+
 
   errorText: {
     color: 'red',
@@ -176,11 +178,6 @@ export default StyleSheet.create({
     flex: 1,
     padding: 20,
     backgroundColor: '#f5f5f5',
-  },
-  sectionTitle: {
-    fontSize: 16,
-    fontWeight: 'bold',
-    marginBottom: 10,
   },
   input: {
     height: 40,
@@ -198,6 +195,17 @@ export default StyleSheet.create({
     borderWidth: Platform.OS === 'ios' ? 1 : 0,
     borderColor: '#ccc',
     marginBottom: 15,
+  },
+  notaPicker: {
+    backgroundColor: '#fff',
+    borderWidth: 1,
+    borderColor: '#ccc',
+    borderRadius: 5,
+    height: 50,
+    paddingHorizontal: 10,
+    marginVertical: 10,
+    width: 100,         // Define a largura em pixels (por exemplo, 200px)
+    alignSelf: 'center' // Centraliza o componente horizontalmente
   },
   checkboxContainer: {
     flexDirection: 'row',
