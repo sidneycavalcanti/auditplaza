@@ -6,6 +6,8 @@ import {
   ScrollView,
 } from 'react-native';
 
+import { StatusBar } from 'react-native';
+
 //import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useNavigation } from '@react-navigation/native';
 import useAuditoriaDetails from '../hooks/useAuditoriaDetails';
@@ -281,6 +283,7 @@ const AuditoriaScreen = ({ route }) => {
 
   return (
     <View style={styles.container}>
+      <StatusBar barStyle="dark-content" backgroundColor="#FFF" />
       {/* Barra com o nome da loja, data/hora e nome do usuário */}
       <View style={styles.header}>
         <Text style={styles.headerText}>Loja: {lojaName}</Text>

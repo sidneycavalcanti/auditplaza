@@ -12,6 +12,11 @@ import {
 import Icon from 'react-native-vector-icons/Ionicons';
 import { format, isToday, parseISO } from 'date-fns';
 
+import { useFocusEffect } from '@react-navigation/native';
+import { Alert, BackHandler } from 'react-native';
+
+import { StatusBar } from 'react-native';
+
 import useAuditorias from '../hooks/useAuditorias';
 import styles from '../styles/HomeScreenStyles';
 
@@ -35,7 +40,18 @@ const HomeScreen = ({ navigation }) => {
   };
 
   const handleLogout = () => {
-    navigation.replace('Login'); // Substitua 'Login' pelo nome da tela de login na navegação
+    Alert.alert(
+      'Sair',
+      'Deseja realmente sair da aplicação?',
+      [
+        { text: 'Cancelar', style: 'cancel' },
+        {
+          text: 'Sim',
+          onPress: () => navigation.replace('Login'),
+        },
+      ],
+      { cancelable: true }
+    );
   };
 
   const sortedAuditorias = auditorias
@@ -49,11 +65,40 @@ const HomeScreen = ({ navigation }) => {
     item.loja?.name?.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
+  useFocusEffect(
+    React.useCallback(() => {
+      const onBackPress = () => {
+        Alert.alert(
+          'Sair da aplicação',
+          'Deseja realmente sair?',
+          [
+            {
+              text: 'Cancelar',
+              style: 'cancel',
+            },
+            {
+              text: 'Sair',
+              onPress: () => BackHandler.exitApp(),
+            },
+          ],
+          { cancelable: true }
+        );
+        return true; // Evita o comportamento padrão
+      };
+  
+      BackHandler.addEventListener('hardwareBackPress', onBackPress);
+  
+      return () => BackHandler.removeEventListener('hardwareBackPress', onBackPress);
+    }, [])
+  );
+  
+
   const renderAuditoria = ({ item }) => {
     const isDisponivel = isToday(item.data);
 
     return (
       <View style={styles.auditoriaItem}>
+        <StatusBar barStyle="dark-content" backgroundColor="#FFF" />
         <Text style={styles.auditoriaText}>
           <Text style={styles.label}>Loja:</Text> {item.loja?.name || 'N/A'}
         </Text>

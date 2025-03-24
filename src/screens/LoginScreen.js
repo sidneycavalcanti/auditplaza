@@ -16,6 +16,8 @@ import {
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import useAuth from '../hooks/useAuth';
 
+import { StatusBar } from 'react-native';
+
 const LoginScreen = ({ navigation }) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -47,6 +49,7 @@ const LoginScreen = ({ navigation }) => {
       style={{ flex: 1 }}
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
     >
+       <StatusBar barStyle="dark-content" backgroundColor="#FFF" />
       <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
         <KeyboardAwareScrollView
           contentContainerStyle={styles.container}
