@@ -50,7 +50,7 @@ const AnotacoesEditTab = ({ anotacao, setActiveTab }) => {
 
   const handleEditarPerda = async () => {
     if (!selectedMotivoPerda) {
-      Alert.alert('Erro', 'Por favor, selecione um motivo da perda.');
+      Alert.alert('Por favor, selecione um motivo da perda.');
       return;
     }
   

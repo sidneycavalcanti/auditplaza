@@ -25,7 +25,7 @@ const AnotacoesTab = ({ auditoriaId, usuarioId, lojaId, setActiveTab }) => {
     // Função para cadastrar uma antonacao
     const addAnnotation = async () => {
       if (!selectAnotation) {
-        Alert.alert('Erro', 'Preencha o campo de anotações.');
+        Alert.alert('Por favor, Preencha o campo.');
         return;
       }
   

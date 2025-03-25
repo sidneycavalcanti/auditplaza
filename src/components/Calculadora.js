@@ -1,5 +1,14 @@
 import React, { useState } from 'react';
-import { View, Text, TouchableOpacity, TextInput, StyleSheet, Dimensions } from 'react-native';
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  TextInput,
+  StyleSheet,
+  Dimensions,
+  SafeAreaView,
+  ScrollView,
+} from 'react-native';
 
 const { width, height } = Dimensions.get('window');
 
@@ -18,67 +27,72 @@ const Calculadora = ({ onClose }) => {
 
   const handleCalculate = () => {
     try {
-      setResult(eval(input).toString()); // ⚠️ Cuidado ao usar eval
+      setResult(eval(input).toString());
     } catch (error) {
       setResult('Erro');
     }
   };
 
   return (
-    <View style={styles.container}>
-      <View style={styles.modalContainer}>
-        <Text style={styles.title}>Calculadora</Text>
-        <TextInput style={styles.input} value={input} editable={false} />
-        <Text style={styles.resultText}>{result}</Text>
+    <SafeAreaView style={styles.container}>
+      <ScrollView contentContainerStyle={styles.scroll}>
+        <View style={styles.modalContainer}>
+          <Text style={styles.title}>Calculadora</Text>
+          <TextInput style={styles.input} value={input} editable={false} />
+          <Text style={styles.resultText}>{result}</Text>
 
-        {[
-          ['7', '8', '9', '/'],
-          ['4', '5', '6', '*'],
-          ['1', '2', '3', '-'],
-          ['0', '.', '=', '+'],
-        ].map((row, i) => (
-          <View key={i} style={styles.row}>
-            {row.map((char) => (
-              <TouchableOpacity
-                key={char}
-                style={styles.button}
-                onPress={char === '=' ? handleCalculate : () => handlePress(char)}
-              >
-                <Text style={styles.buttonText}>{char}</Text>
-              </TouchableOpacity>
-            ))}
+          {[
+            ['7', '8', '9', '/'],
+            ['4', '5', '6', '*'],
+            ['1', '2', '3', '-'],
+            ['0', '.', '=', '+'],
+          ].map((row, i) => (
+            <View key={i} style={styles.row}>
+              {row.map((char) => (
+                <TouchableOpacity
+                  key={char}
+                  style={styles.button}
+                  onPress={char === '=' ? handleCalculate : () => handlePress(char)}
+                >
+                  <Text style={styles.buttonText}>{char}</Text>
+                </TouchableOpacity>
+              ))}
+            </View>
+          ))}
+
+          <View style={styles.row}>
+            <TouchableOpacity style={styles.clearButton} onPress={handleClear}>
+              <Text style={styles.buttonText}>C</Text>
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.closeButton} onPress={onClose}>
+              <Text style={styles.buttonText}>Fechar</Text>
+            </TouchableOpacity>
           </View>
-        ))}
-
-        <View style={styles.row}>
-          <TouchableOpacity style={styles.clearButton} onPress={handleClear}>
-            <Text style={styles.buttonText}>C</Text>
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.closeButton} onPress={onClose}>
-            <Text style={styles.buttonText}>Fechar</Text>
-          </TouchableOpacity>
         </View>
-      </View>
-    </View>
+      </ScrollView>
+    </SafeAreaView>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    backgroundColor: 'rgba(0, 0, 0, 0.6)',
+    justifyContent: 'flex-end',
+  },
+  scroll: {
+    flexGrow: 1,
     justifyContent: 'flex-end',
     alignItems: 'center',
-    backgroundColor: 'rgba(0, 0, 0, 0.6)',
-    paddingBottom: 30,
+    paddingBottom: 20,
   },
   modalContainer: {
-    width: width * 0.9,
+    width: width * 0.95,
     backgroundColor: '#fff',
-    padding: width * 0.05,
+    padding: 20,
     borderRadius: 10,
-    alignItems: 'center',
-    justifyContent: 'center',
     elevation: 10,
+    alignItems: 'center',
   },
   title: {
     fontSize: width * 0.06,
@@ -104,31 +118,34 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-around',
     width: '100%',
-    marginBottom: 5,
+    marginVertical: 3,
   },
   button: {
     backgroundColor: '#007BFF',
-    paddingVertical: height * 0.015,
-    paddingHorizontal: width * 0.06,
+    paddingVertical: 10,
+    paddingHorizontal: 20,
     borderRadius: 5,
-    margin: 3,
     alignItems: 'center',
+    flex: 1,
+    marginHorizontal: 5,
   },
   clearButton: {
     backgroundColor: '#ff4444',
-    paddingVertical: height * 0.015,
-    paddingHorizontal: width * 0.08,
+    paddingVertical: 10,
+    paddingHorizontal: 30,
     borderRadius: 5,
-    margin: 3,
     alignItems: 'center',
+    flex: 1,
+    marginHorizontal: 5,
   },
   closeButton: {
     backgroundColor: '#444',
-    paddingVertical: height * 0.015,
-    paddingHorizontal: width * 0.08,
+    paddingVertical: 10,
+    paddingHorizontal: 30,
     borderRadius: 5,
-    margin: 3,
     alignItems: 'center',
+    flex: 1,
+    marginHorizontal: 5,
   },
   buttonText: {
     fontSize: width * 0.045,

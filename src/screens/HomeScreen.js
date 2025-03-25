@@ -106,6 +106,9 @@ const HomeScreen = ({ navigation }) => {
           <Text style={styles.label}>Data:</Text> {format(item.data, 'dd/MM/yyyy')}
         </Text>
         <Text style={styles.auditoriaText}>
+          <Text style={styles.label}>Horário:</Text> {item.horaInicial} a {item.horaFinal}
+        </Text>
+        <Text style={styles.auditoriaText}>
           <Text style={styles.label}>Status:</Text>{' '}
           {isDisponivel ? 'Disponível' : 'Indisponível'}
         </Text>

@@ -28,12 +28,14 @@ return(
     </TouchableOpacity>
      {/* Modal para abrir a calculadora */}
      <Modal visible={modalVisible} animationType="slide" transparent={true}>
-        <View style={styles.modalBackground}>
-          <Calculadora onClose={() => setModalVisible(false)} />
-        </View>
-      </Modal>
+  <View style={styles.modalBackground}>
+    <Calculadora onClose={() => setModalVisible(false)} />
+  </View>
+</Modal>
   </View>)
    
 };
+
+
 
   export default OutrosTab;

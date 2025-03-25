@@ -25,11 +25,11 @@ const PerdasTab = ({ auditoriaId, setActiveTab }) => {
   // Função para cadastrar uma perda
   const handleCadPerdas = async () => {
     if (!selectedMotivoPerda) {
-      Alert.alert('Erro', 'Selecione um motivo para a perda.');
+      Alert.alert('Por favor, selecione um motivo da perda.');
       return;
     }
     if (!selectedObs) {
-      Alert.alert('Erro', 'Digite uma descrição para a perda.');
+      Alert.alert('Por favor, digite sua observação.');
       return;
     }
 

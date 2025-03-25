@@ -57,7 +57,22 @@ const VendasEditTab = ({ venda, setActiveTab }) => {
 
   const handleEditarVenda = async () => {
     if (!valor || isNaN(Number(valor.replace(',', '.'))) || Number(valor.replace(',', '.')) <= 0) {
-      Alert.alert('Erro', 'Por favor, insira um valor numérico válido.');
+      Alert.alert('Por favor, insira um valor numérico válido.');
+      return;
+    }
+
+    if (!selectedSexo) {
+      Alert.alert('Selecione um sexo.');
+      return;
+    }
+
+    if (!selectedFormaPagamento) {
+      Alert.alert('Selecione uma forma de pagamento.');
+      return;
+    }
+
+    if (!faixaEtaria) {
+      Alert.alert('Selecione uma faixa etária.');
       return;
     }
 
@@ -90,7 +105,7 @@ const VendasEditTab = ({ venda, setActiveTab }) => {
 
       {loading && (
         <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', marginVertical: 10 }}>
-          <ActivityIndicator size="large"  color="#778899"  />
+          <ActivityIndicator size="large" color="#778899" />
           <Text>Carregando...</Text>
         </View>
       )}
@@ -162,7 +177,7 @@ const VendasEditTab = ({ venda, setActiveTab }) => {
               <Switch
                 value={isTrocaChecked}
                 onValueChange={setIsTrocaChecked}
-                trackColor={{ false: '#767577', true: '#778899'  }}
+                trackColor={{ false: '#767577', true: '#778899' }}
                 thumbColor={isTrocaChecked ? '#778899' : '#f4f3f4'}
               />
             </View>

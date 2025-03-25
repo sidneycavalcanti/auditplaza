@@ -1,8 +1,8 @@
 {
   "expo": {
-    "name": "auditplaza",
-    "slug": "auditplaza",
-    "version": "1.0.0",
+    "name": "auditpoint",
+    "slug": "auditpoint",
+    "version": "1.0.1",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
@@ -14,7 +14,7 @@
     },
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.sidney1706.auditplaza",
+      "bundleIdentifier": "com.sidney1706.auditpoint",
       "infoPlist": {
         "ITSAppUsesNonExemptEncryption": false
       }

@@ -36,8 +36,10 @@ const useAuth = () => {
 
     } catch (err) {
       console.error('Erro ao fazer login:', err);
-      setError('Ocorreu um erro ao tentar fazer login. Tente novamente.');
-      return { success: false, error: 'Usuário ou senha incorreto' };
+      setError('Usuário ou senha incorretos. Tente novamente.');
+      return { 
+        //success: false, error: 'Usuário ou senha incorretos. Tente novamente.'
+         };
     } finally {
       setLoading(false);
     }

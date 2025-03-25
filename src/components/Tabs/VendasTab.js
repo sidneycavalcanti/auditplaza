@@ -58,22 +58,22 @@ const VendasTab = ({ auditoriaId, userId, lojaId, setActiveTab }) => {
 
   const handleAdicionarVenda = async () => {
     if (!valor || isNaN(Number(valor.replace(',', '.'))) || Number(valor.replace(',', '.')) <= 0) {
-      Alert.alert('Erro', 'Por favor, insira um valor numérico válido.');
+      Alert.alert('Por favor, insira um valor numérico válido.');
       return;
     }
 
     if (!selectedSexo) {
-      Alert.alert('Erro', 'Selecione um sexo.');
+      Alert.alert('Selecione um sexo.');
       return;
     }
 
     if (!selectedFormaPagamento) {
-      Alert.alert('Erro', 'Selecione uma forma de pagamento.');
+      Alert.alert('Selecione uma forma de pagamento.');
       return;
     }
 
     if (!faixaEtaria) {
-      Alert.alert('Erro', 'Selecione uma faixa etária.');
+      Alert.alert('Selecione uma faixa etária.');
       return;
     }
 

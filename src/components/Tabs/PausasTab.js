@@ -28,10 +28,10 @@ const PausasTab = ({ auditoriaId, setActiveTab }) => {
 
   // Criar uma nova pausa e bloquear a interface
   const handleNovaPausa = async () => {
-    console.log("🟡 Motivo de pausa selecionado antes de cadastrar:", selectedMotivoPausa);
+   // console.log("🟡 Motivo de pausa selecionado antes de cadastrar:", selectedMotivoPausa);
   
     if (!selectedMotivoPausa) {
-      Alert.alert('Erro', 'Selecione um motivo para a pausa.');
+      Alert.alert('Por favor, Selecione um motivo para a pausa.');
       return;
     }
   

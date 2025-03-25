@@ -64,17 +64,21 @@ const AvaliacoesEditTab = ({ avaliacao, setActiveTab }) => {
 
   const handleEditarAvaliacao = async () => {
     if (!selectedAvaliacao) {
-      Alert.alert('Erro', 'Por favor, selecione uma avaliação.');
-      return;
-    }
-    if (!selectedPergunta) {
-      Alert.alert('Erro', 'Por favor, selecione uma pergunta.');
-      return;
-    }
-    if (!selectedNota) {
-      Alert.alert('Erro', 'Por favor, selecione uma nota.');
-      return;
-    }
+         Alert.alert('Por favor, selecione a avaliação.');
+         return;
+       }
+       if (!selectedPergunta) {
+         Alert.alert('Por favor, selecione a pergunta.');
+         return;
+       }
+       if (!selectedNota) {
+         Alert.alert('Por favor, selecione uma nota.');
+         return;
+       }
+       if (!selectedResposta.trim()) {
+         Alert.alert('Por favor, digite uma resposta.');
+         return;
+       }
 
     const avaliacaoAtualizada = {
       id: avaliacao.id,

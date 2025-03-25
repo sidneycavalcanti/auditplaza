@@ -36,7 +36,7 @@ const LoginScreen = ({ navigation }) => {
         Alert.alert(`Bem-vindo, ${response.data.user.username}`);
         navigation.navigate('Home');
       } else {
-        Alert.alert(response.error || 'Usuário ou senha incorretos. Tente novamente.');
+       // Alert.alert(response.error || 'Usuário ou senha incorretos. Tente novamente.');
       }
     } catch (error) {
       console.error('Erro inesperado no login:', error);

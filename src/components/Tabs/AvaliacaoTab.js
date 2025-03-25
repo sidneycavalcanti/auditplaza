@@ -39,16 +39,20 @@ const AvaliacaoTab = ({ auditoriaId, setActiveTab }) => {
 
   // Função para cadastrar uma nova avaliação
   const handleCadAvaliacao = async () => {
+    if (!selectedAvaliacao) {
+      Alert.alert('Por favor, selecione a avaliação.');
+      return;
+    }
     if (!selectedPergunta) {
-      Alert.alert('Erro', 'Selecione uma pergunta.');
+      Alert.alert('Por favor, selecione a pergunta.');
       return;
     }
     if (!selectedNota) {
-      Alert.alert('Erro', 'Selecione uma nota.');
+      Alert.alert('Por favor, selecione uma nota.');
       return;
     }
     if (!selectedResposta.trim()) {
-      Alert.alert('Erro', 'Digite uma resposta válida.');
+      Alert.alert('Por favor, digite uma resposta.');
       return;
     }
     try {
